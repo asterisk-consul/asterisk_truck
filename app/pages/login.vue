@@ -53,7 +53,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     showError.value = false
 
     toast.add({
-      title: 'Login Exitoso',
+      title: 'Ingreso Exitoso',
       description: `Bienvenido ${payload.data.username}`,
       color: 'success'
     })
