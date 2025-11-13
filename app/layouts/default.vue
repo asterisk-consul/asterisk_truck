@@ -21,7 +21,6 @@ const links = [
       label: 'Kilometros',
       icon: 'i-lucide-truck',
       to: '/inbox',
-      badge: '4',
       onSelect: () => {
         open.value = false
       }
@@ -137,7 +136,7 @@ onMounted(async () => {
     close: false,
     actions: [
       {
-        label: 'Accept',
+        label: 'Aceptar',
         color: 'neutral',
         variant: 'outline',
         onClick: () => {
@@ -145,10 +144,10 @@ onMounted(async () => {
         }
       },
       {
-        label: 'Opt out',
-        color: 'neutral',
-        variant: 'ghost'
-      }
+  label: 'Rechazar',
+  color: 'neutral',
+  variant: 'ghost'
+}
     ]
   })
 })

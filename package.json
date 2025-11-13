@@ -21,7 +21,10 @@
     "date-fns": "^4.1.0",
     "nuxt": "^4.2.0",
     "pinia": "^3.0.4",
-    "zod": "^4.1.12"
+    "zod": "^4.1.12",
+     "xlsx": "https://cdn.sheetjs.com/xlsx-latest/xlsx-latest.tgz",
+      "papaparse": "^5.5.3",
+      "dayjs": "^1.11.18"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.9.0",
