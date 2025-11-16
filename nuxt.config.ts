@@ -28,5 +28,22 @@ export default defineNuxtConfig({
         braceStyle: '1tbs'
       }
     }
+  },
+  imports: {
+    dirs: [
+      'composables',
+      'utils/**', // Incluye subcarpetas
+      'helpers', // Carpeta adicional
+      'stores' // Si tienes helpers en stores
+    ]
+  },
+  typescript: {
+    typeCheck: true,
+    strict: true
+  },
+
+  // 👇 Auto-importar types globalmente
+  alias: {
+    '@types': './types'
   }
 })

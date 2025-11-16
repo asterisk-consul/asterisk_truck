@@ -20,7 +20,7 @@ const links = [
     {
       label: 'Kilometros',
       icon: 'i-lucide-truck',
-      to: '/inbox',
+      to: '/VKilomentros',
       onSelect: () => {
         open.value = false
       }

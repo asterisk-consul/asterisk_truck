@@ -1,56 +1,13 @@
 import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
-import { setToken, postData,loginService } from '../service/apiService'
-
-interface Credentials {
-  username: string
-  password: string
-  saved: boolean
-}
-
-interface UserData {
-  id: number | null
-  perfilid: number | null
-  username: string | null
-  roles: string[]
-}
-
-interface ConnectionStatus {
-  success?: boolean
-  message?: string
-  hasToken?: boolean
-  userId?: number | null
-  username?: string | null
-  roles?: string[]
-  tokenExpiry?: string | null
-  timestamp?: string
-  error?: string
-}
-
-interface FormParams {
-  username: string
-  password: string
-}
-
-interface BatchConfig {
-  tokenRefreshThreshold: number
-}
-
-interface LoginResponse {
-  access_token: string
-  expires_in?: number
-  id: number
-  perfilid: number
-  username: string
-  roles: string[]
-}
+import { setToken, postData, loginService } from '../service/apiService'
 
 export const useAuthStore = defineStore('auth', () => {
   // --- Cookies ---
-const credentialsCookie = useCookie<Credentials | null>('auth_credentials')
-const tokenCookie = useCookie<string | null>('auth_token')
-const tokenExpiryCookie = useCookie<number | null>('auth_token_expiry')
-const userDataCookie = useCookie<UserData | null>('auth_user_data')
+  const credentialsCookie = useCookie<Credentials | null>('auth_credentials')
+  const tokenCookie = useCookie<string | null>('auth_token')
+  const tokenExpiryCookie = useCookie<number | null>('auth_token_expiry')
+  const userDataCookie = useCookie<UserData | null>('auth_user_data')
   // --- Estado ---
   const credentials = reactive<Credentials>({
     username: credentialsCookie.value?.username || '',
@@ -61,12 +18,12 @@ const userDataCookie = useCookie<UserData | null>('auth_user_data')
   const token = ref<string | null>(tokenCookie.value || null)
   const tokenExpiry = ref<number | null>(tokenExpiryCookie.value || null)
 
-const userData = reactive<UserData>({
-  id: userDataCookie.value?.id ?? null,
-  perfilid: userDataCookie.value?.perfilid ?? null,
-  username: userDataCookie.value?.username ?? null,
-  roles: userDataCookie.value?.roles ?? []
-})
+  const userData = reactive<UserData>({
+    id: userDataCookie.value?.id ?? null,
+    perfilid: userDataCookie.value?.perfilid ?? null,
+    username: userDataCookie.value?.username ?? null,
+    roles: userDataCookie.value?.roles ?? []
+  })
 
 
   const connectionStatus = reactive<ConnectionStatus>({})
@@ -120,11 +77,11 @@ const userData = reactive<UserData>({
     userData.username = null
     userData.roles = []
 
-      // Limpiar cookies
-  credentialsCookie.value = null
-  tokenCookie.value = null
-  tokenExpiryCookie.value = null
-  userDataCookie.value = null
+    // Limpiar cookies
+    credentialsCookie.value = null
+    tokenCookie.value = null
+    tokenExpiryCookie.value = null
+    userDataCookie.value = null
 
     setToken(null)
   }
@@ -139,31 +96,31 @@ const userData = reactive<UserData>({
   }
 
   // --- Login ---
-async function login(username: string, password: string): Promise<LoginResponse> {
-  if (!username || !password) throw new Error('Usuario y contraseña son requeridos')
+  async function login(username: string, password: string): Promise<LoginResponse> {
+    if (!username || !password) throw new Error('Usuario y contraseña son requeridos')
 
-  try {
-    const data = await loginService(username, password) // <- directamente el response
+    try {
+      const data = await loginService(username, password) // <- directamente el response
 
-    token.value = data.access_token
-    tokenExpiry.value = Date.now() + (data.expires_in || 3600) * 1000
-    tokenCookie.value = data.access_token
-    tokenExpiryCookie.value = tokenExpiry.value
+      token.value = data.access_token
+      tokenExpiry.value = Date.now() + (data.expires_in || 3600) * 1000
+      tokenCookie.value = data.access_token
+      tokenExpiryCookie.value = tokenExpiry.value
 
-    saveUserData({
-      id: data.id,
-      perfilid: data.perfilid,
-      username: data.username,
-      roles: data.roles
-    })
+      saveUserData({
+        id: data.id,
+        perfilid: data.perfilid,
+        username: data.username,
+        roles: data.roles
+      })
 
-    setToken(data.access_token)
-    return data
-  } catch (error: unknown) {
-    console.error('❌ Error en login:', error)
-    throw error instanceof Error ? error : new Error(String(error))
+      setToken(data.access_token)
+      return data
+    } catch (error: unknown) {
+      console.error('❌ Error en login:', error)
+      throw error instanceof Error ? error : new Error(String(error))
+    }
   }
-}
 
 
   // --- Test de conexión ---
