@@ -5,7 +5,7 @@
   const props = defineProps({
     modelValue: Boolean,
     registros: {
-      type: Array,
+      type: Array as PropType<TransformedRow[]>,
       default: () => []
     }
   })
@@ -18,10 +18,11 @@
   const envioCompleto = ref(false)
   const progresoActual = ref(0)
   const totalRegistros = ref(0)
-  const registroActual = ref(null)
-  const resultadosEnvio = ref({
+  const registroActual = ref<TransformedRow | null>(null)
+  const resultadosEnvio = ref<SaveResult>({
     exitosos: [],
-    fallidos: []
+    fallidos: [],
+    total: 0
   })
 
   // Sincronizar con v-model
@@ -42,14 +43,16 @@
     envioCompleto.value = false
     progresoActual.value = 0
     registroActual.value = null
-    resultadosEnvio.value = { exitosos: [], fallidos: [] }
+    resultadosEnvio.value = { exitosos: [], fallidos: [], total: 0 }
     totalRegistros.value = props.registros.length
 
     // Convertir datos como espera la API
-    const datos = props.registros.map((r) => ({
+    const datos: TransformedRow[] = props.registros.map((r) => ({
+      id: r.id,
       patente: r.descripcion,
-      kilometros: parseFloat(r.kilometros),
-      fecha: r.fecha
+      kilometros: r.kilometros,
+      fecha: r.fecha,
+      descripcion: r.descripcion
     }))
 
     // Llamar método con callback de progreso
@@ -57,34 +60,23 @@
       datos,
       (actual, registro) => {
         progresoActual.value = actual
-        registroActual.value = registro
+        registroActual.value = registro // ✅ Ahora funciona
       }
     )
 
-    resultadosEnvio.value = resultado.resultados
+    resultadosEnvio.value = resultado.resultados // ✅ Ahora funciona
     envioCompleto.value = true
 
     emit('completado', resultado)
   }
-
   const cerrarDialog = () => {
     dialogVisible.value = false
   }
 </script>
 
 <template>
-  <UModal v-model="dialogVisible" :ui="{ width: 'max-w-xl' }" prevent-close>
+  <UModal v-model:open="dialogVisible" title="Enviando registros a Flow" close>
     <UCard>
-      <!-- Título -->
-      <template #header>
-        <div
-          class="flex items-center gap-2 text-white bg-blue-600 p-3 rounded-t-xl"
-        >
-          <UIcon name="i-heroicons-paper-airplane-solid" class="w-5 h-5" />
-          <span class="font-semibold">Enviando registros a Flow</span>
-        </div>
-      </template>
-
       <div class="p-4">
         <!-- Progreso general -->
         <div v-if="!envioCompleto" class="mb-6">

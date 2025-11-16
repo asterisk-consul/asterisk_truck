@@ -13,7 +13,7 @@ declare global {
     id: number
     descripcion: string
     fecha: string
-    kilometros: string
+    kilometros: number
     patente?: string
   }
 

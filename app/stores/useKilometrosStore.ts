@@ -104,12 +104,19 @@ export const useKilometrosStore = defineStore('csv', {
           const km = kmRow[col]
 
           if (fecha && km && km !== '0' && km !== '' && km !== '0,00') {
-            result.push({
-              id: idCounter++, // ID único incremental
-              descripcion: patente,
-              fecha: String(fecha).trim(),
-              kilometros: String(km).replace(',', '.')
-            })
+            // Convertir km a número
+            const kmString = String(km).replace(',', '.')
+            const kmNumber = parseFloat(kmString)
+
+            // Solo agregar si la conversión es válida
+            if (!isNaN(kmNumber)) {
+              result.push({
+                id: idCounter++,
+                descripcion: patente,
+                fecha: String(fecha).trim(),
+                kilometros: kmNumber
+              })
+            }
           }
         }
       })
@@ -118,7 +125,6 @@ export const useKilometrosStore = defineStore('csv', {
       console.log('✨ Datos transformados:', result.length, 'registros')
       return result
     },
-
     _downloadFile(blob: Blob, filename: string) {
       const link = document.createElement('a')
       link.href = URL.createObjectURL(blob)
@@ -162,7 +168,7 @@ export const useKilometrosStore = defineStore('csv', {
           data.map((row) => ({
             Descripción: row.descripcion,
             Fecha: row.fecha,
-            Kilómetros: parseFloat(row.kilometros)
+            Kilómetros: row.kilometros
           }))
         )
 
@@ -281,7 +287,7 @@ export const useKilometrosStore = defineStore('csv', {
                 articulodepositoid: depositoArticuloId,
                 cuerpoflowid: flowid,
                 cuerpostatusid: statusid,
-                cantidad: parseFloat(registro.kilometros),
+                cantidad: registro.kilometros,
                 articulospecresult: '{}',
                 medidasancho: 1,
                 medidasalto: 1,
