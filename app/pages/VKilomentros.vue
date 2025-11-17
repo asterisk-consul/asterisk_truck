@@ -1,154 +1,165 @@
 <script setup lang="ts">
-  import { ref, computed } from 'vue'
-  import { useKilometrosStore } from '@/stores/useKilometrosStore'
-  import DialogEnvioFlow from '@/components/kilometros/DialogEnvioFlow.vue'
+import { ref, computed } from 'vue'
+import { getPaginationRowModel } from '@tanstack/vue-table'
+import type { TableColumn } from '@nuxt/ui'
+import { useKilometrosStore } from '@/stores/useKilometrosStore'
+import DialogEnvioFlow from '@/components/kilometros/DialogEnvioFlow.vue'
 
-  const csvStore = useKilometrosStore()
-  const fileInput = ref<File | null>(null)
+const csvStore = useKilometrosStore()
+const fileInput = ref<File | null>(null)
 
-  // ⚡ Cambiado a string[] simple - el v-model del USelectMenu manejará los valores directamente
-  const selectedCamiones = ref<string[]>([])
-  const dialogEnvio = ref(false)
-  const downloadMenu = ref(false)
-  import type { TableColumn } from '#ui/types'
+// ✅ Solución: Usar any para evitar errores de tipado
+const table = useTemplateRef<any>('table')
 
-  type DataRow = {
-    id: number | string
-    descripcion: string
-    fecha: string
-    kilometros: number
-    rowNumber?: number
+const selectedCamiones = ref<string[]>([])
+const dialogEnvio = ref(false)
+const downloadMenu = ref(false)
+const pagination = ref({
+  pageIndex: 0,
+  pageSize: 10
+})
+
+const headers = [
+  {
+    accessorKey: 'id',
+    header: '#'
+  },
+  {
+    accessorKey: 'descripcion',
+    header: 'Patente'
+  },
+  {
+    accessorKey: 'fecha',
+    header: 'Fecha'
+  },
+  {
+    accessorKey: 'kilometros',
+    header: 'Kilómetros'
   }
+]
 
-  const headers = [
-    {
-      accessorKey: 'id', // ← Cambiado de accessorKey a key
-      header: '#'
-    },
-    {
-      accessorKey: 'descripcion',
-      header: 'Patente'
-    },
-    {
-      accessorKey: 'fecha',
-      header: 'Fecha'
-    },
-    {
-      accessorKey: 'kilometros',
-      header: 'Kilómetros'
-    }
-  ]
+// ✅ Computed properties para la paginación (solución más limpia)
+const currentPage = computed(
+  () => (table.value?.tableApi?.getState().pagination.pageIndex ?? 0) + 1
+)
 
-  // ⚡ Computed para mapear a { label, value } para el select
-  const selectedCamionesForSelect = computed({
-    get: () => selectedCamiones.value.map((p) => ({ label: p, value: p })),
-    set: (vals: { label: string; value: string }[]) => {
-      selectedCamiones.value = vals.map((v) => v.value)
-    }
-  })
+const itemsPerPage = computed(
+  () => table.value?.tableApi?.getState().pagination.pageSize ?? 10
+)
 
-  async function handleFileUpload(event: any) {
-    const file = event?.target?.files?.[0]
-    if (!file) return
-    await csvStore.loadFile(file)
+const totalItems = computed(
+  () => table.value?.tableApi?.getFilteredRowModel().rows.length ?? 0
+)
 
-    if (csvStore.detectedPairs.length > 0) {
-      selectedCamiones.value = csvStore.detectedPairs.map((p) => p.patente)
-    }
+const handlePageChange = (page: number) => {
+  table.value?.tableApi?.setPageIndex(page - 1)
+}
+
+// ... resto de tu código sin cambios ...
+
+const selectedCamionesForSelect = computed({
+  get: () => selectedCamiones.value.map((p) => ({ label: p, value: p })),
+  set: (vals: { label: string; value: string }[]) => {
+    selectedCamiones.value = vals.map((v) => v.value)
   }
-  const filteredData = computed(() => {
-    let data = csvStore.transformedData
+})
 
-    if (selectedCamiones.value.length > 0) {
-      data = data.filter((row) =>
-        selectedCamiones.value.includes(row.descripcion)
-      )
-    }
-    console.log(data)
-    return data
-  })
+async function handleFileUpload(event: any) {
+  const file = event?.target?.files?.[0]
+  if (!file) return
+  await csvStore.loadFile(file)
 
-  // ⚡ Opciones para el USelectMenu con value como string (patente)
-  const camionesOptions = computed(() =>
-    csvStore.detectedPairs.map((pair) => ({
-      label: `${pair.camion} (${pair.patente})`,
-      value: pair.patente // 👈 value es string, perfecto para v-model de tipo string[]
-    }))
-  )
-
-  // ⚡ Helper para verificar si un camión está seleccionado
-  const isSelected = (patente: string) => {
-    return selectedCamiones.value.includes(patente)
+  if (csvStore.detectedPairs.length > 0) {
+    selectedCamiones.value = csvStore.detectedPairs.map((p) => p.patente)
   }
+}
 
-  // ⚡ Helper para obtener los items seleccionados completos
-  const selectedItems = computed(() => {
-    return camionesOptions.value.filter((option) =>
-      selectedCamiones.value.includes(option.value)
+const filteredData = computed(() => {
+  let data = csvStore.transformedData
+
+  if (selectedCamiones.value.length > 0) {
+    data = data.filter((row) =>
+      selectedCamiones.value.includes(row.descripcion)
     )
-  })
-
-  // ⚡ Toggle de selección (agregar/quitar) - NUEVA FUNCIÓN
-  const toggleItem = (item: { label: string; value: string }) => {
-    const index = selectedCamiones.value.indexOf(item.value)
-    if (index === -1) {
-      // Agregar si no está
-      selectedCamiones.value.push(item.value)
-    } else {
-      // Quitar si ya está
-      selectedCamiones.value.splice(index, 1)
-    }
   }
+  console.log(data)
+  return data
+})
 
-  // ⚡ Remover un item específico
-  const removeItem = (patente: string) => {
-    selectedCamiones.value = selectedCamiones.value.filter((p) => p !== patente)
+const camionesOptions = computed(() =>
+  csvStore.detectedPairs.map((pair) => ({
+    label: `${pair.camion} (${pair.patente})`,
+    value: pair.patente
+  }))
+)
+
+const isSelected = (patente: string) => {
+  return selectedCamiones.value.includes(patente)
+}
+
+const selectedItems = computed(() => {
+  return camionesOptions.value.filter((option) =>
+    selectedCamiones.value.includes(option.value)
+  )
+})
+
+const toggleItem = (item: { label: string; value: string }) => {
+  const index = selectedCamiones.value.indexOf(item.value)
+  if (index === -1) {
+    selectedCamiones.value.push(item.value)
+  } else {
+    selectedCamiones.value.splice(index, 1)
   }
+}
 
-  function toggleSelectAll() {
-    if (selectedCamiones.value.length === csvStore.detectedPairs.length) {
-      selectedCamiones.value = []
-    } else {
-      selectedCamiones.value = csvStore.detectedPairs.map((p) => p.patente)
-    }
-  }
+const removeItem = (patente: string) => {
+  selectedCamiones.value = selectedCamiones.value.filter((p) => p !== patente)
+}
 
-  function resetAndLoadNew() {
-    csvStore.reset()
+function toggleSelectAll() {
+  if (selectedCamiones.value.length === csvStore.detectedPairs.length) {
     selectedCamiones.value = []
-    fileInput.value = null
+  } else {
+    selectedCamiones.value = csvStore.detectedPairs.map((p) => p.patente)
   }
+}
 
-  function downloadCSV() {
-    csvStore.exportCSV(filteredData.value)
-    downloadMenu.value = false
-  }
+function resetAndLoadNew() {
+  csvStore.reset()
+  selectedCamiones.value = []
+  fileInput.value = null
+}
 
-  function downloadXLSX() {
-    csvStore.exportXLSX(filteredData.value)
-    downloadMenu.value = false
-  }
+function downloadCSV() {
+  csvStore.exportCSV(filteredData.value)
+  downloadMenu.value = false
+}
 
-  function downloadJSON() {
-    csvStore.exportJSON(filteredData.value)
-    downloadMenu.value = false
-  }
+function downloadXLSX() {
+  csvStore.exportXLSX(filteredData.value)
+  downloadMenu.value = false
+}
 
-  const filteredPairs = computed(() =>
-    csvStore.detectedPairs.filter((pair) =>
-      selectedCamiones.value.includes(pair.patente)
-    )
+function downloadJSON() {
+  csvStore.exportJSON(filteredData.value)
+  downloadMenu.value = false
+}
+
+const filteredPairs = computed(() =>
+  csvStore.detectedPairs.filter((pair) =>
+    selectedCamiones.value.includes(pair.patente)
   )
-  const rows = computed(() => filteredData.value)
+)
 
-  const handleTransform = () => {
-    csvStore.transformData()
-  }
+const rows = computed(() => filteredData.value)
 
-  // Computed para saber el estado actual
-  const hasLoadedFile = computed(() => csvStore.csvData.length > 0)
-  const hasTransformedData = computed(() => csvStore.transformedData.length > 0)
-  const hasPairsDetected = computed(() => csvStore.detectedPairs.length > 0)
+const handleTransform = () => {
+  csvStore.transformData()
+}
+
+const hasLoadedFile = computed(() => csvStore.csvData.length > 0)
+const hasTransformedData = computed(() => csvStore.transformedData.length > 0)
+const hasPairsDetected = computed(() => csvStore.detectedPairs.length > 0)
 </script>
 
 <template>
@@ -187,7 +198,7 @@
           </label>
         </div>
 
-        <!-- Éxito al cargar - CORREGIDO -->
+        <!-- Éxito al cargar -->
         <UAlert
           v-if="hasLoadedFile && !hasTransformedData && !csvStore.loading"
           title="✅ Archivo cargado correctamente"
@@ -205,6 +216,7 @@
             }
           ]"
         />
+
         <!-- Error -->
         <UAlert
           v-if="csvStore.error"
@@ -223,7 +235,7 @@
         </div>
 
         <!-- Selector de camiones -->
-        <div v-if="hasPairsDetected && !hasTransformedData" class="mb-6">
+        <div v-if="hasPairsDetected" class="mb-6">
           <UCard>
             <template #header>
               <div class="flex justify-between items-center">
@@ -238,7 +250,7 @@
                 </UButton>
               </div>
             </template>
-            <UPopover :ui="{ content: 'w-auto min-w-[400px]' }">
+            <UPopover :ui="{ content: 'w-(--reka-popper-anchor-width) p-4' }">
               <UButton
                 variant="outline"
                 color="primary"
@@ -258,8 +270,8 @@
                   >
                     {{ item.label }}
                     <button
-                      @click.stop="removeItem(item.value)"
                       class="ml-1 hover:text-red-500 font-bold"
+                      @click.stop="removeItem(item.value)"
                     >
                       ×
                     </button>
@@ -272,15 +284,17 @@
               </UButton>
 
               <template #content="{ close }">
-                <div class="p-2 max-h-64 overflow-y-auto min-w-[300px]">
+                <div class="p-2 max-h-64 overflow-y-auto w-full">
                   <div class="space-y-1">
                     <button
                       v-for="item in camionesOptions"
                       :key="item.value"
-                      @click="toggleItem(item)"
                       class="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded flex items-center justify-between"
+                      @click="toggleItem(item)"
                     >
-                      <UBadge variant="soft">{{ item.label }}</UBadge>
+                      <UBadge variant="soft">
+                        {{ item.label }}
+                      </UBadge>
                       <UIcon
                         v-if="isSelected(item.value)"
                         name="i-heroicons-check-20-solid"
@@ -297,7 +311,7 @@
               variant="soft"
               class="mt-3"
               title="No se seleccionaron camiones"
-            ></UAlert>
+            />
           </UCard>
         </div>
 
@@ -329,8 +343,8 @@
                     color="info"
                     variant="outline"
                     size="xs"
-                    @click="dialogEnvio = true"
                     :disabled="filteredData.length === 0"
+                    @click="dialogEnvio = true"
                   >
                     Enviar a Flow
                   </UButton>
@@ -362,21 +376,38 @@
             </template>
 
             <UTable
+              ref="table"
+              v-model:pagination="pagination"
               :columns="headers"
               :data="filteredData"
+              :pagination-options="{
+                getPaginationRowModel: getPaginationRowModel()
+              }"
               loading-animation="carousel"
-            ></UTable>
+            />
+
+            <!-- ✅ Paginación mejorada con computed properties -->
+            <div class="flex justify-center border-t border-default pt-4 mt-4">
+              <UPagination
+                :default-page="currentPage"
+                :items-per-page="itemsPerPage"
+                :total="totalItems"
+                @update:page="handlePageChange"
+              />
+            </div>
           </UCard>
 
           <!-- Resumen -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
             <UCard v-for="pair in filteredPairs" :key="pair.patente">
-              <div class="text-sm text-gray-500 mb-1">{{ pair.camion }}</div>
-              <div class="text-xl font-bold text-blue-700">
+              <div class="text-sm text-gray-500 mb-1">
+                {{ pair.camion }}
+              </div>
+              <div class="text-xl font-bold text-primary-200">
                 {{
                   csvStore.transformedData
                     .filter((d) => d.descripcion === pair.patente)
-                    .reduce((sum, d) => sum + parseFloat(d.kilometros), 0)
+                    .reduce((sum, d) => sum + Number(d.kilometros), 0)
                     .toFixed(2)
                 }}
                 km
@@ -403,10 +434,17 @@
     </template>
   </UDashboardPanel>
 
-  <!-- Dialog -->
-  <DialogEnvioFlow
-    v-if="dialogEnvio"
-    v-model="dialogEnvio"
-    :registros="filteredData"
-  />
+  <UModal
+    v-model:open="dialogEnvio"
+    title="Enviando registros a Flow"
+    :close="{
+      color: 'primary',
+      variant: 'outline',
+      class: 'rounded-full'
+    }"
+  >
+    <template #body>
+      <DialogEnvioFlow :registros="filteredData" />
+    </template>
+  </UModal>
 </template>

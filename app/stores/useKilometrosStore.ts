@@ -221,10 +221,9 @@ export const useKilometrosStore = defineStore('csv', {
       console.log(`🚀 Iniciando envío de ${registros.length} registros...`)
 
       try {
-        const artKilometros: ArticuloResponse = await fetchData(
-          '/articulo/show/1860'
-        )
-        const depositos = artKilometros.data.articulosDepositos
+        const artKilometros: Articulo = await fetchData('/articulo/show/1860')
+
+        const depositos = artKilometros.articulosDepositos
         const flowid = 11087
         const statusid = 1713
         const statusflowid = 779
@@ -277,11 +276,11 @@ export const useKilometrosStore = defineStore('csv', {
               '/workspace/saveRegistroCab',
               dataCab
             )
-            // console.log("📋 Cabecera guardada:", respCab.data.id)
+            // console.log('Status:', respCab.status)
+            // console.log('Data:', respCab.data.id)
 
             if (respCab.status === 200) {
               const dataCuerpo = {
-                id: -1,
                 presupcabid: respCab.data.id,
                 articulo: 'kilometros',
                 articulodepositoid: depositoArticuloId,
@@ -297,6 +296,7 @@ export const useKilometrosStore = defineStore('csv', {
                 xlatitud: -32.4097451,
                 xlongitud: -63.2385806
               }
+              console.log(dataCuerpo)
 
               const respCuerpo: ApiResponse = await postData(
                 '/workspace/saveRegistroCuerpo',
@@ -324,7 +324,7 @@ export const useKilometrosStore = defineStore('csv', {
                 }
 
                 const respEstadoSiguiente = (await postData(
-                  'workspace/setProximoEstadoCuerposYCab',
+                  '/workspace/setProximoEstadoCuerposYCab',
                   respuestaSiguiente
                 )) as ApiResponse
 
@@ -378,12 +378,6 @@ export const useKilometrosStore = defineStore('csv', {
       }
     },
 
-    reset() {
-      this.csvData = []
-      this.headers = []
-      this.transformedData = []
-      this.detectedPairs = []
-      this.error = null
-    }
+    reset() {}
   }
 })

@@ -3,6 +3,6 @@
   "semi": false,
   "trailingComma": "none",
   "htmlWhitespaceSensitivity": "ignore",
-  "vueIndentScriptAndStyle": true,
+  "vueIndentScriptAndStyle": false,
   "embeddedLanguageFormatting": "auto"
 }

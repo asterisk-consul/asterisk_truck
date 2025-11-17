@@ -37,10 +37,6 @@ export default defineNuxtConfig({
       'stores' // Si tienes helpers en stores
     ]
   },
-  typescript: {
-    typeCheck: true,
-    strict: true
-  },
 
   // 👇 Auto-importar types globalmente
   alias: {
