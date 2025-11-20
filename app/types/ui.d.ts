@@ -56,10 +56,10 @@ declare global {
 
   type Period = 'daily' | 'weekly' | 'monthly'
 
-  interface Range {
+  interface DateRange {
     start: Date
     end: Date
   }
 }
 
-export { }
+export {}

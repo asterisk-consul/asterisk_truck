@@ -12,39 +12,17 @@ const links = [
     {
       label: 'Inicio',
       icon: 'i-lucide-house',
-      to: '/',
-      onSelect: () => {
-        open.value = false
-      }
+      to: '/'
     },
     {
       label: 'Kilometros',
       icon: 'i-lucide-truck',
-      to: '/VKilomentros',
-      onSelect: () => {
-        open.value = false
-      }
+      to: '/VKilomentros'
     },
     {
       label: 'Compras',
       icon: 'i-lucide-folder-closed',
-      defaultOpen: true,
-      children: [
-        {
-          label: 'Compras A',
-          to: '/customers',
-          onSelect: () => {
-            open.value = false
-          }
-        },
-        {
-          label: 'Compras B',
-          to: '/suppliers',
-          onSelect: () => {
-            open.value = false
-          }
-        }
-      ]
+      to: '/Vcompras'
     },
     {
       label: 'Settings',
@@ -144,10 +122,10 @@ onMounted(async () => {
         }
       },
       {
-  label: 'Rechazar',
-  color: 'neutral',
-  variant: 'ghost'
-}
+        label: 'Rechazar',
+        color: 'neutral',
+        variant: 'ghost'
+      }
     ]
   })
 })
@@ -155,7 +133,8 @@ onMounted(async () => {
 
 <template>
   <UDashboardGroup unit="rem">
-    <UDashboardSidebar v-if="showSidebar"
+    <UDashboardSidebar
+      v-if="showSidebar"
       id="default"
       v-model:open="open"
       collapsible

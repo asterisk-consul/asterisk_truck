@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { getPaginationRowModel } from '@tanstack/vue-table'
-import type { TableColumn } from '@nuxt/ui'
 import { useKilometrosStore } from '@/stores/useKilometrosStore'
 import DialogEnvioFlow from '@/components/kilometros/DialogEnvioFlow.vue'
 
@@ -54,8 +53,6 @@ const totalItems = computed(
 const handlePageChange = (page: number) => {
   table.value?.tableApi?.setPageIndex(page - 1)
 }
-
-// ... resto de tu código sin cambios ...
 
 const selectedCamionesForSelect = computed({
   get: () => selectedCamiones.value.map((p) => ({ label: p, value: p })),
