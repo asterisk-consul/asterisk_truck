@@ -41,5 +41,13 @@ export default defineNuxtConfig({
   // 👇 Auto-importar types globalmente
   alias: {
     '@types': './types'
+  },
+  ssr: false, // ← Esto lo hace SPA
+  nitro: {
+    preset: 'static' // Para generar archivos estáticos
+  },
+  app: {
+    baseURL: '/', // Ajusta si está en subdirectorio
+    buildAssetsDir: 'assets'
   }
 })
