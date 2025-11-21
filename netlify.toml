@@ -1,17 +1,15 @@
 [build]
-  command = "npm run generate"
-  publish = ".output/public"  # ← Cambiado de 'dist' a '.output/public'
+  command = "npm run build"  
+  publish = ".output/public"
 
 [build.environment]
   NODE_VERSION = "18"
 
-# Configuración esencial para SPA
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
-# Opcional: Cache para mejor performance
 [[headers]]
   for = "/*"
   [headers.values]
