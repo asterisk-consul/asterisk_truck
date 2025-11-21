@@ -4229,10 +4229,10 @@ function _expandFromEnv(value) {
 
 const _inlineRuntimeConfig = {
   "app": {
-    "baseURL": "/",
-    "buildId": "f8fea8fd-a5b8-4fa7-9a81-a148b611dca3",
+    "baseURL": "/asterisk_truck/",
+    "buildId": "5979337e-24c0-4c78-af58-45cef398fb9e",
     "buildAssetsDir": "/_nuxt/",
-    "cdnURL": ""
+    "cdnURL": "/asterisk_truck/"
   },
   "nitro": {
     "envPrefix": "NUXT_",
@@ -4491,7 +4491,7 @@ function defaultHandler(error, event, opts) {
   const statusMessage = error.statusMessage || "Server Error";
   const url = getRequestURL(event, { xForwardedHost: true, xForwardedProto: true });
   if (statusCode === 404) {
-    const baseURL = "/";
+    const baseURL = "/asterisk_truck/";
     if (/^\/[^/]/.test(baseURL) && !url.pathname.startsWith(baseURL)) {
       const redirectTo = `${baseURL}${url.pathname.slice(1)}${url.search}`;
       return {

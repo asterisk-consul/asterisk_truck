@@ -43,10 +43,11 @@ export default defineNuxtConfig({
     '@types': './types'
   },
   nitro: {
-    preset: 'netlify'
+    preset: 'static'
   },
   ssr: false,
+
   app: {
-    baseURL: '/'
+    baseURL: '/asterisk_truck/' // 👈 nombre exacto del repo
   }
 })
