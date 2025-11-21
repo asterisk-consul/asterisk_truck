@@ -41,5 +41,12 @@ export default defineNuxtConfig({
   // 👇 Auto-importar types globalmente
   alias: {
     '@types': './types'
+  },
+  nitro: {
+    preset: 'netlify'
+  },
+  ssr: false,
+  app: {
+    baseURL: '/'
   }
 })
