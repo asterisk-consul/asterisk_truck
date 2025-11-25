@@ -42,12 +42,12 @@ export default defineNuxtConfig({
   alias: {
     '@types': './types'
   },
+  ssr: false, // ← Esto lo hace SPA
   nitro: {
-    preset: 'static'
+    preset: 'static' // Para generar archivos estáticos
   },
-  ssr: false,
-
   app: {
-    baseURL: '/asterisk_truck/' // 👈 nombre exacto del repo
+    baseURL: '/', // Ajusta si está en subdirectorio
+    buildAssetsDir: 'assets'
   }
 })
