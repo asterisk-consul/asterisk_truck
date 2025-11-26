@@ -105,9 +105,29 @@ const dataFiltrada = computed(() => {
   })
 })
 
-function handleOpenModalCompra(e: any) {
-  compraSeleccionada.value = e.detail
-  modalAbierto.value = true
+const loadingModal = ref(false)
+
+async function handleOpenModalCompra(e: any) {
+  const compraParcial = e.detail
+  if (!compraParcial?.id) return
+
+  loadingModal.value = true
+  try {
+    const detalle = await comprasStore.fetchCompraDetalle(compraParcial.id)
+    if (detalle) {
+      compraSeleccionada.value = detalle
+      modalAbierto.value = true
+    } else {
+      // Fallback si falla la carga
+      compraSeleccionada.value = compraParcial
+      modalAbierto.value = true
+      console.error('No se pudo cargar el detalle completo')
+    }
+  } catch (err) {
+    console.error(err)
+  } finally {
+    loadingModal.value = false
+  }
 }
 
 onMounted(async () => {

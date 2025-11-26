@@ -31,7 +31,7 @@ export const useComprasStore = defineStore('compras', {
     },
 
     /**
-     * 👉 Carga completa de compras con cache inteligente
+     * 👉 Carga completa de compras (SOLO LISTA)
      */
     async fetchCompras(force = false): Promise<void> {
       const CACHE_TIME = 12 * 60 * 60 * 1000 // ⏳ 12 horas
@@ -82,67 +82,9 @@ export const useComprasStore = defineStore('compras', {
           postData<ApiRegistroCabList>('/workspace/getRegistroCabList', dataB)
         ])
 
-        const idsA = (comprasAResList.data.rows || []).map((row) => row.id)
-        const idsB = (comprasBResList.data.rows || []).map((row) => row.id)
-
-        /**
-         * 👉 Carga concurrente limitada para evitar cuelgues
-         */
-        const fetchInBatchesProgressive = async (
-          ids: number[],
-          batchSize: number,
-          tipo: 'A' | 'B'
-        ) => {
-          if (tipo === 'A') this.comprasA = []
-          else this.comprasB = []
-
-          for (let i = 0; i < ids.length; i += batchSize) {
-            const batch = ids.slice(i, i + batchSize)
-
-            const batchResults = await Promise.all(
-              batch.map((id) =>
-                postData('/workspace/getRegistroCabGeneric', {
-                  id: id,
-                  checkuser: true
-                }).catch((err) => {
-                  console.error(`Error en ID ${id}:`, err)
-                  return null
-                })
-              )
-            )
-
-            const validResults = batchResults
-              .filter((r) => r?.data)
-              .map((r) => r?.data)
-
-            if (tipo === 'A') this.comprasA.push(...validResults)
-            else this.comprasB.push(...validResults)
-
-            // Evento para notificar progresos (si lo usás)
-            window.dispatchEvent(
-              new CustomEvent(`compras-${tipo.toLowerCase()}-updated`, {
-                detail: {
-                  loaded:
-                    tipo === 'A' ? this.comprasA.length : this.comprasB.length,
-                  total: ids.length,
-                  tipo
-                }
-              })
-            )
-
-            console.log(
-              `✓ Compras ${tipo}: ${
-                tipo === 'A' ? this.comprasA.length : this.comprasB.length
-              }/${ids.length}`
-            )
-          }
-        }
-
-        // Procesar ambas listas A y B en paralelo
-        await Promise.all([
-          fetchInBatchesProgressive(idsA, 50, 'A'),
-          fetchInBatchesProgressive(idsB, 50, 'B')
-        ])
+        // Asignar directamente la lista (lazy loading de detalles después)
+        this.comprasA = comprasAResList.data.rows || []
+        this.comprasB = comprasBResList.data.rows || []
 
         this.lastFetch = new Date()
         this.loaded = true
@@ -199,31 +141,79 @@ export const useComprasStore = defineStore('compras', {
       console.log('🆕 IDs nuevos A:', nuevosA)
       console.log('🆕 IDs nuevos B:', nuevosB)
 
-      // Descargar solo nuevos
-      const fetchNuevos = async (ids: number[]) => {
-        return Promise.all(
-          ids.map((id) =>
-            postData('/workspace/getRegistroCabGeneric', {
-              id,
-              checkuser: true
-            })
-              .then((r) => r.data)
-              .catch(() => null)
-          )
-        )
-      }
-
+      // Agregar nuevos registros (solo lista)
       if (nuevosA.length) {
-        const nuevosDatosA = await fetchNuevos(nuevosA)
-        this.comprasA.push(...nuevosDatosA.filter(Boolean))
+        const nuevosRegistrosA = listaA.data.rows.filter((r) =>
+          nuevosA.includes(r.id)
+        )
+        this.comprasA.push(...nuevosRegistrosA)
       }
 
       if (nuevosB.length) {
-        const nuevosDatosB = await fetchNuevos(nuevosB)
-        this.comprasB.push(...nuevosDatosB.filter(Boolean))
+        const nuevosRegistrosB = listaB.data.rows.filter((r) =>
+          nuevosB.includes(r.id)
+        )
+        this.comprasB.push(...nuevosRegistrosB)
       }
 
       console.log('✨ Sync completa sin recargar todo')
+    },
+
+    /**
+     * 👉 Obtener detalle completo de una compra específica
+     */
+    async fetchCompraDetalle(id: number): Promise<Compra | null> {
+      try {
+        const res = await postData<any>('/workspace/getRegistroCabGeneric', {
+          id: id,
+          checkuser: true
+        })
+        return res.data
+      } catch (error) {
+        console.error(`Error al obtener detalle de compra ${id}:`, error)
+        return null
+      }
+    },
+
+    /**
+     * 👉 Carga TODOS los detalles (Para reportes/Excel)
+     * ⚠️ Puede tardar, usar con loading
+     */
+    async fetchAllDetails(tipo: 'A' | 'B' | 'AMBOS' = 'AMBOS') {
+      const idsA = this.comprasA.map((c) => c.id)
+      const idsB = this.comprasB.map((c) => c.id)
+      const todos: number[] = []
+
+      if (tipo === 'A' || tipo === 'AMBOS') todos.push(...idsA)
+      if (tipo === 'B' || tipo === 'AMBOS') todos.push(...idsB)
+
+      console.log(`📥 Descargando detalles para ${todos.length} registros...`)
+
+      // Descargar en lotes de 20 para no saturar
+      const batchSize = 20
+      let procesados = 0
+
+      for (let i = 0; i < todos.length; i += batchSize) {
+        const batch = todos.slice(i, i + batchSize)
+        await Promise.all(
+          batch.map(async (id) => {
+            const detalle = await this.fetchCompraDetalle(id)
+            if (detalle) {
+              // Actualizar en el store
+              if (idsA.includes(id)) {
+                const idx = this.comprasA.findIndex((c) => c.id === id)
+                if (idx !== -1) this.comprasA[idx] = { ...this.comprasA[idx], ...detalle }
+              } else {
+                const idx = this.comprasB.findIndex((c) => c.id === id)
+                if (idx !== -1) this.comprasB[idx] = { ...this.comprasB[idx], ...detalle }
+              }
+            }
+          })
+        )
+        procesados += batch.length
+        console.log(`📊 Progreso: ${procesados}/${todos.length}`)
+      }
+      console.log('✅ Carga completa de detalles finalizada')
     },
 
     async reloadCompras(): Promise<void> {
