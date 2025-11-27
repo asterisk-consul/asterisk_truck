@@ -9,21 +9,6 @@ declare global {
     patente: string
   }
 
-  export interface Distribucion {
-    clasificacion: string
-    porcentaje: number
-    importes: Importes
-  }
-
-  export interface Importes {
-    totalimpuestos: number
-    totalprecio: number
-    varcn0: number
-    varcn1: number
-    varcn2: number
-    varcn3: number
-  }
-
   interface Articulo {
     activo: boolean
     articuloprecios: Articuloprecio[]

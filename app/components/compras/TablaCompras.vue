@@ -4,6 +4,7 @@ import { ref, computed, watch } from 'vue'
 import { UButton } from '#components'
 import FiltroDateCompras from './FiltroDateCompras.vue'
 import ModalCompras from './ModalCompras.vue'
+import ModalProgresoCompras from './ModalProgresoCompras.vue'
 
 import { getPaginationRowModel } from '@tanstack/vue-table'
 import { columns } from './columns'
@@ -22,6 +23,30 @@ const columnaFiltro = ref<{ label: string; value: string }>({
 const comprasStore = useComprasStore()
 const modalAbierto = ref(false)
 const compraSeleccionada = ref<Partial<Compra>>({})
+
+const modalProgreso = ref(false)
+const mensaje = ref('')
+const progreso = ref(0)
+
+function abrirProgreso(
+  data: boolean | { actual: number; total: number; mensaje: string }
+) {
+  // Si el hijo manda true -> abrir modal
+  if (data === true) {
+    modalProgreso.value = true
+    return
+  }
+
+  // Si el hijo manda false -> cerrar modal
+  if (data === false) {
+    modalProgreso.value = false
+    return
+  }
+
+  // Si manda el progreso detallado
+  mensaje.value = data.mensaje
+  progreso.value = Math.round((data.actual / data.total) * 100)
+}
 
 const pagination = ref({
   pageIndex: 0,
@@ -253,7 +278,18 @@ onUnmounted(() => {
       <ModalCompras
         :compras="compraSeleccionada"
         @close="modalAbierto = false"
+        @progreso="abrirProgreso"
       />
+    </template>
+  </UModal>
+  <UModal v-model:open="modalProgreso" prevent-close>
+    <template #header>
+      <h3 class="text-lg font-semibold text-neutral-50">
+        Procesando registros
+      </h3>
+    </template>
+    <template #body>
+      <ModalProgresoCompras :mensaje="mensaje" :progreso="progreso" />
     </template>
   </UModal>
 </template>

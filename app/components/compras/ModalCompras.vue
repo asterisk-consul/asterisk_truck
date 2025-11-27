@@ -2,135 +2,97 @@
 const depositosStore = useDepositosStore()
 const comprasStore = useComprasStore()
 const { getCamionesOptionsDescrip } = storeToRefs(useDepositosStore())
+import z from 'zod'
+
+import {
+  distribucionSchema,
+  distribucionesSchema
+} from '@/schemas/distribuciones.schema'
+
 const props = defineProps<{
   compras: Partial<Compra>
 }>()
 const emit = defineEmits<{
   (e: 'close'): void
+  (
+    e: 'progreso',
+    payload: boolean | { actual: number; total: number; mensaje: string }
+  ): void
 }>()
+const {
+  distribuciones,
+  totalesDistribuidos,
+  totalesCoincidenCompletamente,
+  agregarDistribucion,
+  eliminarDistribucion,
+  toggleBloqueo,
+  calcularImportesPorPorcentaje,
+  esDistribucionValida,
+  prorraterarEquitativamente,
+  distribuirTodosCamiones,
+  ajustarDistribucionesNoBloquedas,
+  getOpcionesDisponibles
+} = useDistribuciones(toRef(props, 'compras'), getCamionesOptionsDescrip)
 
-const crearDistribucionVacia = (): Distribucion => ({
-  clasificacion: null,
-  porcentaje: 0,
-  importes: {
-    totalimpuestos: 0,
-    totalprecio: 0,
-    varcn0: 0,
-    varcn1: 0,
-    varcn2: 0,
-    varcn3: 0
-  }
-})
-const distribuciones = ref<Distribucion[]>([crearDistribucionVacia()])
+// ✅ CORREGIDO: Removido .value de props.compras
 
-const agregarDistribucion = () => {
-  distribuciones.value.push(crearDistribucionVacia())
-}
-
-const eliminarDistribucion = (index: number) => {
-  distribuciones.value.splice(index, 1)
-}
-
-const totalesDistribuidos = computed(() => {
-  return distribuciones.value.reduce(
-    (acc, dist) => {
-      acc.totalimpuestos += dist.importes.totalimpuestos || 0
-      acc.totalprecio += dist.importes.totalprecio || 0
-      acc.varcn0 += dist.importes.varcn0 || 0
-      acc.varcn1 += dist.importes.varcn1 || 0
-      acc.varcn2 += dist.importes.varcn2 || 0
-      acc.varcn3 += dist.importes.varcn3 || 0
-      return acc
-    },
-    {
-      totalimpuestos: 0,
-      totalprecio: 0,
-      varcn0: 0,
-      varcn1: 0,
-      varcn2: 0,
-      varcn3: 0
-    }
-  )
-})
-
-// Redondear SIEMPRE a 2 decimales
-const r2 = (n: number | null | undefined) => Math.round((n || 0) * 100) / 100
-
-// Tolerancia de 1 centavo
-const tolerance = 0.01
-
-const isEqual = (a: number, b: number) => Math.abs(r2(a) - r2(b)) <= tolerance
-
-const totalesCoincidenCompletamente = computed(() => {
-  const original = props.compras
-  const d = totalesDistribuidos.value
-
-  if (!original) return true
-
-  return (
-    isEqual(original.totalimpuestos, d.totalimpuestos) &&
-    isEqual(original.totalprecio, d.totalprecio) &&
-    isEqual(original.varcn0, d.varcn0) &&
-    isEqual(original.varcn1, d.varcn1) &&
-    isEqual(original.varcn2, d.varcn2) &&
-    isEqual(original.varcn3, d.varcn3)
-  )
-})
 
 const toast = useToast()
 
 const guardarClasificacion = async () => {
   try {
+    // Validar con Zod
+    distribucionesSchema.parse(distribuciones.value)
+
+    // Validar que los totales coincidan
+    if (!totalesCoincidenCompletamente.value) {
+      toast.add({
+        title: 'Error de validación',
+        description:
+          'Los totales distribuidos no coinciden con los importes originales',
+        color: 'error'
+      })
+      return
+    }
+
+    emit('progreso', true)
+
     await comprasStore.crearRegistrosClasificados(
       props.compras,
-      distribuciones.value
+      distribuciones.value,
+      ({ actual, total, mensaje: msg }) => {
+        emit('progreso', { actual, total, mensaje: msg })
+      }
     )
 
     toast.add({
-      id: 'ok-clasificacion',
-      title: 'Registros creados',
-      description: `${distribuciones.value.length} registro(s) creado(s) correctamente`,
+      title: 'Éxito',
+      description: 'Clasificación guardada correctamente',
       color: 'success'
     })
 
-    cerrarDialog()
+    emit('progreso', false)
+    emit('close')
   } catch (error) {
-    toast.add({
-      id: 'error-clasificacion',
-      title: 'Error',
-      description: 'Error al crear los registros clasificados',
-      color: 'error'
-    })
+    emit('progreso', false)
+
+    if (error instanceof z.ZodError) {
+      // Cambiar 'errors' por 'issues' y tipar el parámetro
+      error.issues.forEach((issue: z.ZodIssue) => {
+        toast.add({
+          title: 'Error de validación',
+          description: issue.message,
+          color: 'error'
+        })
+      })
+    } else {
+      toast.add({
+        title: 'Error',
+        description: 'Ocurrió un error al guardar la clasificación',
+        color: 'error'
+      })
+    }
   }
-}
-
-const prorraterarEquitativamente = () => {
-  const cantidad = distribuciones.value.length
-  const porcentaje = 1 / cantidad // 0–1
-
-  distribuciones.value.forEach((dist, index) => {
-    dist.porcentaje = porcentaje // ejemplo: 0.25
-    calcularImportesPorPorcentaje(index)
-  })
-}
-
-// ✅ CORREGIDO: Removido .value de props.compras
-const calcularImportesPorPorcentaje = (index) => {
-  const dist = distribuciones.value[index]
-  const porcentaje = dist.porcentaje
-
-  dist.importes.totalimpuestos =
-    Math.round((props.compras.totalimpuestos || 0) * porcentaje * 100) / 100
-  dist.importes.totalprecio =
-    Math.round((props.compras.totalprecio || 0) * porcentaje * 100) / 100
-  dist.importes.varcn0 =
-    Math.round((props.compras.varcn0 || 0) * porcentaje * 100) / 100
-  dist.importes.varcn1 =
-    Math.round((props.compras.varcn1 || 0) * porcentaje * 100) / 100
-  dist.importes.varcn2 =
-    Math.round((props.compras.varcn2 || 0) * porcentaje * 100) / 100
-  dist.importes.varcn3 =
-    Math.round((props.compras.varcn3 || 0) * porcentaje * 100) / 100
 }
 
 const cerrarDialog = () => {
@@ -235,7 +197,10 @@ onMounted(async () => {
       v-for="(dist, index) in distribuciones"
       variant="subtle"
       :key="index"
-      class="border p-1 my-3"
+      :class="[
+        'border p-1 my-3',
+        !esDistribucionValida(dist) ? 'border-error-500' : ''
+      ]"
     >
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- Encabezado -->
@@ -260,7 +225,7 @@ onMounted(async () => {
           <p class="text-sm font-medium mb-1">Clasificación</p>
           <USelectMenu
             v-model="dist.clasificacion"
-            :items="getCamionesOptionsDescrip"
+            :items="getOpcionesDisponibles(index)"
             placeholder="Clasificación"
             icon="i-heroicons-truck"
             class="w-full"
@@ -309,6 +274,12 @@ onMounted(async () => {
             type="number"
             prefix="$"
             class="w-full"
+            :format-options="{
+              style: 'currency',
+              currency: 'ARS',
+              currencyDisplay: 'narrowSymbol',
+              currencySign: 'accounting'
+            }"
           />
         </div>
 
@@ -324,6 +295,12 @@ onMounted(async () => {
               type="number"
               prefix="$"
               label="VarCN0"
+              :format-options="{
+                style: 'currency',
+                currency: 'ARS',
+                currencyDisplay: 'narrowSymbol',
+                currencySign: 'accounting'
+              }"
             />
           </div>
 
@@ -335,6 +312,12 @@ onMounted(async () => {
               type="number"
               prefix="$"
               label="VarCN1"
+              :format-options="{
+                style: 'currency',
+                currency: 'ARS',
+                currencyDisplay: 'narrowSymbol',
+                currencySign: 'accounting'
+              }"
             />
           </div>
 
