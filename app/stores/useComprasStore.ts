@@ -244,12 +244,11 @@ export const useComprasStore = defineStore('compras', {
       try {
         for (let i = 0; i < total; i++) {
           const distribucion = distribuciones[i]
-
           // Emitimos progreso hacia el modal
           onProgreso?.({
             actual: i + 1,
             total,
-            mensaje: `Creando registro ${i + 1} de ${total} (${distribucion.clasificacion})`
+            mensaje: `Creando registro ${i + 1} de ${total} (${distribucion.clasificacion.value})`
           })
 
           const resultado = await postData('/workspace/saveRegistroCab', {
@@ -257,7 +256,7 @@ export const useComprasStore = defineStore('compras', {
             flowid: 11088,
             statusid: 1715,
             statusflowid: 781,
-            opciondesplegabletexto: distribucion.clasificacion,
+            opciondesplegabletexto: distribucion.clasificacion.value,
             clientid: compra.clientid ?? null,
             clientname: compra.clientname ?? null,
             referenciatexto: compra.referenciatexto ?? null,
