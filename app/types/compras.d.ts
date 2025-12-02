@@ -18,8 +18,10 @@ interface ImportesDistribuidos {
 }
 
 interface Distribucion {
-  clasificacion: { label: string; value: string } | null
+  clasificacion: { label: string; value: string } | undefined
+  porcentaje: number
   importes: ImportesDistribuidos
+  bloqueada: boolean
 }
 
 interface ComprasState {

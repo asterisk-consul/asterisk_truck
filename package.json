@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.10.0",
+    "@oxc-parser/binding-win32-x64-msvc": "^0.99.0",
     "@types/papaparse": "^5.5.0",
     "eslint": "^9.39.1",
     "gh-pages": "^6.3.0",

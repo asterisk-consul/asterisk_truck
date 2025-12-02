@@ -202,10 +202,12 @@ export const useComprasStore = defineStore('compras', {
               // Actualizar en el store
               if (idsA.includes(id)) {
                 const idx = this.comprasA.findIndex((c) => c.id === id)
-                if (idx !== -1) this.comprasA[idx] = { ...this.comprasA[idx], ...detalle }
+                if (idx !== -1)
+                  this.comprasA[idx] = { ...this.comprasA[idx], ...detalle }
               } else {
                 const idx = this.comprasB.findIndex((c) => c.id === id)
-                if (idx !== -1) this.comprasB[idx] = { ...this.comprasB[idx], ...detalle }
+                if (idx !== -1)
+                  this.comprasB[idx] = { ...this.comprasB[idx], ...detalle }
               }
             }
           })
@@ -226,19 +228,35 @@ export const useComprasStore = defineStore('compras', {
      */
     async crearRegistrosClasificados(
       compra: Compra,
-      distribuciones: Distribucion[]
+      distribuciones: Distribucion[],
+      onProgreso?: (info: {
+        actual: number
+        total: number
+        mensaje: string
+      }) => void
     ): Promise<{ success: boolean; creados: number; resultados: any[] }> {
       this.clasificando = true
       this.error = null
 
+      const resultados: any[] = []
+      const total = distribuciones.length
+
       try {
-        const promesas = distribuciones.map((distribucion) =>
-          postData('/workspace/saveRegistroCab', {
+        for (let i = 0; i < total; i++) {
+          const distribucion = distribuciones[i]
+          // Emitimos progreso hacia el modal
+          onProgreso?.({
+            actual: i + 1,
+            total,
+            mensaje: `Creando registro ${i + 1} de ${total} (${distribucion.clasificacion.value})`
+          })
+
+          const resultado = await postData('/workspace/saveRegistroCab', {
             id: -1,
             flowid: 11088,
             statusid: 1715,
             statusflowid: 781,
-            opciondesplegabletexto: distribucion.clasificacion,
+            opciondesplegabletexto: distribucion.clasificacion.value,
             clientid: compra.clientid ?? null,
             clientname: compra.clientname ?? null,
             referenciatexto: compra.referenciatexto ?? null,
@@ -259,11 +277,10 @@ export const useComprasStore = defineStore('compras', {
             dependeDe: [],
             instructivoExec: []
           })
-        )
 
-        const resultados = await Promise.all(promesas)
+          resultados.push(resultado)
+        }
 
-        // Refrescar datos
         await this.reloadCompras()
 
         return {
@@ -279,7 +296,6 @@ export const useComprasStore = defineStore('compras', {
         this.clasificando = false
       }
     },
-
     limpiarSeleccion(): void {
       this.comprasSeleccionadas = []
     }
