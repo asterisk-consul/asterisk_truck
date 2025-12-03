@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { useFileParser } from '@/composables/useFileParser'
-import { fetchData, postData } from '../service/apiService'
+import { fetchData, postData } from '../composables/apiService'
 
 import { formatearFecha } from '@/utils/formatDate'
 import * as XLSX from 'xlsx'

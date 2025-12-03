@@ -1,7 +1,7 @@
 // stores/useProfileStore.ts
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { fetchData } from '@/service/apiService'
+import { fetchData } from '~/composables/apiService'
 
 interface Perfil {
   id: number

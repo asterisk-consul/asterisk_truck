@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
-import { setToken, postData, loginService } from '../service/apiService'
+import { setToken, postData, loginService } from '../composables/apiService'
 
 export const useAuthStore = defineStore('auth', () => {
   // --- Cookies ---
@@ -25,7 +25,6 @@ export const useAuthStore = defineStore('auth', () => {
     roles: userDataCookie.value?.roles ?? []
   })
 
-
   const connectionStatus = reactive<ConnectionStatus>({})
   const batchConfig = reactive<BatchConfig>({
     tokenRefreshThreshold: 1200 // 20 minutos antes de expirar
@@ -33,7 +32,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const formParams = reactive<FormParams>({
     username: credentials.username,
-    password: credentials.password,
+    password: credentials.password
   })
 
   // Restaurar token en Axios si hay token guardado y aún es válido
@@ -42,7 +41,10 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // --- Guardar credenciales ---
-  function saveCredentials(userCredentials: { username: string; password: string }) {
+  function saveCredentials(userCredentials: {
+    username: string
+    password: string
+  }) {
     credentials.username = userCredentials.username
     credentials.password = userCredentials.password
     credentials.saved = true
@@ -96,8 +98,12 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // --- Login ---
-  async function login(username: string, password: string): Promise<LoginResponse> {
-    if (!username || !password) throw new Error('Usuario y contraseña son requeridos')
+  async function login(
+    username: string,
+    password: string
+  ): Promise<LoginResponse> {
+    if (!username || !password)
+      throw new Error('Usuario y contraseña son requeridos')
 
     try {
       const data = await loginService(username, password) // <- directamente el response
@@ -122,7 +128,6 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-
   // --- Test de conexión ---
   async function testConnection() {
     try {
@@ -142,7 +147,8 @@ export const useAuthStore = defineStore('auth', () => {
     } catch (error: unknown) {
       connectionStatus.success = false
       connectionStatus.message = 'Error de conexión'
-      connectionStatus.error = error instanceof Error ? error.message : String(error)
+      connectionStatus.error =
+        error instanceof Error ? error.message : String(error)
       connectionStatus.timestamp = new Date().toLocaleString()
       console.error('❌', connectionStatus)
       throw error

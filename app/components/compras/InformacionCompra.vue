@@ -46,7 +46,7 @@ const props = defineProps<{
         class="flex flex-col justify-around"
       >
         Total con Impuestos:
-        <span class="text-neutral-50 text-base">
+        <span class="dark:text-neutral-50 text-neutral-900 text-base">
           ${{ compra?.totalimpuestos || '—' }}
         </span>
       </UBadge>
@@ -57,7 +57,7 @@ const props = defineProps<{
         class="flex flex-col justify-around"
       >
         Total:
-        <span class="text-neutral-50 text-base">
+        <span class="dark:text-neutral-50 text-neutral-900 text-base">
           ${{ compra?.totalprecio || '—' }}
         </span>
       </UBadge>
@@ -68,7 +68,7 @@ const props = defineProps<{
         class="flex flex-col justify-around"
       >
         Imp excento:
-        <span class="text-neutral-50 text-base">
+        <span class="dark:text-neutral-50 text-neutral-900 text-base">
           ${{ compra?.varcn0 || '—' }}
         </span>
       </UBadge>
@@ -79,7 +79,7 @@ const props = defineProps<{
         class="flex flex-col justify-around"
       >
         Gravado:
-        <span class="text-neutral-50 text-base">
+        <span class="dark:text-neutral-50 text-neutral-900 text-base">
           ${{ compra?.varcn1 || '—' }}
         </span>
       </UBadge>

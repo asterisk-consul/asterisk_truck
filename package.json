@@ -3,13 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nuxt build",
+    "prebuild": "node -e \"try { const fs = require('fs'); if (fs.existsSync('node_modules/oxc-parser')) { console.log('oxc-parser presente') } } catch(e) {}\"",
+    "build": "OXC_BINDINGS_FORCE_BUILD=1 nuxt build",
     "dev": "nuxt dev",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
-    "deploy": "gh-pages -d .output/public"
+    "start": "nuxt start"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.73",
@@ -25,17 +26,20 @@
     "papaparse": "^5.5.3",
     "pinia": "^3.0.4",
     "xlsx": "https://cdn.sheetjs.com/xlsx-latest/xlsx-latest.tgz",
-    "zod": "^4.1.12"
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.10.0",
-    "@oxc-parser/binding-win32-x64-msvc": "^0.99.0",
     "@types/papaparse": "^5.5.0",
     "eslint": "^9.39.1",
-    "gh-pages": "^6.3.0",
+    "postcss": "^8.5.6",
     "prettier": "^3.6.2",
+    "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3",
     "vue-tsc": "^3.1.4"
   },
-  "packageManager": "pnpm@10.19.0"
+  "packageManager": "pnpm@10.23.0",
+  "optionalDependencies": {
+    "@oxc-parser/binding-linux-x64-gnu": "^0.99.0"
+  }
 }
