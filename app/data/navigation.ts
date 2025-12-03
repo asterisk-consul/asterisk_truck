@@ -15,13 +15,21 @@ export const navigationLinks = [
     {
       label: 'Compras',
       icon: 'i-lucide-folder-closed',
-      to: '/Vcompras'
+      defaultOpen: false,
+      children: [
+        { label: 'Compras', to: '/Vcompras' },
+        {
+          label: 'Importador',
+          to: 'https://maxipedano.github.io/Asterisk_truck/',
+          target: '_blank'
+        }
+      ]
     },
     {
       label: 'Settings',
       to: '/settings',
       icon: 'i-lucide-settings',
-      defaultOpen: true,
+      defaultOpen: false,
       type: 'trigger',
       children: [
         { label: 'General', to: '/settings', exact: true },
