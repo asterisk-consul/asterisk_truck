@@ -1,6 +1,6 @@
 // useComprasStore.ts
 import { defineStore } from 'pinia'
-import { postData } from '@/service/apiService'
+import { postData } from '~/composables/apiService'
 // ⬆️ Arriba del defineStore
 function diffIds(oldIds: number[], newIds: number[]) {
   const setOld = new Set(oldIds)

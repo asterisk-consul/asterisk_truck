@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { fetchData, postData } from '@/service/apiService'
+import { fetchData, postData } from '~/composables/apiService'
 
 export const useDepositosStore = defineStore('depositos', {
   state: () => ({
