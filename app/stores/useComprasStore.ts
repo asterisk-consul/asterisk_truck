@@ -78,8 +78,14 @@ export const useComprasStore = defineStore('compras', {
 
         // Obtener listas principales A y B
         const [comprasAResList, comprasBResList] = await Promise.all([
-          postData<ApiRegistroCabList>('/workspace/getRegistroCabList', dataA),
-          postData<ApiRegistroCabList>('/workspace/getRegistroCabList', dataB)
+          postData<ApiRegistroCabList, typeof dataA>(
+            '/workspace/getRegistroCabList',
+            dataA
+          ),
+          postData<ApiRegistroCabList, typeof dataB>(
+            '/workspace/getRegistroCabList',
+            dataB
+          )
         ])
 
         // Asignar directamente la lista (lazy loading de detalles después)
@@ -124,8 +130,14 @@ export const useComprasStore = defineStore('compras', {
       }
 
       const [listaA, listaB] = await Promise.all([
-        postData<ApiRegistroCabList>('/workspace/getRegistroCabList', dataA),
-        postData<ApiRegistroCabList>('/workspace/getRegistroCabList', dataB)
+        postData<ApiRegistroCabList, typeof dataA>(
+          '/workspace/getRegistroCabList',
+          dataA
+        ),
+        postData<ApiRegistroCabList, typeof dataB>(
+          '/workspace/getRegistroCabList',
+          dataB
+        )
       ])
 
       const nuevosA = diffIds(
@@ -164,10 +176,14 @@ export const useComprasStore = defineStore('compras', {
      */
     async fetchCompraDetalle(id: number): Promise<Compra | null> {
       try {
-        const res = await postData<any>('/workspace/getRegistroCabGeneric', {
-          id: id,
-          checkuser: true
-        })
+        const res = await postData<any, { id: number; checkuser: boolean }>(
+          '/workspace/getRegistroCabGeneric',
+          {
+            id: id,
+            checkuser: true
+          }
+        )
+
         return res.data
       } catch (error) {
         console.error(`Error al obtener detalle de compra ${id}:`, error)
@@ -241,10 +257,20 @@ export const useComprasStore = defineStore('compras', {
       const resultados: any[] = []
       const total = distribuciones.length
 
+      if (distribuciones.length === 0) {
+        this.error = 'No hay distribuciones para clasificar'
+        return { success: false, creados: 0, resultados }
+      }
+
       try {
         for (let i = 0; i < total; i++) {
-          const distribucion = distribuciones[i]
+          const distribucion = distribuciones.at(i)
+          if (!distribucion) continue
           // Emitimos progreso hacia el modal
+          if (!distribucion.clasificacion) {
+            throw new Error(`La distribución ${i + 1} no tiene clasificación`)
+          }
+
           onProgreso?.({
             actual: i + 1,
             total,
@@ -270,6 +296,8 @@ export const useComprasStore = defineStore('compras', {
             varcn3: distribucion.importes.varcn3 ?? 0,
             responsableactactualid: '358',
             responsableactactual: { id: '358', identificador: '' },
+            obsinicio: compra.obsinicio ?? null,
+            obsfin: compra.obsfin ?? null,
             xlatitud: -32.4193186,
             xlongitud: -63.2334244,
             articulos: [],

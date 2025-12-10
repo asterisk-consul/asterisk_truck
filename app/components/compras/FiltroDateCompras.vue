@@ -6,19 +6,19 @@ import {
   today
 } from '@internationalized/date'
 
-const df = new DateFormatter('en-US', {
+const df = new DateFormatter('es-AR', {
   dateStyle: 'medium'
 })
 
 const selected = defineModel<DateRange>({ required: true })
 
 const ranges = [
-  { label: 'Last 7 days', days: 7 },
-  { label: 'Last 14 days', days: 14 },
-  { label: 'Last 30 days', days: 30 },
-  { label: 'Last 3 months', months: 3 },
-  { label: 'Last 6 months', months: 6 },
-  { label: 'Last year', years: 1 }
+  { label: 'Ultimos 7 dias', days: 7 },
+  { label: 'Ultimos 14 dias', days: 14 },
+  { label: 'Ultimos 30 dias', days: 30 },
+  { label: 'Ultimos 3 meses', months: 3 },
+  { label: 'Ultimos 6 meses', months: 6 },
+  { label: 'Ultimo año', years: 1 }
 ]
 
 const toCalendarDate = (date: Date) => {
@@ -147,6 +147,7 @@ const selectRange = (range: {
           class="p-2"
           :number-of-months="2"
           range
+          locale="es-AR"
         />
       </div>
     </template>

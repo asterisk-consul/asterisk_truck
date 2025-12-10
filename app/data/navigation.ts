@@ -19,6 +19,11 @@ export const navigationLinks = [
       children: [
         { label: 'Compras', to: '/Vcompras' },
         {
+          label: 'Clasificaciones',
+          to: 'https://reportes.flowsma.com/reportes/flow.html?reportUnit=%2F2_DON_ANDRES%2Fclasificador_compras&_flowId=viewReportFlow&decorate=no&j_username=donandres&j_password=donandres',
+          target: '_blank'
+        },
+        {
           label: 'Importador',
           to: 'https://maxipedano.github.io/Asterisk_truck/',
           target: '_blank'
@@ -26,16 +31,16 @@ export const navigationLinks = [
       ]
     },
     {
-      label: 'Settings',
+      label: 'Ajustes',
       to: '/settings',
       icon: 'i-lucide-settings',
       defaultOpen: false,
       type: 'trigger',
       children: [
         { label: 'General', to: '/settings', exact: true },
-        { label: 'Members', to: '/settings/members' },
-        { label: 'Notifications', to: '/settings/notifications' },
-        { label: 'Security', to: '/settings/security' }
+        { label: 'Miembros', to: '/settings/members' },
+        { label: 'Notificaciones', to: '/settings/notifications' },
+        { label: 'Seguridad', to: '/settings/security' }
       ]
     }
   ],
@@ -47,7 +52,7 @@ export const navigationLinks = [
       target: '_blank'
     },
     {
-      label: 'Help & Support',
+      label: 'Ayuda',
       icon: 'i-lucide-info',
       to: 'https://github.com/nuxt-ui-templates/dashboard',
       target: '_blank'
