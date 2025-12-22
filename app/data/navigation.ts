@@ -31,6 +31,12 @@ export const navigationLinks = [
       ]
     },
     {
+      label: 'Combustible',
+      to: '/combustible',
+      icon: 'i-lucide-fuel',
+      defaultOpen: false
+    },
+    {
       label: 'Ajustes',
       to: '/settings',
       icon: 'i-lucide-settings',

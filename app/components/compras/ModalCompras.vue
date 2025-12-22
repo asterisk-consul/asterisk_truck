@@ -5,10 +5,11 @@ import TotalesDistribuidos from './TotalesDistribuidos.vue'
 import AccionesDistribucion from './AccionesDistribucion.vue'
 import z from 'zod'
 import { distribucionesSchema } from '@/schemas/distribuciones.schema'
+import { useDepositos } from '@/composables/useDepositos'
 
 const depositosStore = useDepositosStore()
 const comprasStore = useComprasStore()
-const { getCamionesOptionsDescrip } = storeToRefs(depositosStore)
+const depositos = useDepositos()
 const toast = useToast()
 
 const props = defineProps<{
@@ -37,7 +38,7 @@ const {
   distribuirTodosCamiones,
   ajustarDistribucionesNoBloquedas,
   getOpcionesDisponibles
-} = useDistribuciones(toRef(props, 'compras'), getCamionesOptionsDescrip)
+} = useDistribuciones(toRef(props, 'compras'), depositos.selectCamiones)
 
 // Método cuando se actualiza el porcentaje
 const handleActualizarPorcentaje = (index: number) => {
@@ -108,7 +109,7 @@ const guardarClasificacion = async () => {
 }
 
 onMounted(async () => {
-  await depositosStore.fetchCamiones()
+  await depositos.load()
 })
 </script>
 
