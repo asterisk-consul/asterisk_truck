@@ -2,7 +2,6 @@
 import { sub } from 'date-fns'
 import { useFileParser } from '~/composables/useFileParser'
 import { useCombustibleImporter } from '~/composables/combustible/useCombustibleImporter'
-import { useCombustibleApi } from '~/composables/combustible/useCombustibleApi'
 import DateRangePicker from '~/components/compras/FiltroDateCompras.vue'
 import {
   parseExcelDate,
@@ -16,7 +15,6 @@ const open = defineModel<boolean>({ required: true })
 // ===== Composables =====
 const { parseFile } = useFileParser()
 const { processRows } = useCombustibleImporter()
-const { bulkInsertCarga, bulkInsertDescarga } = useCombustibleApi()
 
 // ===== State =====
 const file = ref<File | null>(null)
@@ -105,23 +103,23 @@ watch(
 /* =========================
  * Confirm import
  * ========================= */
-const onConfirmImport = async () => {
-  if (!result.value?.valid?.length) return
+// const onConfirmImport = async () => {
+//   if (!result.value?.valid?.length) return
 
-  const cargas = result.value.valid.filter((r: any) => r.tipo === 'CARGA')
-  const descargas = result.value.valid.filter((r: any) => r.tipo === 'DESCARGA')
+//   const cargas = result.value.valid.filter((r: any) => r.tipo === 'CARGA')
+//   const descargas = result.value.valid.filter((r: any) => r.tipo === 'DESCARGA')
 
-  try {
-    await Promise.all([
-      cargas.length ? bulkInsertCarga(cargas) : Promise.resolve(),
-      descargas.length ? bulkInsertDescarga(descargas) : Promise.resolve()
-    ])
+//   try {
+//     await Promise.all([
+//       cargas.length ? bulkInsertCarga(cargas) : Promise.resolve(),
+//       descargas.length ? bulkInsertDescarga(descargas) : Promise.resolve()
+//     ])
 
-    open.value = false
-  } catch (err) {
-    console.error(err)
-  }
-}
+//     open.value = false
+//   } catch (err) {
+//     console.error(err)
+//   }
+// }
 
 /* =========================
  * Reset
@@ -249,9 +247,10 @@ const accordionItems = computed(() => [
           label="Importar"
           color="primary"
           :disabled="!result?.valid?.length"
-          @click="onConfirmImport"
         />
       </div>
     </template>
   </UModal>
 </template>
+
+<!-- @click="onConfirmImport" -->
