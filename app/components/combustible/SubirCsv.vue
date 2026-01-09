@@ -108,8 +108,8 @@ watch(
 /* =========================
  * Confirm import
  * ========================= */
-const onConfirmImport = async () => {
-  if (!result.value?.valid?.length) return
+// const onConfirmImport = async () => {
+//   if (!result.value?.valid?.length) return
 
   try {
     await submitBatch(result.value.valid)
@@ -261,3 +261,5 @@ onMounted(async () => {
     <UAlert v-if="error" color="error" :title="error" />
   </UModal>
 </template>
+
+<!-- @click="onConfirmImport" -->

@@ -1,10 +1,20 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 
-const totalLitros = 5000
-const litrosActuales = ref(3500) // Cambiá dinámicamente
+const props = defineProps({
+  totalLitros: {
+    type: Number,
+    required: true
+  },
+  litrosActuales: {
+    type: Number,
+    required: true
+  }
+})
 
-const porcentaje = computed(() => (litrosActuales.value / totalLitros) * 100)
+const porcentaje = computed(
+  () => (props.litrosActuales / props.totalLitros) * 100
+)
 </script>
 
 <template>
