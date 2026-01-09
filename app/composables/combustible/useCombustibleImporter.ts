@@ -3,11 +3,16 @@
 export interface RegistroCombustible {
   fecha: string
   chofer: string
+  estacion: string
   tipo: 'CARGA' | 'DESCARGA'
   patente: string
   litros: number
-  kmHoras: number
+
+  km: number | null
+  horas: number | null
+
   usuario: string
+  clientName: string
 
   _key: string
   _rowIndex: number
@@ -25,21 +30,23 @@ interface ImportResult {
   }
 }
 
-export function useCombustibleImporter() {
+export function useCombustibleImporter(
+  getTipoCamion: (patente: string) => 'TRACTOR' | 'SEMI' | null
+) {
   /* =========================
    * Normalización
    * ========================= */
 
   const normalizeText = (value: any) =>
-    String(value || '')
+    String(value ?? '')
       .trim()
       .toUpperCase()
 
-  const normalizeDate = (value: any) => String(value || '').trim()
+  const normalizeDate = (value: any) => String(value ?? '').trim()
 
-  const normalizeNumber = (value: any, decimals = 2) => {
-    const n = Number(String(value || '0').replace(',', '.'))
-    return Number.isFinite(n) ? n.toFixed(decimals) : '0.00'
+  const normalizeNumber = (value: any) => {
+    const n = Number(String(value ?? '0').replace(',', '.'))
+    return Number.isFinite(n) ? n : 0
   }
 
   /* =========================
@@ -48,10 +55,20 @@ export function useCombustibleImporter() {
 
   const buildKey = (
     fecha: string,
-    chofer: string,
+    clientName: string,
     patente: string,
-    litros: string
-  ) => `${fecha}|${chofer}|${patente}|${litros}`
+    litros: number
+  ) => `${fecha}|${clientName}|${patente}|${litros}`
+
+  /* =========================
+   * Resolver clientName
+   * ========================= */
+
+  const resolveClientName = (
+    tipo: 'CARGA' | 'DESCARGA',
+    chofer: string,
+    estacion: string
+  ) => (tipo === 'DESCARGA' ? estacion : chofer)
 
   /* =========================
    * Procesar filas
@@ -68,27 +85,60 @@ export function useCombustibleImporter() {
     const seen = new Set<string>()
 
     rows.forEach((row, index) => {
-      // Saltear header
+      // header
       if (index === 0 && typeof row[0] === 'string') return
 
       const fecha = normalizeDate(row[0])
       const chofer = normalizeText(row[1])
       const tipo = normalizeText(row[2]) as 'CARGA' | 'DESCARGA'
       const patente = normalizeText(row[3])
+      const estacion = normalizeText(row[4])
 
-      const litrosNormalized = normalizeNumber(row[4])
-      const litros = Number(litrosNormalized)
+      const litros = normalizeNumber(row[5])
+      const valorFH = normalizeNumber(row[6])
+      const usuario = normalizeText(row[7])
 
-      const kmHoras = Number(row[5] || 0)
-      const usuario = normalizeText(row[6])
+      const clientName = resolveClientName(tipo, chofer, estacion)
+
+      let km: number | null = null
+      let horas: number | null = null
 
       /* =========================
-       * Validaciones
+       * Reglas por tipo
+       * ========================= */
+
+      if (tipo === 'CARGA') {
+        const tipoCamion = getTipoCamion(patente)
+
+        if (!tipoCamion) {
+          invalid.push({
+            fecha,
+            chofer,
+            estacion,
+            tipo,
+            patente,
+            litros,
+            km: null,
+            horas: null,
+            usuario,
+            clientName,
+            _key: '',
+            _rowIndex: index + 1
+          })
+          return
+        }
+
+        if (tipoCamion === 'TRACTOR') km = valorFH
+        if (tipoCamion === 'SEMI') horas = valorFH
+      }
+
+      /* =========================
+       * Validaciones generales
        * ========================= */
 
       if (
         !fecha ||
-        !chofer ||
+        !clientName ||
         !patente ||
         !['CARGA', 'DESCARGA'].includes(tipo) ||
         litros <= 0
@@ -96,32 +146,34 @@ export function useCombustibleImporter() {
         invalid.push({
           fecha,
           chofer,
+          estacion,
           tipo,
           patente,
           litros,
-          kmHoras,
+          km,
+          horas,
           usuario,
+          clientName,
           _key: '',
           _rowIndex: index + 1
         })
         return
       }
 
-      const key = buildKey(fecha, chofer, patente, litrosNormalized)
-
-      /* =========================
-       * Duplicados
-       * ========================= */
+      const key = buildKey(fecha, clientName, patente, litros)
 
       if (seen.has(key) || existingKeys.has(key)) {
         duplicated.push({
           fecha,
           chofer,
+          estacion,
           tipo,
           patente,
           litros,
-          kmHoras,
+          km,
+          horas,
           usuario,
+          clientName,
           _key: key,
           _rowIndex: index + 1
         })
@@ -130,18 +182,17 @@ export function useCombustibleImporter() {
 
       seen.add(key)
 
-      /* =========================
-       * Válidos
-       * ========================= */
-
       valid.push({
         fecha,
         chofer,
+        estacion,
         tipo,
         patente,
         litros,
-        kmHoras,
+        km,
+        horas,
         usuario,
+        clientName,
         _key: key,
         _rowIndex: index + 1
       })
@@ -152,7 +203,7 @@ export function useCombustibleImporter() {
       duplicated,
       invalid,
       summary: {
-        total: rows.length,
+        total: rows.length - 1,
         valid: valid.length,
         duplicated: duplicated.length,
         invalid: invalid.length

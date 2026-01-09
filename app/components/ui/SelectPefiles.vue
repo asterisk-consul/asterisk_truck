@@ -4,10 +4,20 @@ import type { SelectItem } from '@nuxt/ui'
 import { usePerfiles } from '~/composables/usePerfiles'
 import type { PropType } from 'vue'
 
+// --- tipos ---
+type ValueMode = 'id' | 'label' | 'both'
+
+export interface PerfilSelectValue {
+  id: number
+  label: string
+}
+
 // --- props ---
 const props = defineProps({
   modelValue: {
-    type: Number as PropType<number | null>,
+    type: [Number, String, Object] as PropType<
+      number | string | PerfilSelectValue | null
+    >,
     default: null
   },
   label: {
@@ -25,18 +35,57 @@ const props = defineProps({
   categoriaid: {
     type: Number as PropType<number | null>,
     default: null
+  },
+  // 🔑 modo de salida
+  valueMode: {
+    type: String as PropType<ValueMode>,
+    default: 'id'
   }
 })
 
 // --- emits ---
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: number | null): void
+  (
+    e: 'update:modelValue',
+    value: number | string | PerfilSelectValue | null
+  ): void
 }>()
 
-// --- v-model normalizado ---
-const model = computed<number | null>({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
+// --- v-model interno ---
+// el select siempre trabaja con un value "simple"
+const internalValue = computed<number | null>({
+  get: () => {
+    if (props.valueMode === 'both' && props.modelValue) {
+      return (props.modelValue as PerfilSelectValue).id
+    }
+    if (props.valueMode === 'id') {
+      return props.modelValue as number | null
+    }
+    return null
+  },
+  set: (value) => {
+    if (value == null) {
+      emit('update:modelValue', null)
+      return
+    }
+
+    const perfil = perfiles.findById(value)
+    if (!perfil) return
+
+    const label =
+      perfil.identificador ??
+      perfil.razonsocial ??
+      `${perfil.apellido ?? ''}`.trim() ??
+      '-'
+
+    if (props.valueMode === 'id') {
+      emit('update:modelValue', value)
+    } else if (props.valueMode === 'label') {
+      emit('update:modelValue', label)
+    } else {
+      emit('update:modelValue', { id: value, label })
+    }
+  }
 })
 
 // --- composable perfiles ---
@@ -48,7 +97,7 @@ onMounted(async () => {
   await perfiles.load(props.tipo ?? undefined, true)
 })
 
-// --- items filtrados ---
+// --- items ---
 const items = computed<SelectItem[]>(() =>
   perfiles.selectOptions(props.categoriaid ?? undefined)
 )
@@ -59,7 +108,7 @@ const items = computed<SelectItem[]>(() =>
     <label v-if="label" class="block">{{ label }}</label>
 
     <USelect
-      v-model="model"
+      v-model="internalValue"
       :items="items"
       :loading="loading"
       :placeholder="placeholder"

@@ -20,6 +20,7 @@ const model = defineModel<any>()
       :tipo="4"
       :categoriaid="10895"
       label="Chofer"
+      valueMode="both"
     />
 
     <DataPicker v-model="model.fecha" label="Fecha" />

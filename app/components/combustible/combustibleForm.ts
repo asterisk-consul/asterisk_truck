@@ -6,13 +6,13 @@ export interface CombustibleForm {
   fecha: string
 
   camionId?: string
-  choferId?: string
-  cargadorId?: string
+  choferId?: { id: number | null; label: string }
+  cargadorId?: { id: number | null; label?: string }
 
   litros: number | null
   km?: number | null
   horas?: number | null
 
-  estacion?: string
+  estacion?: { id: number | null; label: string }
   ajusteSigno?: AjusteSigno
 }

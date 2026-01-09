@@ -38,7 +38,7 @@ export function useCombustibleSubmit() {
         cuerpoPayload
       )
       console.log(cuerpoResp)
-      const cuerpoId = cuerpoResp?.id
+      const cuerpoId = cuerpoResp?.data.id
       if (!cuerpoId) {
         throw new Error('No se pudo crear el cuerpo de combustible')
       }

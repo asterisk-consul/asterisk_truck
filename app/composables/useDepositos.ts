@@ -2,6 +2,8 @@ import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDepositosStore } from '~/stores/depositos.store'
 
+export type TipoCamion = 'TRACTOR' | 'SEMI'
+
 export function useDepositos() {
   const store = useDepositosStore()
   const { entities, loading } = storeToRefs(store)
@@ -33,11 +35,23 @@ export function useDepositos() {
     return entities.value.find((d) => d.id === id)
   }
 
+  function getTipoCamion(patente: string): TipoCamion | null {
+    const camion = camiones.value.find(
+      (c) => c.descrip?.toUpperCase() === patente.toUpperCase()
+    )
+
+    if (!camion) return null
+    if (camion.parentid === 254) return 'TRACTOR'
+    if (camion.parentid === 255) return 'SEMI'
+    return null
+  }
+
   return {
     loading,
     load,
     camiones,
     selectCamiones,
-    findById
+    findById,
+    getTipoCamion
   }
 }

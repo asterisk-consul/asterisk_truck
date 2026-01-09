@@ -22,8 +22,16 @@ export function buildCabecera(form: CombustibleForm, cfg: any) {
     statusid: cfg.statusId,
     fecha: form.fecha,
     referenciatexto: buildReferencia(form),
+    descrip: buildReferencia(form),
+
     clientname:
-      form.tipoMovimiento === 'ajuste' ? null : form.estacion || form.choferId,
+      form.tipoMovimiento === 'ajuste'
+        ? null
+        : form.estacion || form.choferId?.label,
+    clientid:
+      form.tipoMovimiento === 'ajuste'
+        ? null
+        : form.estacion || form.choferId?.id,
     vendedorid: form.cargadorId,
     varcn1: form.tipoMovimiento === 'carga' ? form.km : null,
     varcn2: form.tipoMovimiento === 'carga' ? form.horas : null

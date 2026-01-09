@@ -2,7 +2,8 @@
 import { sub } from 'date-fns'
 import { useFileParser } from '~/composables/useFileParser'
 import { useCombustibleImporter } from '~/composables/combustible/useCombustibleImporter'
-import { useCombustibleApi } from '~/composables/combustible/useCombustibleApi'
+import { useCombustibleBatchSubmit } from '~/composables/combustible/useCombustibleBatchSubmit'
+
 import DateRangePicker from '~/components/compras/FiltroDateCompras.vue'
 import {
   parseExcelDate,
@@ -16,7 +17,9 @@ const open = defineModel<boolean>({ required: true })
 // ===== Composables =====
 const { parseFile } = useFileParser()
 const { processRows } = useCombustibleImporter()
-const { bulkInsertCarga, bulkInsertDescarga } = useCombustibleApi()
+
+const { submitBatch, running, progress, currentRow } =
+  useCombustibleBatchSubmit()
 
 // ===== State =====
 const file = ref<File | null>(null)
@@ -108,18 +111,11 @@ watch(
 const onConfirmImport = async () => {
   if (!result.value?.valid?.length) return
 
-  const cargas = result.value.valid.filter((r: any) => r.tipo === 'CARGA')
-  const descargas = result.value.valid.filter((r: any) => r.tipo === 'DESCARGA')
-
   try {
-    await Promise.all([
-      cargas.length ? bulkInsertCarga(cargas) : Promise.resolve(),
-      descargas.length ? bulkInsertDescarga(descargas) : Promise.resolve()
-    ])
-
+    await submitBatch(result.value.valid)
     open.value = false
-  } catch (err) {
-    console.error(err)
+  } catch (e: any) {
+    error.value = e.message ?? 'Error durante la importación'
   }
 }
 
@@ -154,6 +150,10 @@ const accordionItems = computed(() => [
     disabled: !result.value?.summary.invalid
   }
 ])
+onMounted(async () => {
+  const perfiles = usePerfiles()
+  await perfiles.load(undefined, true)
+})
 </script>
 
 <template>
@@ -234,6 +234,11 @@ const accordionItems = computed(() => [
           </template>
         </UAccordion>
       </div>
+      <UProgress v-if="running" :value="progress" />
+
+      <p v-if="currentRow" class="text-sm text-gray-500">
+        Procesando fila {{ currentRow }}
+      </p>
     </template>
 
     <template #footer>
@@ -248,10 +253,11 @@ const accordionItems = computed(() => [
         <UButton
           label="Importar"
           color="primary"
-          :disabled="!result?.valid?.length"
+          :disabled="!result?.valid?.length || running"
           @click="onConfirmImport"
         />
       </div>
     </template>
+    <UAlert v-if="error" color="error" :title="error" />
   </UModal>
 </template>
