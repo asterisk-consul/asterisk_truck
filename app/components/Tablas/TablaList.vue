@@ -203,8 +203,6 @@ const DATA_COLUMNS: TableColumn<any>[] = [
   { accessorKey: 'total', header: 'Total' }
 ]
 
-const tableColumns = ref<TableColumn<any>[]>([])
-
 const multiColumnSearchFilter: FilterFn<any> = (row, _columnId, value) => {
   const { query, scopes } = value || {}
   if (!query || !scopes?.length) return true
@@ -229,16 +227,55 @@ const SEARCH_COLUMN: TableColumn<any> = {
   filterFn: multiColumnSearchFilter
 }
 
-const initColumns = () => {
-  const cols = [DRAG_COLUMN, SEARCH_COLUMN, ...DATA_COLUMNS]
-  if (props.selectable) cols.splice(1, 0, SELECT_COLUMN)
-  tableColumns.value = cols
+/* COLUMNAS VISIBLES & REORDENAMIENTO */
+// Estado local de las columnas de datos para permitir reordenamiento y visibilidad
+const dataColumns = ref(
+  DATA_COLUMNS.map((c) => ({
+    ...c,
+    p_visible: true,
+    id: c.accessorKey,
+    // Render function para el header: Icono + Texto
+    header: ({ column }: any) =>
+      h('div', { class: 'flex items-center gap-1' }, [
+        h(UIcon, {
+          name: 'i-lucide-grip-vertical',
+          class:
+            'col-drag-handle w-4 h-4 text-gray-400 cursor-grab opacity-50 hover:opacity-100'
+        }),
+        h('span', typeof c.header === 'function' ? c.header : c.header)
+      ])
+  }))
+)
+
+// Actualizar visibilidad
+const updateColumnVisibility = (col: any, val: boolean) => {
+  col.p_visible = val
 }
 
-initColumns()
-watch(() => props.selectable, initColumns)
+const tableColumns = computed(() => {
+  const cols = []
+
+  // 1. Columna Drag (siempre primera)
+  cols.push(DRAG_COLUMN)
+
+  // 2. Columna de Búsqueda (Lógica interna del usuario)
+  cols.push(SEARCH_COLUMN)
+
+  // 3. Columna Select (siempre visible si se requiere)
+  if (props.selectable) cols.push(SELECT_COLUMN)
+
+  // 4. Columnas de Datos (según orden y visibilidad en dataColumns)
+  dataColumns.value.forEach((Col) => {
+    if (Col.p_visible) {
+      cols.push(Col)
+    }
+  })
+
+  return cols
+})
 
 /* DRAG */
+// Drag de Filas
 onMounted(async () => {
   await nextTick()
   const tbody = tableRef.value?.$el.querySelector('tbody')
@@ -250,6 +287,79 @@ onMounted(async () => {
       onEnd: () => emit('reorder', tableData.value)
     })
   }
+})
+
+// Drag de Columnas (Headers)
+onMounted(async () => {
+  await nextTick()
+
+  const headerRow = tableRef.value?.$el.querySelector('thead tr')
+  if (!headerRow) return
+
+  useDraggable(headerRow, dataColumns, {
+    handle: '.col-drag-handle',
+    animation: 150,
+    ghostClass: 'sortable-ghost',
+
+    // Solo permitir drag horizontal
+    direction: 'horizontal',
+
+    onMove: (evt) => {
+      // Bloquear columnas fijas
+      const fixedCount =
+        1 + // drag
+        1 + // search
+        (props.selectable ? 1 : 0)
+
+      if (!evt.relatedContext) return true
+
+      // Solo prohibir mover HACIA las columnas fijas (izquierda)
+      const targetIndex = evt.relatedContext.index
+      return targetIndex >= fixedCount
+    },
+
+    onEnd: (evt) => {
+      const { oldIndex, newIndex } = evt
+
+      console.log('DRAG END', { oldIndex, newIndex })
+
+      const fixedCount =
+        1 + // drag
+        1 + // search
+        (props.selectable ? 1 : 0)
+
+      const realOldIndex = (oldIndex || 0) - fixedCount
+      const realNewIndex = (newIndex || 0) - fixedCount
+
+      console.log('REAL INDICES', {
+        realOldIndex,
+        realNewIndex,
+        total: dataColumns.value.length
+      })
+
+      if (
+        realOldIndex < 0 ||
+        realNewIndex < 0 ||
+        realOldIndex === realNewIndex ||
+        realOldIndex >= dataColumns.value.length ||
+        realNewIndex >= dataColumns.value.length
+      ) {
+        console.warn('Índices inválidos para reordenar', {
+          realOldIndex,
+          realNewIndex
+        })
+        return
+      }
+
+      // Reordenar
+      const newData = [...dataColumns.value]
+      const [moved] = newData.splice(realOldIndex, 1)
+      newData.splice(realNewIndex, 0, moved)
+      dataColumns.value = newData
+
+      console.log('Reordenamiento aplicado.')
+    }
+  })
 })
 
 /* SELECCIÓN */
@@ -275,25 +385,6 @@ const getPaginationInfo = () => {
     total: props.data?.total || 0
   }
 }
-
-/* COLUMNAS VISIBLES */
-const getColumnItems = () => {
-  const table = tableRef.value?.tableApi
-  if (!table) return []
-
-  return [
-    table
-      .getAllColumns()
-      .filter((column: any) => column.getCanHide())
-      .map((column: any) => ({
-        label: column.columnDef.header,
-        icon: column.getIsVisible()
-          ? 'i-lucide-check-square'
-          : 'i-lucide-square',
-        click: () => column.toggleVisibility()
-      }))
-  ]
-}
 </script>
 
 <template>
@@ -317,18 +408,43 @@ const getColumnItems = () => {
         </UButton>
       </TablasDeleteModal>
 
-      <UDropdownMenu
-        :items="getColumnItems()"
-        :content="{ align: 'end' }"
-        :ui="{ content: 'max-h-64 overflow-y-auto' }"
-      >
+      <UPopover :ui="{ width: 'w-72', ring: '', shadow: 'shadow-xl' }">
         <UButton
           label="Columnas"
           color="neutral"
           variant="outline"
           trailing-icon="i-lucide-columns"
         />
-      </UDropdownMenu>
+
+        <template #content>
+          <div
+            class="p-4 space-y-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg"
+          >
+            <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">
+              Configurar Columnas
+            </h4>
+            <div class="space-y-1 max-h-64 overflow-y-auto">
+              <div
+                v-for="(col, index) in dataColumns"
+                :key="col.id"
+                class="flex items-center gap-2 p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 group"
+              >
+                <!-- Checkbox Visibility -->
+                <UCheckbox
+                  v-model="col.p_visible"
+                  @update:model-value="(v) => updateColumnVisibility(col, v)"
+                  :ui="{ wrapper: 'flex items-center' }"
+                />
+
+                <!-- Label -->
+                <span class="text-sm truncate select-none">
+                  {{ col.header }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </template>
+      </UPopover>
     </div>
     <div>
       <FiltroDateCompras v-model="range" class="-ms-1" />
@@ -373,7 +489,7 @@ const getColumnItems = () => {
       :get-filtered-row-model="getFilteredRowModel()"
       sticky
       class="border border-default rounded-lg"
-    />
+    ></UTable>
 
     <div
       class="flex justify-between items-center border-t border-default py-4 px-4"
