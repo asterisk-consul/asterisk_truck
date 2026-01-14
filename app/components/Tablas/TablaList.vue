@@ -177,7 +177,16 @@ const SELECT_COLUMN: TableColumn<any> = {
 }
 
 const DATA_COLUMNS: TableColumn<any>[] = [
-  { accessorKey: 'id', header: 'ID' },
+  { accessorKey: 'auditorid', header: 'Auditor' },
+  { accessorKey: 'clientid', header: 'Cliente id' },
+  { accessorKey: 'clientname', header: 'Cliente' },
+  {
+    accessorKey: 'creationdate',
+    header: 'Creación',
+    filterFn: dateRangeFilter
+  },
+  { accessorKey: 'descrip', header: 'Descripción' },
+  { accessorKey: 'ejecutorid', header: 'Ejecutor' },
   {
     accessorKey: 'fecha',
     header: 'Fecha',
@@ -188,19 +197,15 @@ const DATA_COLUMNS: TableColumn<any>[] = [
     header: 'Fecha compromiso',
     filterFn: dateRangeFilter
   },
-  {
-    accessorKey: 'fechavencimiento',
-    header: 'Fecha vencimiento',
-    filterFn: dateRangeFilter
-  },
-  {
-    accessorKey: 'creationdate',
-    header: 'Creación',
-    filterFn: dateRangeFilter
-  },
-  { accessorKey: 'clientname', header: 'Cliente' },
+  { accessorKey: 'id', header: 'ID' },
+
+  { accessorKey: 'parteinteresadatipo', header: 'Parte interesado tipo' },
+  { accessorKey: 'procesoid', header: 'Proceso id' },
+  { accessorKey: 'puestotrabajo', header: 'Puesto de trabajo' },
   { accessorKey: 'referenciatexto', header: 'Referencia' },
-  { accessorKey: 'total', header: 'Total' }
+  { accessorKey: 'totalimpuestos', header: 'Total impuestos' },
+  { accessorKey: 'totalprecio', header: 'Total precio' },
+  { accessorKey: 'vendedorid', header: 'Vendedor id' }
 ]
 
 const multiColumnSearchFilter: FilterFn<any> = (row, _columnId, value) => {
@@ -385,6 +390,17 @@ const getPaginationInfo = () => {
     total: props.data?.total || 0
   }
 }
+watch(
+  () => props.data?.rows,
+  (rows) => {
+    tableData.value = [...(rows || [])]
+
+    nextTick(() => {
+      pagination.value.pageIndex = 0
+      tableRef.value?.tableApi?.setPageIndex(0)
+    })
+  }
+)
 </script>
 
 <template>

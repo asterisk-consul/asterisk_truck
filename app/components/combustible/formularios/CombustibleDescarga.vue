@@ -4,10 +4,6 @@ import SelectPefiles from '@/components/ui/SelectPefiles.vue'
 
 const model = defineModel<any>()
 
-onMounted(() => {
-  model.value.auditor = 'descarga'
-})
-
 const estaciones = [
   { label: 'PETROLERA SUQUIA SRL', value: 'PETROLERA SUQUIA SRL' },
   { label: 'POSTA DEL MERCOSUR SRL', value: 'POSTA DEL MERCOSUR SRL' }

@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 const toast = useToast()
+
+const emit = defineEmits<{
+  (e: 'saved'): void
+}>()
 import type {
   CombustibleForm,
   TipoMovimiento
@@ -20,7 +24,6 @@ const tab = ref<TipoMovimiento>('carga')
 const form = reactive<CombustibleForm>({
   tipoMovimiento: 'carga',
   fecha: '',
-  auditor: '',
   camionId: '',
   choferId: '',
   cargadorId: '',
@@ -47,6 +50,7 @@ async function onSubmit() {
       color: 'success',
       icon: 'i-lucide-check-circle'
     })
+    emit('saved')
     open.value = false
   } else {
     toast.add({

@@ -43,9 +43,11 @@ const paramsUrea = ref(
   })
 )
 
-const { data: dataCombustible, loading: loadingCombustible } =
-  useRegistroCabList(paramsCombustible)
-console.log(dataCombustible.value)
+const {
+  data: dataCombustible,
+  loading: loadingCombustible,
+  refresh: refreshCombustible
+} = useRegistroCabList(paramsCombustible)
 
 const { data: dataUrea, loading: loadingUrea } = useRegistroCabList(paramsUrea)
 
@@ -55,6 +57,10 @@ const onCombustibleSelection = (rows: any[]) => {
 
 const onUreaSelection = (rows: any[]) => {
   // console.log('Urea:', rows)
+}
+
+const onSavedCombustible = () => {
+  refreshCombustible()
 }
 </script>
 
@@ -97,7 +103,7 @@ const onUreaSelection = (rows: any[]) => {
             selectable
             @selection-change="onCombustibleSelection"
           />
-          <FormsubirCombustible v-model="open" />
+          <FormsubirCombustible v-model="open" @saved="onSavedCombustible" />
           <SubirCsv v-model="openCsv" />
         </template>
         <template #urea>
