@@ -5,6 +5,7 @@ export interface CombustibleForm {
   tipoMovimiento: TipoMovimiento
   fecha: string
 
+  auditor?: string
   camionId?: string
   choferId?: { id: number | null; label: string }
   cargadorId?: { id: number | null; label?: string }

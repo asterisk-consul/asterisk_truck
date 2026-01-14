@@ -20,6 +20,7 @@ const tab = ref<TipoMovimiento>('carga')
 const form = reactive<CombustibleForm>({
   tipoMovimiento: 'carga',
   fecha: '',
+  auditor: '',
   camionId: '',
   choferId: '',
   cargadorId: '',

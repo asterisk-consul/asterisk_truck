@@ -23,7 +23,6 @@ export function buildCabecera(form: CombustibleForm, cfg: any) {
     fecha: form.fecha,
     referenciatexto: buildReferencia(form),
     descrip: buildReferencia(form),
-
     clientname:
       form.tipoMovimiento === 'ajuste'
         ? null

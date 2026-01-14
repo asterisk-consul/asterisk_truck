@@ -26,22 +26,26 @@ const {
   totalCantidad: totalCantidadCombustible
 } = useArticulos(1189)
 
+const { articulo: articuloUrea, totalCantidad: totalCantidadUrea } =
+  useArticulos(1923)
+
 const paramsCombustible = ref(
   buildRegistroParams({
-    statusid: 1640,
-    flowid: 10987
+    statusid: 1723,
+    flowid: 11093
   })
 )
 
 const paramsUrea = ref(
   buildRegistroParams({
-    statusid: 1719,
-    flowid: 10987
+    statusid: 1731,
+    flowid: 11093
   })
 )
 
 const { data: dataCombustible, loading: loadingCombustible } =
   useRegistroCabList(paramsCombustible)
+console.log(dataCombustible.value)
 
 const { data: dataUrea, loading: loadingUrea } = useRegistroCabList(paramsUrea)
 
@@ -112,7 +116,10 @@ const onUreaSelection = (rows: any[]) => {
               />
             </template>
           </UDashboardNavbar>
-          <CisternaMedida :total-litros="5000" :litros-actuales="3500" />
+          <CisternaMedida
+            :total-litros="200"
+            :litros-actuales="totalCantidadUrea"
+          />
           <TablaList
             table-key="urea"
             :data="dataUrea"

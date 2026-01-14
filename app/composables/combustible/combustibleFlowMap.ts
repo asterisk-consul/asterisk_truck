@@ -1,24 +1,24 @@
 export const COMBUSTIBLE_FLOW = {
   carga: {
-    flowId: 10987,
-    statusId: 1628,
-    nextStatusId: 1640
+    flowId: 11093,
+    statusId: 1724,
+    nextStatusId: 1723
   },
   descarga: {
-    flowId: 11016,
-    statusId: 1669,
-    nextStatusId: 1164
+    flowId: 11093,
+    statusId: 1728,
+    nextStatusId: 1723
   },
   ajuste: {
     plus: {
-      flowId: 11058,
-      statusId: 1677,
-      nextStatusId: 1717
+      flowId: 11093,
+      statusId: 1729,
+      nextStatusId: 1723
     },
     minus: {
-      flowId: 11057,
-      statusId: 1678,
-      nextStatusId: 1718
+      flowId: 11093,
+      statusId: 1730,
+      nextStatusId: 1723
     }
   }
 } as const

@@ -3,6 +3,9 @@ import DataPicker from '@/components/ui/DataPicker.vue'
 import SelectPefiles from '@/components/ui/SelectPefiles.vue'
 
 const model = defineModel<any>()
+onMounted(() => {
+  model.value.auditor = 'ajuste'
+})
 </script>
 
 <template>
