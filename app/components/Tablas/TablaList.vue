@@ -234,23 +234,23 @@ const SEARCH_COLUMN: TableColumn<any> = {
 
 /* COLUMNAS VISIBLES & REORDENAMIENTO */
 // Estado local de las columnas de datos para permitir reordenamiento y visibilidad
-const dataColumns = ref(
-  DATA_COLUMNS.map((c) => ({
-    ...c,
-    p_visible: true,
-    id: c.accessorKey,
-    // Render function para el header: Icono + Texto
-    header: ({ column }: any) =>
-      h('div', { class: 'flex items-center gap-1' }, [
-        h(UIcon, {
-          name: 'i-lucide-grip-vertical',
-          class:
-            'col-drag-handle w-4 h-4 text-gray-400 cursor-grab opacity-50 hover:opacity-100'
-        }),
-        h('span', typeof c.header === 'function' ? c.header : c.header)
-      ])
-  }))
-)
+  const dataColumns = ref(
+    DATA_COLUMNS.map((c) => ({
+      ...c,
+      p_visible: true,
+      id: c.accessorKey,
+      // Render function para el header: Icono + Texto
+      header: ({ column }: any) =>
+        h('div', { class: 'flex items-center gap-1' }, [
+          h(UIcon, {
+            name: 'i-lucide-grip-vertical',
+            class:
+              'col-drag-handle w-4 h-4 text-gray-400 cursor-grab opacity-50 hover:opacity-100'
+          }),
+          h('span', typeof c.header === 'function' ? c.header : c.header)
+        ])
+    }))
+  )
 
 // Actualizar visibilidad
 const updateColumnVisibility = (col: any, val: boolean) => {

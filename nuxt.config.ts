@@ -7,7 +7,7 @@ export default defineNuxtConfig({
   ],
   devServer: {
     host: '0.0.0.0', // <- debe estar así
-    port: 3000
+    port: 3008
   },
   experimental: {
     watcher: 'chokidar',
@@ -16,7 +16,7 @@ export default defineNuxtConfig({
   typescript: {
     typeCheck: false // Desactivar temporalmente durante build
   },
-  ssr: false,
+  ssr: true,
   imports: {
     dirs: [
       'composables',
@@ -25,24 +25,32 @@ export default defineNuxtConfig({
       'stores' // Si tienes helpers en stores
     ]
   },
+
   devtools: {
     enabled: true
   },
   app: {
-    baseURL: '/', // Ajusta si está en subdirectorio
-    buildAssetsDir: 'assets'
+    baseURL: './', // Relative paths for filesystem routing in Capacitor
+    buildAssetsDir: '/_nuxt/'
   },
 
   css: ['~/assets/css/main.css'],
   runtimeConfig: {
-    apiBase: process.env.API_BASE, // solo server
+    apiBase1: process.env.API_BASE1,
+    apiBase2: process.env.API_BASE2,
+    // solo server
     public: {
-      apiBase: process.env.PUBLIC_API_BASE // visible en cliente
+      apiBase1: process.env.PUBLIC_API_BASE1,
+      apiBase2: process.env.PUBLIC_API_BASE2
+      // visible en cliente
     }
   },
+
+  // 👇 Auto-importar types globalmente
   alias: {
     '@types': './types'
   },
+
   routeRules: {
     '/api/**': {
       cors: true
@@ -51,8 +59,7 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2024-07-11',
 
-  // ← Esto lo hace SPA
   nitro: {
-    preset: 'static' // Para generar archivos estáticos
+    preset: 'node'
   }
 })

@@ -4,8 +4,10 @@ import { navigationLinks } from '~/data/navigation'
 const route = useRoute()
 const toast = useToast()
 
+const auth = useAuthStore()
+
 const open = ref(false)
-const showSidebar = computed(() => route.path !== '/login')
+const showSidebar = computed(() => auth.isLogged)
 
 const links = navigationLinks
 

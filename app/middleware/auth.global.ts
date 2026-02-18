@@ -1,17 +1,24 @@
-import { defineNuxtRouteMiddleware, navigateTo } from '#app'
-import { useAuthStore } from '@/stores/useAuthStore'
+export default defineNuxtRouteMiddleware(async (to) => {
+  // 1. Rutas públicas
+  const publicPages = ['/login']
+  if (publicPages.includes(to.path)) {
+    return
+  }
 
-export default defineNuxtRouteMiddleware((to) => {
   const auth = useAuthStore()
 
-  // Restaurar token de cookie si aún no está en el store
-  const token = auth.token
+  // 2. Si ya hay usuario, no hacer nada
+  if (auth.user) return
 
-  // No proteger la ruta de login
-  if (to.path === '/login') return
+  try {
+    // 3. Intentar restaurar sesión desde cookies
+    await auth.fetchMe()
+  } catch {
+    // ignorar error
+  }
 
-  // Redirigir a login si no hay token válido
-  if (!token || auth.isTokenExpiring()) {
+  // 4. Si sigue sin usuario → login
+  if (!auth.user) {
     return navigateTo('/login')
   }
 })
