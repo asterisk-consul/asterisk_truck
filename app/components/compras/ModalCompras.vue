@@ -5,7 +5,7 @@ import TotalesDistribuidos from './TotalesDistribuidos.vue'
 import AccionesDistribucion from './AccionesDistribucion.vue'
 import z from 'zod'
 import { distribucionesSchema } from '@/schemas/distribuciones.schema'
-import { useDepositos } from '@/composables/useDepositos'
+import { useDepositos } from '~/composables/useDeposito'
 
 const depositosStore = useDepositosStore()
 const comprasStore = useComprasStore()

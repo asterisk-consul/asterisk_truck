@@ -11,13 +11,13 @@ useHead({
   ],
   link: [{ rel: 'icon', href: '/donandres.ico' }],
   htmlAttrs: {
-    lang: 'en'
+    lang: 'es'
   }
 })
 
-const title = 'Asterisk Truck'
+const title = 'Asterisk Suite'
 const description =
-  'A professional dashboard template built with Nuxt UI, featuring multiple pages, data visualization, and comprehensive management capabilities for creating powerful admin interfaces.'
+  'Un suite de herramientas para la gestión de proyectos de Asterisk'
 
 useSeoMeta({
   title,

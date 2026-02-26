@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import type { SelectItem } from '@nuxt/ui'
-import { useDepositos } from '@/composables/useDepositos'
+import { useDepositos } from '~/composables/useDeposito'
 import type { PropType } from 'vue'
 
 // --- props ---

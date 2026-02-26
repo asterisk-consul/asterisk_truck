@@ -29,7 +29,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       color: 'success'
     })
 
-    router.push('/')
+    await navigateTo('/')
   } catch (err: any) {
     errorMessage.value =
       err?.data?.message || 'Usuario o contraseña incorrectos'

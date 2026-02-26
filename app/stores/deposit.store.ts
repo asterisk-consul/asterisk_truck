@@ -1,7 +1,7 @@
 // stores/depositos.store.ts
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { DepositosService } from '~/services/depositos.service'
+import { DepositosService } from '~/services/deposit.service'
 
 export const useDepositosStore = defineStore('depositos', () => {
   const entities = ref<Partial<ApiDeposito>[]>([])

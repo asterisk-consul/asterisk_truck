@@ -30,19 +30,16 @@ export default defineNuxtConfig({
     enabled: true
   },
   app: {
-    baseURL: './', // Relative paths for filesystem routing in Capacitor
+    baseURL: '/', // Relative paths for filesystem routing in Capacitor
     buildAssetsDir: '/_nuxt/'
   },
 
   css: ['~/assets/css/main.css'],
   runtimeConfig: {
-    apiBase1: process.env.API_BASE1,
-    apiBase2: process.env.API_BASE2,
-    // solo server
+    apiBase: process.env.API_BASE,
+
     public: {
-      apiBase1: process.env.PUBLIC_API_BASE1,
-      apiBase2: process.env.PUBLIC_API_BASE2
-      // visible en cliente
+      apiBase: process.env.PUBLIC_API_BASE
     }
   },
 

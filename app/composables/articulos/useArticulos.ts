@@ -20,8 +20,8 @@ export function useArticulos(id: number) {
     { immediate: true }
   )
 
-  const articulosDepositos = computed(() =>
-    articulo.value?.articulosDepositos ?? []
+  const articulosDepositos = computed(
+    () => articulo.value?.articulosDepositos ?? []
   )
 
   const totalCantidad = computed(() =>
@@ -39,4 +39,3 @@ export function useArticulos(id: number) {
     totalCantidad
   }
 }
-

@@ -1,0 +1,93 @@
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import { useLocationsService } from '@/services/logistica/master-data/locations.service'
+import type {
+  Location,
+  CreateLocationInput,
+  UpdateLocationInput
+} from '~/types/logistica/master-data/locations'
+
+export const useLocationsStore = defineStore('locations', () => {
+  const service = useLocationsService()
+
+  const items = ref<Location[]>([])
+  const current = ref<Location | null>(null)
+  const loading = ref(false)
+
+  // =========================
+  // LOAD ALL
+  // =========================
+  const fetchAll = async () => {
+    try {
+      loading.value = true
+      items.value = await service.getAll()
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // =========================
+  // LOAD ONE
+  // =========================
+  const fetchOne = async (id: string) => {
+    try {
+      loading.value = true
+      const data = await service.getOne(id)
+      current.value = data
+      return data
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // =========================
+  // CREATE
+  // =========================
+  const create = async (payload: CreateLocationInput) => {
+    const created = await service.create(payload)
+    items.value.unshift(created)
+    return created
+  }
+
+  // =========================
+  // UPDATE
+  // =========================
+  const update = async (id: string, payload: UpdateLocationInput) => {
+    const updated = await service.update(id, payload)
+
+    const index = items.value.findIndex((i) => i.id === id)
+    if (index !== -1) {
+      items.value[index] = updated
+    }
+
+    if (current.value?.id === id) {
+      current.value = updated
+    }
+
+    return updated
+  }
+
+  // =========================
+  // DELETE
+  // =========================
+  const remove = async (id: string) => {
+    await service.remove(id)
+
+    items.value = items.value.filter((i) => i.id !== id)
+
+    if (current.value?.id === id) {
+      current.value = null
+    }
+  }
+
+  return {
+    items,
+    current,
+    loading,
+    fetchAll,
+    fetchOne,
+    create,
+    update,
+    remove
+  }
+})

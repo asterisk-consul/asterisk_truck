@@ -37,6 +37,13 @@ export const navigationLinks = [
       defaultOpen: false
     },
     {
+      label: 'logistica',
+      to: '/logistica',
+      icon: 'i-lucide-truck',
+      defaultOpen: false,
+      children: [{ label: 'Demostracion', to: '/logistica/operaciones' }]
+    },
+    {
       label: 'Ajustes',
       to: '/settings',
       icon: 'i-lucide-settings',

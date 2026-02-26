@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useDepositosStore } from '~/stores/depositos.store'
+import { useDepositosStore } from '~/stores/deposit.store'
 
 export type TipoCamion = 'TRACTOR' | 'SEMI'
 
