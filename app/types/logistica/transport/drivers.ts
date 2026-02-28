@@ -4,12 +4,12 @@
 export interface Driver {
   id: string
   companyId: string
-  firstName: string
-  lastName: string
+  first_name: string
+  last_name: string
   document: string | null
   phone: string | null
   licenseNumber: string | null
-  licenseExpiration: Date | null
+  license_expiration: Date | null
   active: boolean
   createdAt: string
 

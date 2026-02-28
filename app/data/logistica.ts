@@ -16,14 +16,15 @@ export const links: NavigationMenuItem[][] = [
     { label: 'Stock', icon: 'i-heroicons-archive-box', to: '/' },
     { label: 'Flota', icon: 'i-heroicons-wrench-screwdriver', to: '/' },
     {
+      label: 'Choferes',
+      icon: 'i-heroicons-users',
+      to: '/logistica/transport/drivers/'
+    },
+    {
       label: 'Clientes',
       icon: 'i-heroicons-building-office-2',
       to: '/'
     },
     { label: 'Reportes', icon: 'i-heroicons-chart-bar', to: '/' }
-  ],
-  [
-    { label: 'Permisos', icon: 'i-heroicons-lock-closed', to: '/' },
-    { label: 'Multi-Empresa', icon: 'i-heroicons-globe-alt', to: '/' }
   ]
 ]

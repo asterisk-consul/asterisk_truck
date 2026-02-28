@@ -1,12 +1,8 @@
+import { apiProxy } from '~~/server/utils/api-proxy'
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
-  const token = getCookie(event, 'api2_token')
   const body = await readBody(event)
 
-  return await $fetch(`${config.apiBase2}/transport/transfers`, {
-    headers: {
-      Authorization: token ? `Bearer ${token}` : ''
-    },
+  return await apiProxy(event, '/transport/drivers', {
     method: 'POST',
     body
   })

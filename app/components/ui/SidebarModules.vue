@@ -7,12 +7,14 @@ defineProps<{
 </script>
 
 <template>
-  <UNavigationMenu :items="links[0]" orientation="vertical" tooltip popover />
+  <UDashboardSidebar resizable :ui="{ footer: 'border-t border-default' }">
+    <UNavigationMenu :items="links[0]" orientation="vertical" tooltip popover />
 
-  <UNavigationMenu
-    :items="links[1]"
-    orientation="vertical"
-    tooltip
-    class="mt-auto"
-  />
+    <UNavigationMenu
+      :items="links[1]"
+      orientation="vertical"
+      tooltip
+      class="mt-auto"
+    />
+  </UDashboardSidebar>
 </template>

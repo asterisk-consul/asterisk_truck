@@ -31,6 +31,7 @@ export async function apiProxy(
   options: {
     method?: HTTPMethod
     body?: any
+    query?: FetchOptions['query'] // 👈 NUEVO
   } = {}
 ) {
   const config = useRuntimeConfig()
@@ -44,6 +45,7 @@ export async function apiProxy(
     return await $fetch(`${config.apiBase}${path}`, {
       method,
       body: options.body,
+      query: options.query, // 👈 PASAR QUERY
       headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
     })
   } catch (error: any) {
@@ -65,6 +67,7 @@ export async function apiProxy(
       return await $fetch(`${config.apiBase}${path}`, {
         method,
         body: options.body,
+        query: options.query, // 👈 TAMBIÉN AQUÍ
         headers: {
           Authorization: `Bearer ${refreshRes.access_token}`
         }

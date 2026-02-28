@@ -45,7 +45,8 @@ export default defineNuxtConfig({
 
   // 👇 Auto-importar types globalmente
   alias: {
-    '@types': './types'
+    '@types': './types',
+    '@server/utils': './server/utils'
   },
 
   routeRules: {

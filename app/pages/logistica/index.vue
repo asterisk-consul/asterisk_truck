@@ -1,9 +1,17 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: 'default'
-})
+import { links } from '~/data/logistica'
+import SidebarModules from '~/components/ui/SidebarModules.vue'
 </script>
 
 <template>
-  <div class="p-6">Dashboard logística</div>
+  <UDashboardPanel id="logistica">
+    <template #header>
+      <UDashboardNavbar title="Logistica" :ui="{ right: 'gap-3' }">
+        <template #leading>
+          <UDashboardSidebarCollapse />
+        </template>
+      </UDashboardNavbar>
+      <SidebarModules :links="links" />
+    </template>
+  </UDashboardPanel>
 </template>
