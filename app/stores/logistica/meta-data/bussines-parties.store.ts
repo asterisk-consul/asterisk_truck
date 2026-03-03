@@ -29,10 +29,6 @@ export const useBusinessPartiesStore = defineStore('businessParties', () => {
     items.value.filter((i) => i.type === 'supplier')
   )
 
-  const carriers = computed(() =>
-    items.value.filter((i) => i.type === 'carrier')
-  )
-
   // =========================
   // LOAD ALL
   // =========================
@@ -116,7 +112,6 @@ export const useBusinessPartiesStore = defineStore('businessParties', () => {
     activeItems,
     clients,
     suppliers,
-    carriers,
 
     // actions
     fetchAll,

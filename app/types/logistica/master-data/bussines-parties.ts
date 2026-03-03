@@ -1,7 +1,7 @@
 export interface BusinessParty {
   id: string
   company_id: string
-  type: 'client' | 'supplier' | 'carrier'
+  type: 'client' | 'supplier'
   name: string
   tax_id?: string
   phone?: string

@@ -1,4 +1,5 @@
-export const driverFormFields = [
+import type { BaseField } from '@/types/form.types'
+export const driverFormFields: BaseField[] = [
   { label: 'Nombre', name: 'first_name', type: 'text', placeholder: 'Juan' },
   { label: 'Apellido', name: 'last_name', type: 'text', placeholder: 'Pérez' },
   {
@@ -7,7 +8,7 @@ export const driverFormFields = [
     type: 'text',
     placeholder: '30123456'
   },
-  { label: 'Teléfono', name: 'phone', type: 'tel', placeholder: '3511234567' },
+  { label: 'Teléfono', name: 'phone', type: 'text', placeholder: '3511234567' },
   {
     label: 'N° Licencia',
     name: 'license_number',

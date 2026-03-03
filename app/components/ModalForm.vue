@@ -1,61 +1,76 @@
-<script setup lang="ts">
-import type { PropType } from 'vue'
+<script setup lang="ts" generic="T extends Record<string, any>">
 import { reactive, watch, computed } from 'vue'
+import type { BaseField } from '@/types/form.types'
 
-interface Field {
-  label: string
-  name: string
-  type: string
-  placeholder?: string
-}
+const props = defineProps<{
+  open: boolean
+  fields: BaseField[]
+  title?: string
+  initialValues?: Partial<T>
+}>()
 
-const props = defineProps({
-  open: Boolean,
-  fields: { type: Array as PropType<Field[]>, required: true },
-  title: { type: String, default: 'Formulario' }
-})
+const emit = defineEmits<{
+  (e: 'update:open', value: boolean): void
+  (e: 'submit', value: T): void
+}>()
 
-const emit = defineEmits(['update:open', 'submit'])
-
+/* ---------------------------------------
+   CONTROL MODAL
+--------------------------------------- */
 const modalOpen = computed({
   get: () => props.open,
-  set: (value: boolean) => emit('update:open', value)
+  set: (val: boolean) => emit('update:open', val)
 })
 
+/* ---------------------------------------
+   STATE DINÁMICO TIPADO
+--------------------------------------- */
 const state = reactive<Record<string, any>>({})
 
-function resetForm() {
-  for (const f of props.fields) {
-    state[f.name] = f.type === 'checkbox' ? false : ''
+function buildInitialState() {
+  for (const field of props.fields) {
+    if (props.initialValues && field.name in props.initialValues) {
+      state[field.name] = props.initialValues[field.name as keyof T]
+      continue
+    }
+
+    switch (field.type) {
+      case 'checkbox':
+        state[field.name] = false
+        break
+      case 'select':
+        state[field.name] = null
+        break
+      default:
+        state[field.name] = ''
+    }
   }
 }
 
-/* Inicialización */
+/* ---------------------------------------
+   WATCHERS
+--------------------------------------- */
 watch(
   () => props.fields,
-  () => resetForm(),
+  () => buildInitialState(),
   { immediate: true }
 )
 
-/* Reset al cerrar */
 watch(
   () => props.open,
-  (value) => {
-    if (!value) {
-      resetForm()
+  (val) => {
+    if (!val) {
+      buildInitialState()
     }
   }
 )
 
+/* ---------------------------------------
+   SUBMIT
+--------------------------------------- */
 function handleSubmit() {
-  emit('submit', { ...state })
-  resetForm()
+  emit('submit', { ...state } as T)
   modalOpen.value = false
-}
-
-function close() {
-  emit('update:open', false)
-  resetForm()
 }
 </script>
 
@@ -65,34 +80,55 @@ function close() {
     <template #header>
       <div class="flex justify-between items-center">
         <h3 class="text-lg font-semibold">
-          {{ title }}
+          {{ title ?? 'Formulario' }}
         </h3>
 
         <UButton
           icon="i-heroicons-x-mark"
           color="neutral"
           variant="ghost"
-          @click="close"
+          @click="modalOpen = false"
         />
       </div>
     </template>
 
-    <!-- FORM -->
+    <!-- BODY -->
     <template #body>
       <div class="max-h-[70vh] overflow-y-auto pr-2">
         <UForm :state="state" @submit="handleSubmit" class="space-y-8">
-          <!-- Grid 2 columnas -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <template v-for="field in fields" :key="field.name">
-              <!-- 🔥 FORM FIELD -->
-              <UFormField :label="field.label" :name="field.name">
+              <!-- HIDDEN -->
+              <input
+                v-if="field.type === 'hidden'"
+                type="hidden"
+                v-model="state[field.name]"
+              />
+
+              <UFormField v-else :label="field.label" :name="field.name">
                 <!-- CHECKBOX -->
                 <UCheckbox
                   v-if="field.type === 'checkbox'"
                   v-model="state[field.name]"
                 />
 
-                <!-- INPUT -->
+                <!-- SELECT -->
+                <USelect
+                  v-else-if="field.type === 'select'"
+                  v-model="state[field.name]"
+                  :items="field.options"
+                  class="w-full"
+                />
+
+                <!-- TEXTAREA -->
+                <UTextarea
+                  v-else-if="field.type === 'textarea'"
+                  v-model="state[field.name]"
+                  :placeholder="field.placeholder"
+                  size="lg"
+                />
+
+                <!-- INPUTS -->
                 <UInput
                   v-else
                   v-model="state[field.name]"
@@ -104,7 +140,7 @@ function close() {
             </template>
           </div>
 
-          <!-- Footer -->
+          <!-- FOOTER -->
           <div class="flex justify-end gap-3 pt-6 border-t">
             <UButton color="neutral" variant="soft" @click="modalOpen = false">
               Cancelar

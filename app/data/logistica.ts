@@ -2,11 +2,36 @@ import type { NavigationMenuItem } from '@nuxt/ui'
 export const links: NavigationMenuItem[][] = [
   [
     { label: 'Dashboard', icon: 'i-heroicons-squares-2x2', to: '/' },
-    { label: 'Viajes', icon: 'i-heroicons-truck', to: '/' },
+    {
+      label: 'Viajes',
+      icon: 'i-heroicons-truck',
+      to: '/',
+      defaultOpen: false,
+      children: [
+        {
+          label: 'Choferes',
+          icon: 'i-heroicons-users',
+          to: '/logistica/transport/drivers/'
+        },
+        {
+          label: 'Locaciones',
+          icon: 'i-lucide-map-pin',
+          to: '/logistica/master-data/locaciones/'
+        }
+      ]
+    },
     {
       label: 'Depósitos',
       icon: 'i-heroicons-building-storefront',
-      to: '/'
+      to: '/',
+      defaultOpen: false,
+      children: [
+        {
+          label: 'Productos',
+          icon: 'i-heroicons-cube',
+          to: '/logistica/master-data/productos/'
+        }
+      ]
     },
     {
       label: 'Picking',
@@ -16,15 +41,14 @@ export const links: NavigationMenuItem[][] = [
     { label: 'Stock', icon: 'i-heroicons-archive-box', to: '/' },
     { label: 'Flota', icon: 'i-heroicons-wrench-screwdriver', to: '/' },
     {
-      label: 'Choferes',
-      icon: 'i-heroicons-users',
-      to: '/logistica/transport/drivers/'
-    },
-    {
       label: 'Clientes',
       icon: 'i-heroicons-building-office-2',
-      to: '/'
+      to: '/logistica/master-data/business-parties/'
     },
-    { label: 'Reportes', icon: 'i-heroicons-chart-bar', to: '/' }
+    { label: 'Reportes', icon: 'i-heroicons-chart-bar', to: '/' },
+    {
+      label: 'Configuraciones',
+      icon: 'i-heroicons-cog-6-tooth'
+    }
   ]
 ]

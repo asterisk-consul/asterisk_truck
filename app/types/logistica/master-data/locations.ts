@@ -4,7 +4,7 @@ export interface Location {
   city?: string
   province?: string
   country?: string
-  postalCode?: string
+  postal_code?: string
   latitude?: number
   longitude?: number
   created_at?: string

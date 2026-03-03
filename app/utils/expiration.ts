@@ -13,14 +13,22 @@ export function daysUntil(dateString?: string | null): number | null {
   return Math.floor(diffMs / (1000 * 60 * 60 * 24))
 }
 
-export function getExpirationStatus(
-  dateString?: string | null,
-  warningDays = 30
-): ExpirationStatus {
-  const days = daysUntil(dateString)
+type ExpirationInput = Date | string | null | undefined
 
-  if (days === null) return 'none'
-  if (days < 0) return 'expired'
-  if (days <= warningDays) return 'warning'
+export function getExpirationStatus(date: ExpirationInput) {
+  if (!date) return 'valid'
+
+  const expirationDate = typeof date === 'string' ? new Date(date) : date
+
+  if (isNaN(expirationDate.getTime())) return 'valid'
+
+  const today = new Date()
+
+  const diffDays =
+    (expirationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+
+  if (diffDays < 0) return 'expired'
+  if (diffDays <= 30) return 'warning'
+
   return 'valid'
 }
