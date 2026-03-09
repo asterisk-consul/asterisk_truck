@@ -7,7 +7,7 @@ const props = defineProps<{
   open: boolean
   fields: BaseField[]
   title?: string
-  initialValues?: Partial<T>
+  initialValues?: Partial<T> // ← si existe = EDIT, si no = CREATE
 }>()
 
 const emit = defineEmits<{
@@ -30,22 +30,29 @@ const modalOpen = computed({
 
 const state = reactive<Record<string, any>>({})
 
+function resetState() {
+  for (const k in state) delete state[k]
+}
+
 function buildInitialState() {
+  resetState()
+
   for (const field of props.fields) {
-    if (props.initialValues && field.name in props.initialValues) {
-      state[field.name] = props.initialValues[field.name as keyof T]
+    const initial = props.initialValues?.[field.name as keyof T]
+
+    // EDIT MODE → usar valor existente
+    if (initial !== undefined && initial !== null) {
+      state[field.name] = initial
       continue
     }
 
+    // CREATE MODE → defaults
     switch (field.type) {
       case 'checkbox':
         state[field.name] = false
         break
 
       case 'select':
-        state[field.name] = null
-        break
-
       case 'date':
         state[field.name] = null
         break
@@ -60,16 +67,20 @@ function buildInitialState() {
    WATCHERS
 --------------------------------------- */
 
+// Reconstruir al abrir o cuando cambian datos iniciales
 watch(
-  () => props.fields,
-  () => buildInitialState(),
-  { immediate: true }
+  () => [props.open, props.initialValues, props.fields],
+  ([open]) => {
+    if (open) buildInitialState()
+  },
+  { immediate: true, deep: true }
 )
 
+// Limpiar al cerrar
 watch(
   () => props.open,
-  (val) => {
-    if (!val) buildInitialState()
+  (open) => {
+    if (!open) resetState()
   }
 )
 

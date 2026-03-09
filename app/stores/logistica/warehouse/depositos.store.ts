@@ -48,6 +48,11 @@ export const useDepositosStore = defineStore('warehouses', () => {
     }
   }
 
+  const desactivate = async (id: string) => {
+    await service.remove(id)
+    warehouses.value = warehouses.value.filter((w) => w.id !== id)
+  }
+
   const deleteWarehouse = async (id: string) => {
     await service.remove(id)
     warehouses.value = warehouses.value.filter((w) => w.id !== id)

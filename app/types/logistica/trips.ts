@@ -5,7 +5,10 @@ export interface TripRate {
   value: number
   created_at: string
   updated_at: string
-  transfer_rates?: any // opcional, detalles de la tarifa de transferencia
+  transfer_rates: {
+    name: string
+    rate_type: string
+  } // opcional, detalles de la tarifa de transferencia
 }
 
 export interface Trip {
@@ -15,14 +18,19 @@ export interface Trip {
   vehicle_combination_id?: string | null
   origin_location_id?: string | null
   destination_location_id?: string | null
-  departure_time?: string | null
-  arrival_time?: string | null
+  departure_time?: string
+  arrival_time?: string
   status: string
   kilometers?: number | null
   created_at: string
   updated_at: string
-  vehicle_combination?: any
+  vehicle_combination?: VehicleCombination
   trip_rates?: TripRate[]
+}
+
+export interface VehicleCombination {
+  id: string
+  unit_number?: string | null
 }
 
 export interface CreateTripInput {

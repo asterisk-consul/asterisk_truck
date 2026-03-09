@@ -1,32 +1,7 @@
 import { h } from 'vue'
-import { UBadge } from '#components'
+import { UBadge, UCheckbox } from '#components'
 import type { TableColumn } from '@nuxt/ui'
-
-export interface TripRate {
-  id: string
-  value: string
-  transfer_rates: {
-    name: string
-    rate_type: string
-  }
-}
-
-export interface VehicleCombination {
-  id: string
-  unit_number?: string | null
-}
-
-export interface Trip {
-  id: string
-  reference_number: string
-  departure_time: string
-  arrival_time: string
-  status: string
-  kilometers?: string
-  vehicle_combination?: VehicleCombination
-  trip_rates?: TripRate[]
-  created_at: string
-}
+import type { Trip } from '~/types/logistica/trips'
 
 function formatDate(date?: string) {
   if (!date) return '—'
@@ -67,6 +42,23 @@ function getStatusLabel(status: string) {
 }
 
 export const columns: TableColumn<Trip>[] = [
+  {
+    id: 'select',
+    header: ({ table }) =>
+      h(UCheckbox, {
+        modelValue: table.getIsSomePageRowsSelected()
+          ? 'indeterminate'
+          : table.getIsAllPageRowsSelected(),
+        'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
+          table.toggleAllPageRowsSelected(!!value)
+      }),
+    cell: ({ row }) =>
+      h(UCheckbox, {
+        modelValue: row.getIsSelected(),
+        'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
+          row.toggleSelected(!!value)
+      })
+  },
   {
     accessorKey: 'reference_number',
     header: 'Referencia'

@@ -2,33 +2,105 @@
 import { storeToRefs } from 'pinia'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 
-//stores
+type EditableField = 'name' | 'code' | 'locationId'
+type EditableValue = string | null | undefined
+
+// stores
 import { useDepositosStore } from '@/stores/logistica/warehouse/depositos.store'
 import { useLocationsStore } from '~/stores/logistica/meta-data/locations.store'
-//form
+
+// form
 import { warehouseFormFields } from '~/form/warehouseFormFields'
 import ModalForm from '~/components/ModalForm.vue'
-//composables
+
+// composables
 import { useLocations } from '~/composables/logistica/useLocations'
-//types
+
+// types
 import type {
   CreateWarehouseInput,
   UpdateWarehouseInput
 } from '~/types/logistica/warehouses/warehouse'
-//columns
-import { columns } from './columns'
-//pages
+
+// columns
+import { createWarehouseColumns } from './columns'
+
+// page meta
 definePageMeta({
   layout: 'logistica'
 })
 
+/* ---------------------------------------
+   STATE
+--------------------------------------- */
+
 const loading = ref(true)
+
 const store = useDepositosStore()
 const locationsStore = useLocationsStore()
+
 const { warehouses } = storeToRefs(store)
 const { items: locations } = storeToRefs(locationsStore)
 
 const { items } = useLocations(locations)
+
+/* ---------------------------------------
+   MODAL CONTROL
+--------------------------------------- */
+
+const modalOpen = ref(false)
+const modalMode = ref<'create' | 'edit'>('create')
+const editingRow = ref<any>(null)
+
+function openCreate() {
+  modalMode.value = 'create'
+  editingRow.value = null
+  modalOpen.value = true
+}
+
+function openEdit(row: any) {
+  modalMode.value = 'edit'
+
+  editingRow.value = {
+    ...row,
+    locationId: row.locationId ?? row.locations?.id ?? null
+  }
+  modalOpen.value = true
+}
+
+/* ---------------------------------------
+   TABLE COLUMNS
+--------------------------------------- */
+
+const columns = createWarehouseColumns({
+  onEdit: openEdit,
+
+  onToggleActive: async (row, value) => {
+    const prev = row.active
+    row.active = value
+
+    try {
+      await store.updateWarehouse(row.id, { active: value })
+    } catch {
+      row.active = prev
+    }
+  },
+
+  onInlineSave: async (row, field: EditableField, value: EditableValue) => {
+    const prev = row[field] as EditableValue
+    row[field] = value ?? ''
+
+    try {
+      await store.updateWarehouse(row.id, { [field]: value })
+    } catch {
+      row[field] = prev ?? ''
+    }
+  }
+})
+
+/* ---------------------------------------
+   FORM FIELDS
+--------------------------------------- */
 
 const fields = computed(() =>
   warehouseFormFields.map((field) => {
@@ -39,46 +111,72 @@ const fields = computed(() =>
         disabled: items.value.length === 0
       }
     }
-
     return field
   })
 )
 
-const open = ref(false)
+/* ---------------------------------------
+   LIFECYCLE
+--------------------------------------- */
 
 onMounted(async () => {
   await store.fetchAll()
-  if (locations.value.length === 0) await locationsStore.fetchAll()
+
+  if (locations.value.length === 0) {
+    await locationsStore.fetchAll()
+  }
+
   loading.value = store.loading
 })
 
-function saveDriver(data: any) {
-  const payload: CreateWarehouseInput = {
-    companyId: 'a060f7ff-0281-4df4-b5b3-cbdf940be31e',
-    name: data.name,
-    locationId: data.locationId,
-    code: data.code,
-    active: true
+/* ---------------------------------------
+   SUBMIT HANDLER
+--------------------------------------- */
+
+async function handleSubmit(data: any) {
+  if (modalMode.value === 'create') {
+    const payload: CreateWarehouseInput = {
+      companyId: 'a060f7ff-0281-4df4-b5b3-cbdf940be31e',
+      name: data.name,
+      locationId: data.locationId,
+      code: data.code,
+      active: true
+    }
+
+    await store.createWarehouse(payload)
+  } else {
+    const payload: UpdateWarehouseInput = {
+      name: data.name,
+      locationId: data.locationId,
+      code: data.code,
+      active: data.active
+    }
+
+    await store.updateWarehouse(editingRow.value.id, payload)
   }
-  store.createWarehouse(payload)
-  open.value = false
+
+  modalOpen.value = false
 }
 </script>
 
 <template>
   <div class="space-y-4">
     <div class="flex flex-row items-center justify-between">
-      <h3>Depositos</h3>
-      <UButton icon="i-heroicons-plus" @click="open = true">
-        Nuevo Deposito
+      <h3>Depósitos</h3>
+
+      <UButton icon="i-heroicons-plus" @click="openCreate">
+        Nuevo Depósito
       </UButton>
     </div>
+
     <LogisticaTable :loading="loading" :data="warehouses" :columns="columns" />
   </div>
+
   <ModalForm
-    v-model:open="open"
+    v-model:open="modalOpen"
     :fields="fields"
-    title="Nuevo Deposito"
-    @submit="saveDriver"
+    :title="modalMode === 'create' ? 'Nuevo Depósito' : 'Editar Depósito'"
+    :initial-values="editingRow"
+    @submit="handleSubmit"
   />
 </template>
