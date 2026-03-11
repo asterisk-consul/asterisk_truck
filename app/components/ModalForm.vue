@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="T extends Record<string, any>">
 import { reactive, watch, computed } from 'vue'
-import { CalendarDate } from '@internationalized/date'
+import { CalendarDate, parseDate } from '@internationalized/date'
 import type { BaseField } from '@/types/form.types'
 
 const props = defineProps<{
@@ -24,6 +24,26 @@ const modalOpen = computed({
   set: (val: boolean) => emit('update:open', val)
 })
 
+function toCalendarDate(value: unknown): CalendarDate | null {
+  if (!value) return null
+
+  if (value instanceof CalendarDate) return value
+
+  if (typeof value === 'string') {
+    try {
+      return parseDate(value.slice(0, 10)) // YYYY-MM-DD
+    } catch {
+      return null
+    }
+  }
+
+  return null
+}
+
+function calendarDateToISO(date: CalendarDate | null) {
+  if (!date) return null
+  return date.toString() // YYYY-MM-DD
+}
 /* ---------------------------------------
    STATE
 --------------------------------------- */
@@ -40,13 +60,17 @@ function buildInitialState() {
   for (const field of props.fields) {
     const initial = props.initialValues?.[field.name as keyof T]
 
-    // EDIT MODE → usar valor existente
+    // EDIT MODE
     if (initial !== undefined && initial !== null) {
-      state[field.name] = initial
+      if (field.type === 'date') {
+        state[field.name] = toCalendarDate(initial)
+      } else {
+        state[field.name] = initial
+      }
       continue
     }
 
-    // CREATE MODE → defaults
+    // CREATE MODE defaults
     switch (field.type) {
       case 'checkbox':
         state[field.name] = false
@@ -109,7 +133,7 @@ function handleSubmit() {
     const value = state[key]
 
     if (value instanceof CalendarDate) {
-      payload[key] = value.toString()
+      payload[key] = calendarDateToISO(value)
     } else {
       payload[key] = value
     }

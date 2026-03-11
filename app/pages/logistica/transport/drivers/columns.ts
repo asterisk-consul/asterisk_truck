@@ -2,6 +2,24 @@ import { h } from 'vue'
 import { UBadge } from '#components'
 import type { TableColumn } from '@nuxt/ui'
 import type { Driver } from '~/types/logistica/transport/drivers'
+import StatusToggle from '@/components/ui/PopoverTableActive.vue'
+
+import { useDateColumn } from '@/composables/useDateColumn'
+import { useSelectColumn } from '@/composables/table/useSelectColumn'
+import { useIdColumn } from '@/composables/table/useIdColumn'
+
+const createdDate = useDateColumn('es-AR')
+
+type OptionValue = string | boolean
+
+type BadgeColor =
+  | 'error'
+  | 'primary'
+  | 'warning'
+  | 'secondary'
+  | 'success'
+  | 'info'
+  | 'neutral'
 
 function getDocumentColor(expiration?: string | null) {
   if (!expiration) return 'neutral'
@@ -15,11 +33,19 @@ function getDocumentColor(expiration?: string | null) {
 
   if (diff < 0) return 'error'
   if (diff < 30) return 'warning'
-
   return 'success'
 }
+type Row = Driver
+export const driversColumns = (actions: {
+  onToggleActive?: (row: Row, value: boolean) => void
+  onEdit?: (row: Row) => void
+}): TableColumn<Row>[] => [
+  // ♻️ si querés selección múltiple
+  useSelectColumn<Driver>(),
 
-export const columns: TableColumn<Driver>[] = [
+  // ♻️ si Driver tiene id:string y querés click para editar
+  useIdColumn<Driver>(actions.onEdit),
+
   {
     id: 'driver',
     header: 'Chofer',
@@ -45,7 +71,6 @@ export const columns: TableColumn<Driver>[] = [
     header: 'Documentos',
     cell: ({ row }) => {
       const docs = row.original.driverDocuments
-
       if (!docs?.length) return '—'
 
       return h(
@@ -66,18 +91,29 @@ export const columns: TableColumn<Driver>[] = [
   },
 
   {
-    accessorKey: 'created_at',
-    header: 'Creado',
-    cell: ({ row }) => {
-      const date = (row.original as any).created_at
+    accessorKey: 'active',
+    header: 'Estado',
 
-      if (!date) return '—'
-
-      return new Date(date).toLocaleDateString('es-AR', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
+    accessorFn: (row) => (row.active ? 'activo' : 'inactivo'),
+    cell: ({ row }) =>
+      h(StatusToggle, {
+        modelValue: row.original.active,
+        title: 'Cambiar estado',
+        options: [
+          { label: 'Activo', value: true, color: 'success' },
+          { label: 'Inactivo', value: false, color: 'error' }
+        ],
+        'onUpdate:modelValue': (value: OptionValue) =>
+          actions.onToggleActive?.(row.original, value as boolean)
       })
-    }
+  },
+
+  // ♻️ fecha reusable
+  {
+    accessorKey: 'created_at', // 👈 camelCase si normalizaste API
+    header: 'Creado',
+    meta: createdDate.meta,
+    filterFn: createdDate.filterFn,
+    cell: ({ row }) => createdDate.format(row.getValue<string>('created_at'))
   }
 ]

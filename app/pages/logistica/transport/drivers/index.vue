@@ -1,26 +1,29 @@
 <script setup lang="ts">
-import type { CreateDriverInput } from '@/types/logistica/transport/drivers'
+import type {
+  CreateDriverInput,
+  UpdateDriverInput
+} from '@/types/logistica/transport/drivers'
 import { storeToRefs } from 'pinia'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 
 import { useDocumentTypesStore } from '~/stores/logistica/documents/document-types.store'
 import { useChoferesStore } from '@/stores/logistica/transport/choferes.store'
 //composable
+import { mapDriverDocumentsToForm } from '~/mappers/mapDriverDocumentsToForm'
 import { useDocuments } from '~/composables/logistica/useDocuments'
 import { useDriverMetrics } from '~/composables/logistica/useDriverMetrics'
+import type { Driver } from '~/types/logistica/transport/drivers'
 //form
 import { driverFormFields } from '~/form/driverFormFields'
 import ModalForm from '~/components/ModalForm.vue'
 //tabla
-import { columns } from './columns'
+import { driversColumns } from './columns'
 
 definePageMeta({
   layout: 'logistica'
 })
 
 const loading = ref(true)
-const open = ref(false)
-
 const store = useChoferesStore()
 const documentStore = useDocumentTypesStore()
 const { drivers } = storeToRefs(store)
@@ -28,6 +31,55 @@ const { items: documentTypes } = storeToRefs(documentStore)
 
 const { driverItems } = useDocuments(documentTypes)
 const metrics = useDriverMetrics(drivers)
+
+/* ---------------------------------------
+   MODAL CONTROL
+--------------------------------------- */
+
+const modalOpen = ref(false)
+const modalMode = ref<'create' | 'edit'>('create')
+const editingRow = ref<any>(null)
+
+function openCreate() {
+  modalMode.value = 'create'
+  editingRow.value = null
+  modalOpen.value = true
+}
+
+function openEdit(row: Driver) {
+  modalMode.value = 'edit'
+
+  editingRow.value = {
+    ...row,
+    ...mapDriverDocumentsToForm(row),
+    locationId: row.locationId ?? row.locations?.id ?? null
+  }
+
+  modalOpen.value = true
+}
+
+/* ---------------------------------------
+   TABLE COLUMNS
+--------------------------------------- */
+
+const columns = driversColumns({
+  onEdit: openEdit,
+  onToggleActive: async (row, value) => {
+    const prev = row.active
+    row.active = value
+
+    try {
+      if (value) await store.activate(row.id)
+      else await store.desactivate(row.id)
+    } catch {
+      row.active = prev
+    }
+  }
+})
+
+/* ---------------------------------------
+   LIFECYCLE
+--------------------------------------- */
 
 onMounted(async () => {
   await store.fetchAll('a060f7ff-0281-4df4-b5b3-cbdf940be31e')
@@ -54,19 +106,37 @@ const fields = computed(() =>
   })
 )
 
-function saveDriver(data: any) {
-  const payload: CreateDriverInput = {
-    company_id: 'a060f7ff-0281-4df4-b5b3-cbdf940be31e',
-    first_name: data.first_name,
-    last_name: data.last_name,
-    document: data.document,
-    phone: data.phone,
-    active: data.active,
-    documents: buildDriverDocuments(data)
+async function handleSubmit(data: any) {
+  if (modalMode.value === 'create') {
+    const payload: CreateDriverInput = {
+      company_id: 'a060f7ff-0281-4df4-b5b3-cbdf940be31e',
+      first_name: data.first_name,
+      last_name: data.last_name,
+      document: data.document,
+      phone: data.phone,
+      active: data.active,
+      documents: buildDriverDocuments(data)
+    }
+
+    await store.create(payload)
+  } else {
+    console.log(data)
+    const payload: UpdateDriverInput = {
+      company_id: 'a060f7ff-0281-4df4-b5b3-cbdf940be31e',
+      first_name: data.first_name,
+      last_name: data.last_name,
+      document: data.document,
+      phone: data.phone,
+      active: data.active,
+      documents: buildDriverDocuments(data)
+    }
+
+    await store.update(editingRow.value.id, payload)
   }
 
-  store.create(payload)
-  open.value = false
+  await store.fetchAll('a060f7ff-0281-4df4-b5b3-cbdf940be31e') // 🔥 FALTA ESTO
+
+  modalOpen.value = false
 }
 function buildDriverDocuments(form: any) {
   const docs = []
@@ -91,7 +161,7 @@ function buildDriverDocuments(form: any) {
   <div class="space-y-4">
     <div class="flex flex-row items-center justify-between">
       <h3>Choferes</h3>
-      <UButton icon="i-heroicons-plus" @click="open = true">
+      <UButton icon="i-heroicons-plus" @click="openCreate">
         Nuevo Chofer
       </UButton>
     </div>
@@ -124,9 +194,10 @@ function buildDriverDocuments(form: any) {
     <LogisticaTable :loading="loading" :data="drivers" :columns="columns" />
   </div>
   <ModalForm
-    v-model:open="open"
+    v-model:open="modalOpen"
     :fields="fields"
-    title="Nuevo Chofer"
-    @submit="saveDriver"
+    :title="modalMode === 'create' ? 'Nuevo Chofer' : 'Editar Chofer'"
+    :initial-values="editingRow"
+    @submit="handleSubmit"
   />
 </template>

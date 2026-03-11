@@ -2,76 +2,68 @@ import { h } from 'vue'
 import { UBadge, UCheckbox } from '#components'
 import type { TableColumn } from '@nuxt/ui'
 import type { Trip } from '~/types/logistica/trips'
+import StatusToggle from '@/components/ui/PopoverTableActive.vue'
+type OptionValue = string | boolean
 
-function formatDate(date?: string) {
-  if (!date) return '—'
-  return new Date(date).toLocaleString('es-AR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  })
-}
+import { useInlineEdit } from '@/composables/useInlineEdit'
+import { useDateColumn } from '@/composables/useDateColumn'
+import { useSelectColumn } from '@/composables/table/useSelectColumn'
+import { useIdColumn } from '@/composables/table/useIdColumn'
 
-function getStatusColor(status: string) {
-  switch (status) {
-    case 'PLANNED':
-      return 'info'
-    case 'IN_PROGRESS':
-      return 'warning'
-    case 'COMPLETED':
-      return 'success'
-    case 'CANCELLED':
-      return 'error'
-    default:
-      return 'neutral'
-  }
-}
-function getStatusLabel(status: string) {
-  switch (status) {
-    case 'PLANNED':
-      return 'Planificado'
-    case 'IN_PROGRESS':
-      return 'En curso'
-    case 'COMPLETED':
-      return 'Completado'
-    case 'CANCELLED':
-      return 'Cancelado'
-    default:
-      return status
-  }
-}
+const { editableCell } = useInlineEdit<Trip, EditableField>()
+const createdDate = useDateColumn('es-AR')
 
-export const columns: TableColumn<Trip>[] = [
-  {
-    id: 'select',
-    header: ({ table }) =>
-      h(UCheckbox, {
-        modelValue: table.getIsSomePageRowsSelected()
-          ? 'indeterminate'
-          : table.getIsAllPageRowsSelected(),
-        'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
-          table.toggleAllPageRowsSelected(!!value)
-      }),
-    cell: ({ row }) =>
-      h(UCheckbox, {
-        modelValue: row.getIsSelected(),
-        'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
-          row.toggleSelected(!!value)
-      })
-  },
+type TripStatus = 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
+type BadgeColor =
+  | 'error'
+  | 'primary'
+  | 'warning'
+  | 'secondary'
+  | 'success'
+  | 'info'
+  | 'neutral'
+
+const tripStatusConfig: Record<
+  TripStatus,
+  { label: string; color: BadgeColor }
+> = {
+  PLANNED: { label: 'Planificado', color: 'info' },
+  IN_PROGRESS: { label: 'En curso', color: 'warning' },
+  COMPLETED: { label: 'Completado', color: 'success' },
+  CANCELLED: { label: 'Cancelado', color: 'error' }
+}
+type Row = Trip
+type EditableField = 'city' | 'province' | 'country' | 'postalCode'
+export const tripsColumns = (actions: {
+  onToggleStatus?: (row: Row, value: TripStatus) => void
+  onEdit?: (row: Row) => void
+}): TableColumn<Row>[] => [
+  useSelectColumn<Row>(),
+  useIdColumn<Row>(actions.onEdit),
+
   {
     accessorKey: 'reference_number',
     header: 'Referencia'
   },
   {
-    id: 'status',
+    accessorKey: 'status',
     header: 'Estado',
+
+    accessorFn: (row) => tripStatusConfig[row.status as TripStatus]?.label,
+
     cell: ({ row }) =>
-      h(
-        UBadge,
-        { variant: 'subtle', color: getStatusColor(row.original.status) },
-        () => getStatusLabel(row.original.status) // ✅ antes era row.original.status directo
-      )
+      h(StatusToggle, {
+        modelValue: row.original.status,
+        title: 'Cambiar estado',
+        options: [
+          { label: 'Planificado', value: 'PLANNED', color: 'info' },
+          { label: 'En curso', value: 'IN_PROGRESS', color: 'warning' },
+          { label: 'Completado', value: 'COMPLETED', color: 'success' },
+          { label: 'Cancelado', value: 'CANCELLED', color: 'error' }
+        ],
+        'onUpdate:modelValue': (value: OptionValue) =>
+          actions.onToggleStatus?.(row.original, value as TripStatus)
+      })
   },
   {
     id: 'vehicle_combination',
@@ -116,16 +108,23 @@ export const columns: TableColumn<Trip>[] = [
   {
     accessorKey: 'departure_time',
     header: 'Salida',
-    cell: ({ row }) => formatDate(row.original.departure_time)
+    meta: createdDate.meta,
+    filterFn: createdDate.filterFn,
+    cell: ({ row }) =>
+      createdDate.format(row.getValue<string>('departure_time'))
   },
   {
     accessorKey: 'arrival_time',
     header: 'Llegada',
-    cell: ({ row }) => formatDate(row.original.arrival_time)
+    meta: createdDate.meta,
+    filterFn: createdDate.filterFn,
+    cell: ({ row }) => createdDate.format(row.getValue<string>('arrival_time'))
   },
   {
     accessorKey: 'created_at',
     header: 'Creado',
-    cell: ({ row }) => formatDate(row.original.created_at)
+    meta: createdDate.meta,
+    filterFn: createdDate.filterFn,
+    cell: ({ row }) => createdDate.format(row.getValue<string>('created_at'))
   }
 ]

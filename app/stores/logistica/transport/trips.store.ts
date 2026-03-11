@@ -78,6 +78,23 @@ export const useTripsStore = defineStore('trips', () => {
       loading.value = false
     }
   }
+  const updateStatus = async (id: string, status: Trip['status']) => {
+    error.value = null
+
+    const trip = items.value.find((t) => t.id === id)
+    if (!trip) return
+
+    const prev = trip.status
+    trip.status = status // optimistic update
+
+    try {
+      await service.updateStatus(id, status)
+    } catch (err: any) {
+      trip.status = prev // rollback
+      error.value = err?.data?.message || err.message
+      throw err
+    }
+  }
 
   const remove = async (id: string) => {
     loading.value = true
@@ -114,6 +131,7 @@ export const useTripsStore = defineStore('trips', () => {
     loading.value = true
     error.value = null
     try {
+      console.log(id, payload)
       const updated = await service.updateRate(id, payload)
       items.value.forEach((trip) => {
         trip.trip_rates?.forEach((rate) => {
@@ -162,6 +180,7 @@ export const useTripsStore = defineStore('trips', () => {
     addRate,
     updateRate,
     removeRate,
-    clearError
+    clearError,
+    updateStatus
   }
 })

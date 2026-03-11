@@ -53,8 +53,6 @@ export const useLocationsStore = defineStore('locations', () => {
   // UPDATE
   // =========================
   const update = async (id: string, payload: UpdateLocationInput) => {
-    console.log('Payload enviado:', payload) // 👈 verificá qué estás mandando
-
     try {
       const updated = await service.update(id, payload)
 

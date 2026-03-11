@@ -25,9 +25,13 @@ export const useChoferesService = () => {
       body
     })
 
-  const remove = (id: string) =>
-    $fetch<{ deleted: boolean }>(`/api/logistica/transport/drivers/${id}`, {
-      method: 'DELETE'
+  const activate = (id: string) =>
+    $fetch<void>(`/api/logistica/transport/drivers/${id}/activate`, {
+      method: 'PATCH'
+    })
+  const desactivate = (id: string) =>
+    $fetch<void>(`/api/logistica/transport/drivers/${id}/desactivate`, {
+      method: 'PATCH'
     })
 
   return {
@@ -35,6 +39,7 @@ export const useChoferesService = () => {
     getById,
     create,
     update,
-    remove
+    activate,
+    desactivate
   }
 }

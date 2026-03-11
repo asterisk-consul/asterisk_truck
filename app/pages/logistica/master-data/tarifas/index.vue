@@ -90,8 +90,11 @@ onMounted(async () => {
 async function handleSubmit(data: any) {
   if (modalMode.value === 'create') {
     const { id, ...payload } = data
-
-    await store.create(payload)
+    const data2 = {
+      ...payload,
+      company_id: 'a060f7ff-0281-4df4-b5b3-cbdf940be31e'
+    }
+    await store.create(data2)
   } else {
     console.log(data)
     const payload: UpdateTransferRateInput = {

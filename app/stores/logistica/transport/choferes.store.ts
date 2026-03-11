@@ -79,18 +79,26 @@ export const useChoferesStore = defineStore('drivers', () => {
     }
   }
 
-  const remove = async (id: string) => {
+  const activate = async (id: string) => {
     loading.value = true
     error.value = null
 
     try {
-      await service.remove(id)
+      await service.activate(id)
+    } catch (err: any) {
+      error.value = err?.data?.message || err.message
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
 
-      const index = drivers.value.findIndex((i) => i.id === id)
+  const desactivate = async (id: string) => {
+    loading.value = true
+    error.value = null
 
-      if (index !== -1) {
-        drivers.value[index]!.active = false
-      }
+    try {
+      await service.desactivate(id)
     } catch (err: any) {
       error.value = err?.data?.message || err.message
       throw err
@@ -107,6 +115,7 @@ export const useChoferesStore = defineStore('drivers', () => {
     fetchById,
     create,
     update,
-    remove
+    activate,
+    desactivate
   }
 })
