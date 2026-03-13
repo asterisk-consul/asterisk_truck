@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     httpOnly: true,
     sameSite: 'lax',
     path: '/',
-    maxAge: 60 * 15
+    maxAge: 40
   })
 
   setCookie(event, 'api_refresh', api.refreshToken, {

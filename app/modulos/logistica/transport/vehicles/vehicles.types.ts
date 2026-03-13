@@ -51,6 +51,7 @@ export interface UpdateVehicleDocumentInput {
 }
 
 export interface UpdateVehicleInput {
+  plate?: string
   type?: string
   brand?: string
   model?: string

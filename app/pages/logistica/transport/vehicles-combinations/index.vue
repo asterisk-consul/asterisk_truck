@@ -6,7 +6,7 @@ definePageMeta({
 import { storeToRefs } from 'pinia'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 //stores
-import { useVehiclesStore } from '~/stores/logistica/transport/vehicles.store'
+import { useVehiclesStore } from '~/modulos/logistica/transport/vehicles/vehicles.store'
 import { useVehicleCombinationsStore } from '~/stores/logistica/transport/vehicle-combinations.store'
 import { useChoferesStore } from '~/stores/logistica/transport/choferes.store'
 import { useAuthStore } from '~/stores/auth.store'

@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
-import { useVehiclesService } from '~/services/logistica/transport/vehicles.service'
+import { useVehiclesService } from '~/modulos/logistica/transport/vehicles/vehicles.service'
 import type {
   Vehicle,
   CreateVehicleInput,
   UpdateVehicleInput
-} from '~/types/logistica/transport/vehicles'
+} from '~/modulos/logistica/transport/vehicles/vehicles.types'
 
 export const useVehiclesStore = defineStore('vehicles', () => {
   // ================= STATE =================
@@ -123,6 +123,24 @@ export const useVehiclesStore = defineStore('vehicles', () => {
       loading.value = false
     }
   }
+  const activate = async (id: string) => {
+    loading.value = true
+    error.value = null
+
+    try {
+      await service.activate(id)
+
+      const vehicle = items.value.find((v) => v.id === id)
+      if (vehicle) {
+        vehicle.active = true
+      }
+    } catch (err: any) {
+      error.value = err?.data?.message || err.message
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
 
   const setCurrent = (id: string | null) => {
     current.value = id ? (items.value.find((v) => v.id === id) ?? null) : null
@@ -149,6 +167,7 @@ export const useVehiclesStore = defineStore('vehicles', () => {
     create,
     update,
     deactivate,
+    activate,
     setCurrent,
     clearError
   }

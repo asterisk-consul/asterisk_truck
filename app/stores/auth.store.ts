@@ -10,71 +10,43 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isLogged = computed(() => !!user.value)
 
-  // 🔐 LOGIN
   async function login(email: string, password: string) {
     loading.value = true
-
     try {
       const res = await fetchApi<{ user: AuthUser }>('/api/auth/login', {
         method: 'POST',
         body: { email, password },
         credentials: 'include'
       })
-
       user.value = res.user
     } finally {
       loading.value = false
     }
   }
 
-  // 👤 ME (usuario actual)
   async function fetchMe() {
     try {
       const res = await fetchApi<AuthUser>('/api/auth/me', {
         credentials: 'include'
       })
-
       user.value = res
     } catch {
       user.value = null
     }
   }
 
-  // 🔄 REFRESH
-  async function refresh() {
-    try {
-      await fetchApi('/api/auth/refresh', {
-        method: 'POST',
-        credentials: 'include'
-      })
-
-      await fetchMe()
-    } catch {
-      user.value = null
-    }
-  }
-
-  // 🚀 INIT SESSION (se ejecuta al cargar app)
+  // 🚀 INIT — solo obtiene el usuario, el refresh lo maneja apiProxy
   async function init() {
     if (initialized.value) return
-
     initialized.value = true
-
-    try {
-      await refresh() // genera access nuevo
-      await fetchMe() // obtiene usuario
-    } catch {
-      user.value = null
-    }
+    await fetchMe() // ✅ apiProxy se encarga del refresh si es necesario
   }
 
-  // 🚪 LOGOUT REAL
   async function logout() {
     await fetchApi('/api/auth/logout', {
       method: 'POST',
       credentials: 'include'
     })
-
     user.value = null
   }
 
@@ -85,7 +57,6 @@ export const useAuthStore = defineStore('auth', () => {
     isLogged,
     login,
     fetchMe,
-    refresh,
     init,
     logout
   }

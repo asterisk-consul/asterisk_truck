@@ -2,31 +2,36 @@ import type {
   Vehicle,
   CreateVehicleInput,
   UpdateVehicleInput
-} from '~/types/logistica/transport/vehicles'
+} from '~/modulos/logistica/transport/vehicles/vehicles.types'
 
 export const useVehiclesService = () => {
+  const baseUrl = '/api/logistica/transport/vehicles'
   const getAll = (companyId: string) =>
-    $fetch<Vehicle[]>('/api/logistica/transport/vehicles', {
+    $fetch<Vehicle[]>(`${baseUrl}`, {
       query: { companyId }
     })
 
-  const getOne = (id: string) =>
-    $fetch<Vehicle>(`/api/logistica/transport/vehicles/${id}`)
+  const getOne = (id: string) => $fetch<Vehicle>(`${baseUrl}/${id}`)
 
   const create = (body: CreateVehicleInput) =>
-    $fetch<Vehicle>('/api/logistica/transport/vehicles', {
+    $fetch<Vehicle>(`${baseUrl}`, {
       method: 'POST',
       body
     })
 
   const update = (id: string, body: UpdateVehicleInput) =>
-    $fetch<Vehicle>(`/api/logistica/transport/vehicles/${id}`, {
+    $fetch<Vehicle>(`${baseUrl}/${id}`, {
       method: 'PATCH',
       body
     })
 
   const deactivate = (id: string) =>
-    $fetch<void>(`/api/logistica/transport/vehicles/${id}/deactivate`, {
+    $fetch<void>(`${baseUrl}/${id}/deactivate`, {
+      method: 'PATCH'
+    })
+
+  const activate = (id: string) =>
+    $fetch<void>(`${baseUrl}/${id}/activate`, {
       method: 'PATCH'
     })
 
@@ -35,6 +40,7 @@ export const useVehiclesService = () => {
     getOne,
     create,
     update,
-    deactivate
+    deactivate,
+    activate
   }
 }

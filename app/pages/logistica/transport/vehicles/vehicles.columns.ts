@@ -4,11 +4,15 @@ import type { TableColumn } from '@nuxt/ui'
 import type {
   Vehicle,
   VehicleDocument
-} from '~/types/logistica/transport/vehicles'
+} from '~/modulos/logistica/transport/vehicles/vehicles.types'
+
+type EditableField = 'plate'
 
 import { useSelectColumn } from '@/composables/table/useSelectColumn'
 import { useIdColumn } from '@/composables/table/useIdColumn'
 import { useDateColumn } from '@/composables/useDateColumn'
+
+const { editableCell } = useInlineEdit<Vehicle, EditableField>()
 const createdDate = useDateColumn('es-AR')
 
 function getDocumentColor(expiration: string) {
@@ -26,6 +30,7 @@ function getDocumentColor(expiration: string) {
 }
 type Row = Vehicle
 export const vehiclesColumns = (actions: {
+  onInlineSave?: (row: Row, field: EditableField, value: EditableValue) => void
   // onToggleActive?: (row: Row, value: boolean) => void
   onEdit?: (row: Row) => void
 }): TableColumn<Row>[] => [
@@ -34,9 +39,11 @@ export const vehiclesColumns = (actions: {
 
   // ♻️ si Driver tiene id:string y querés click para editar
   useIdColumn<Row>(actions.onEdit),
+
   {
     accessorKey: 'plate',
-    header: 'Patente'
+    header: 'Patente',
+    cell: ({ row }) => editableCell('plate', row.original, actions)
   },
 
   {

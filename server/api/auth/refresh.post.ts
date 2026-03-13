@@ -1,12 +1,13 @@
 export default defineEventHandler(async (event) => {
   const refreshToken = getCookie(event, 'api_refresh')
-  if (!refreshToken)
+
+  if (!refreshToken) {
     throw createError({ statusCode: 401, message: 'No refresh token' })
+  }
 
   const config = useRuntimeConfig()
 
   try {
-    // Llamada a tu backend NestJS
     const api = await $fetch<{
       user: any
       accessToken: string
@@ -16,22 +17,39 @@ export default defineEventHandler(async (event) => {
       body: { refreshToken }
     })
 
+    // =========================
+    // SET COOKIES
+    // =========================
+
     setCookie(event, 'api_access', api.accessToken, {
       httpOnly: true,
+      secure: true,
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 15
+      maxAge: 60 * 35
     })
 
     setCookie(event, 'api_refresh', api.refreshToken, {
       httpOnly: true,
+      secure: true,
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24 * 7 // 7 días
+      maxAge: 60 * 60 * 24 * 7
     })
 
-    return { ok: true, user: api.user }
-  } catch (e) {
-    throw createError({ statusCode: 401, message: 'Refresh failed' })
+    return {
+      ok: true,
+      user: api.user,
+      accessToken: api.accessToken,
+      refreshToken: api.refreshToken
+    }
+  } catch (e: any) {
+    deleteCookie(event, 'api_access', { path: '/' })
+    deleteCookie(event, 'api_refresh', { path: '/' })
+
+    throw createError({
+      statusCode: 401,
+      message: 'Refresh failed'
+    })
   }
 })

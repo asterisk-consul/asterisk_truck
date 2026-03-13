@@ -6,7 +6,7 @@ definePageMeta({
 import { storeToRefs } from 'pinia'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 //stores
-import { useVehiclesStore } from '~/stores/logistica/transport/vehicles.store'
+import { useVehiclesStore } from '~/modulos/logistica/transport/vehicles/vehicles.store'
 import { useDocumentTypesStore } from '~/stores/logistica/documents/document-types.store'
 //form
 import { vehicleFormFields } from '~/form/vehicleFormFields'
@@ -20,8 +20,11 @@ import type {
   Vehicle,
   CreateVehicleInput,
   UpdateVehicleInput
-} from '~/types/logistica/transport/vehicles'
+} from '~/modulos/logistica/transport/vehicles/vehicles.types'
 
+type EditableField = 'plate'
+
+type EditableValue = string | null | undefined
 /* ---------------------------------------
    STATE
 --------------------------------------- */
@@ -68,7 +71,26 @@ function openEdit(row: Vehicle) {
 --------------------------------------- */
 
 const columns = vehiclesColumns({
-  onEdit: openEdit
+  onEdit: openEdit,
+  onInlineSave: async (
+    row: Vehicle,
+    field: EditableField,
+    value: EditableValue
+  ) => {
+    const prev = row[field]
+    row[field] = value ?? ''
+
+    try {
+      // Type assertion para el objeto dinámico
+      const updateData = {
+        [field]: value ?? undefined
+      } as UpdateVehicleInput // ← Solución temporal
+
+      await store.update(row.id, updateData)
+    } catch {
+      row[field] = prev
+    }
+  }
 })
 
 // ========================================
