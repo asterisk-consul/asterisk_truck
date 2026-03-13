@@ -1,7 +1,7 @@
 import { h } from 'vue'
 import { UBadge, UCheckbox } from '#components'
 import type { TableColumn } from '@nuxt/ui'
-import type { Trip } from '~/types/logistica/trips'
+import type { Trip } from '~/modulos/logistica/transport/trips/trips.types'
 import StatusToggle from '@/components/ui/PopoverTableActive.vue'
 type OptionValue = string | boolean
 

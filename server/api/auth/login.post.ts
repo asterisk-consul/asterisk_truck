@@ -1,4 +1,4 @@
-import type { ApiLoginResponse } from '@/types/auth'
+import type { ApiLoginResponse } from '~/modulos/auth/auth.types'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)

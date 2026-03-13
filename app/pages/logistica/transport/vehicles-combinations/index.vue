@@ -7,9 +7,9 @@ import { storeToRefs } from 'pinia'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 //stores
 import { useVehiclesStore } from '~/modulos/logistica/transport/vehicles/vehicles.store'
-import { useVehicleCombinationsStore } from '~/stores/logistica/transport/vehicle-combinations.store'
-import { useChoferesStore } from '~/stores/logistica/transport/choferes.store'
-import { useAuthStore } from '~/stores/auth.store'
+import { useVehicleCombinationsStore } from '~/modulos/logistica/transport/vehicles-combinations/vehicle-combinations.store'
+import { useChoferesStore } from '~/modulos/logistica/transport/drivers/choferes.store'
+import { useAuthStore } from '~/modulos/auth/auth.store'
 //form
 import { vehicleCombinationsFormFields } from '~/form/vehicleCombinationsForm'
 import ModalForm from '~/components/ModalForm.vue'

@@ -4,7 +4,7 @@ import type { TableColumn } from '@nuxt/ui'
 import type {
   DocumentType,
   DocumentEntity
-} from '~/types/logistica/transport-document/document-types'
+} from '~/modulos/logistica/documents/delivery-types/document-types.types'
 import StatusToggle from '@/components/ui/PopoverTableActive.vue'
 import '@tanstack/table-core'
 

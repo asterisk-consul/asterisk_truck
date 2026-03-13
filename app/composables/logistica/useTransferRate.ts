@@ -1,5 +1,5 @@
 import { computed, type Ref } from 'vue'
-import type { TransferRate } from '~/types/logistica/transfer-rates'
+import type { TransferRate } from '~/modulos/logistica/transport/transfer-rates/transfer-rates.types'
 
 export interface SelectItem {
   label: string

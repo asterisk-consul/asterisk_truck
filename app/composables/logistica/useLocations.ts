@@ -1,5 +1,5 @@
 import { computed, type Ref } from 'vue'
-import type { Location } from '~/types/logistica/master-data/locations'
+import type { Location } from '~/modulos/logistica/master-data/locations/locations'
 
 export interface SelectItem {
   label: string

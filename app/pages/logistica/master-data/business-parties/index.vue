@@ -3,7 +3,7 @@ definePageMeta({
   layout: 'logistica',
   middleware: ['auth']
 })
-import { useBusinessPartiesStore } from '@/stores/logistica/meta-data/bussines-parties.store'
+import { useBusinessPartiesStore } from '~/modulos/logistica/master-data/bussiness-parties/bussines-parties.store'
 import { businessPartyFormFields } from '~/form/businessPartyFormFields'
 import { columns } from './columns'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'

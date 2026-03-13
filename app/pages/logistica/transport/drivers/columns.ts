@@ -1,7 +1,7 @@
 import { h } from 'vue'
 import { UBadge } from '#components'
 import type { TableColumn } from '@nuxt/ui'
-import type { Driver } from '~/types/logistica/transport/drivers'
+import type { Driver } from '~/modulos/logistica/transport/drivers/drivers.types'
 import StatusToggle from '@/components/ui/PopoverTableActive.vue'
 
 import { useDateColumn } from '@/composables/useDateColumn'

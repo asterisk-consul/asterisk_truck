@@ -1,5 +1,5 @@
 import { computed, type Ref } from 'vue'
-import type { DocumentType } from '~/types/logistica/transport-document/document-types'
+import type { DocumentType } from '~/modulos/logistica/documents/delivery-types/document-types.types'
 
 export interface SelectItem {
   label: string

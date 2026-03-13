@@ -1,17 +1,26 @@
 import { h } from 'vue'
 import { UBadge } from '#components'
 import type { TableColumn } from '@nuxt/ui'
-import type { BusinessParty } from '~/types/logistica/master-data/bussines-parties'
+import type { BusinessParty } from '~/modulos/logistica/master-data/bussiness-parties/bussines-parties.types'
 
-export const columns: TableColumn<BusinessParty>[] = [
-  {
-    accessorKey: 'id',
-    header: '#',
-    cell: ({ row }) => {
-      const id = row.getValue('id') as string
-      return `#${id.slice(0, 8)}`
-    }
-  },
+import { useInlineEdit } from '@/composables/useInlineEdit'
+import { useDateColumn } from '@/composables/useDateColumn'
+import { useSelectColumn } from '@/composables/table/useSelectColumn'
+import { useIdColumn } from '@/composables/table/useIdColumn'
+
+type Row = BusinessParty
+type EditableField = 'city' | 'province' | 'country' | 'postalCode'
+
+const { editableCell } = useInlineEdit<BusinessParty, EditableField>()
+const createdDate = useDateColumn('es-AR')
+
+export const BusinessPartyColumns = (actions: {
+  onToggleActive?: (row: Row, value: boolean) => void
+  onInlineSave?: (row: Row, field: EditableField, value: EditableValue) => void
+  onEdit?: (row: Row) => void
+}): TableColumn<Row>[] => [
+  useSelectColumn<Row>(),
+  useIdColumn<Row>(actions.onEdit),
 
   {
     accessorKey: 'name',

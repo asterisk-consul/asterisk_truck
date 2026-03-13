@@ -4,14 +4,14 @@ definePageMeta({
   middleware: ['auth']
 })
 import { storeToRefs } from 'pinia'
-import { useDocumentTypesStore } from '~/stores/logistica/documents/document-types.store'
+import { useDocumentTypesStore } from '~/modulos/logistica/documents/delivery-types/document-types.store'
 import { documentTypeFormFields } from '~/form/documentTypeFormFields'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 
 import type {
   CreateDocumentTypeInput,
   UpdateDocumentTypeInput
-} from '~/types/logistica/transport-document/document-types'
+} from '~/modulos/logistica/documents/delivery-types/document-types.types'
 
 type EditableField = 'name'
 type EditableValue = string | null | undefined

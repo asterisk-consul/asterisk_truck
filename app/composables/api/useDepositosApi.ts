@@ -2,7 +2,7 @@ import type {
   CreateWarehouseInput,
   UpdateWarehouseInput,
   Warehouse
-} from '~/types/logistica/warehouses/warehouse'
+} from '~/modulos/logistica/warehouses/warehouse/warehouse.types'
 
 export const useDepositosApi = () => {
   const getAll = () =>

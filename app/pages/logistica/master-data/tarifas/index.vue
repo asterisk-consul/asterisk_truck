@@ -7,7 +7,7 @@ import { storeToRefs } from 'pinia'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 
 //stores
-import { useTransferRatesStore } from '~/stores/logistica/transfer-rates/transfer-rates.store'
+import { useTransferRatesStore } from '~/modulos/logistica/transport/transfer-rates/transfer-rates.store'
 //form
 import { transferRatesFormFields } from '~/form/transfer-rates.form'
 import ModalForm from '~/components/ModalForm.vue'
@@ -16,7 +16,7 @@ import { tarifasColumns } from './columns'
 import type {
   TransferRate,
   UpdateTransferRateInput
-} from '~/types/logistica/transfer-rates'
+} from '~/modulos/logistica/transport/transfer-rates/transfer-rates.types'
 type EditableField = 'name' | 'description' | 'rate_type'
 type EditableValue = string | null | undefined
 /* ---------------------------------------

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useAuthStore } from '~/modulos/auth/auth.store'
 import type { DropdownMenuItem } from '@nuxt/ui'
 
 defineProps<{

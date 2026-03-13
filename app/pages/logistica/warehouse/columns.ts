@@ -2,7 +2,7 @@ import { h } from 'vue'
 import { UBadge, UCheckbox, UInput } from '#components'
 import type { TableColumn } from '@nuxt/ui'
 import StatusToggle from '@/components/ui/PopoverTableActive.vue'
-import type { Warehouse } from '~/types/logistica/warehouses/warehouse'
+import type { Warehouse } from '~/modulos/logistica/warehouses/warehouse/warehouse.types'
 import type { Component } from 'vue'
 type OptionValue = string | boolean
 import '@tanstack/table-core'

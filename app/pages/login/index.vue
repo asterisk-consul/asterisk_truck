@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from '@nuxt/ui'
-import { useAuthStore } from '@/stores/auth.store'
+import { useAuthStore } from '~/modulos/auth/auth.store'
 import { schema } from './schema/login.schema'
 import type { Schema } from './schema/login.schema'
 import { fields } from './fields'

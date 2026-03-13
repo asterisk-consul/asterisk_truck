@@ -1,7 +1,7 @@
 import { h } from 'vue'
 import { UBadge } from '#components'
 import type { TableColumn } from '@nuxt/ui'
-import type { VehicleCombination } from '@/types/logistica/transport/vehicles-combinations'
+import type { VehicleCombination } from '~/modulos/logistica/transport/vehicles-combinations/vehicles-combinations.types'
 
 function formatDate(date?: string | null) {
   if (!date) return '—'

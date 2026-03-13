@@ -1,5 +1,5 @@
 import type { TableColumn } from '@nuxt/ui'
-import type { Location } from '~/types/logistica/master-data/locations'
+import type { Location } from '~/modulos/logistica/master-data/locations/locations'
 
 import { useInlineEdit } from '@/composables/useInlineEdit'
 import { useDateColumn } from '@/composables/useDateColumn'

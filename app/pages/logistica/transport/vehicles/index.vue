@@ -7,7 +7,7 @@ import { storeToRefs } from 'pinia'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 //stores
 import { useVehiclesStore } from '~/modulos/logistica/transport/vehicles/vehicles.store'
-import { useDocumentTypesStore } from '~/stores/logistica/documents/document-types.store'
+import { useDocumentTypesStore } from '~/modulos/logistica/documents/delivery-types/document-types.store'
 //form
 import { vehicleFormFields } from '~/form/vehicleFormFields'
 import ModalForm from '~/components/ModalForm.vue'

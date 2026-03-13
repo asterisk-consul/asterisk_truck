@@ -6,11 +6,14 @@ definePageMeta({
 import { storeToRefs } from 'pinia'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 //stores
-import { useTripsStore } from '~/stores/logistica/transport/trips.store'
-import { useVehicleCombinationsStore } from '~/stores/logistica/transport/vehicle-combinations.store'
-import { useLocationsStore } from '~/stores/logistica/meta-data/locations.store'
-import { useTransferRatesStore } from '~/stores/logistica/transfer-rates/transfer-rates.store'
-import type { CreateTripInput, UpdateTripInput } from '~/types/logistica/trips'
+import { useTripsStore } from '~/modulos/logistica/transport/trips/trips.store'
+import { useVehicleCombinationsStore } from '~/modulos/logistica/transport/vehicles-combinations/vehicle-combinations.store'
+import { useLocationsStore } from '~/modulos/logistica/master-data/locations/locations.store'
+import { useTransferRatesStore } from '~/modulos/logistica/transport/transfer-rates/transfer-rates.store'
+import type {
+  CreateTripInput,
+  UpdateTripInput
+} from '~/modulos/logistica/transport/trips/trips.types'
 //form
 import { tripsFormFields } from '~/form/tripFormFields'
 import ModalForm from '~/components/ModalForm.vue'

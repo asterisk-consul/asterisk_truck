@@ -1,5 +1,5 @@
 import { computed } from 'vue'
-import type { Driver } from '~/types/logistica/transport/drivers'
+import type { Driver } from '~/modulos/logistica/transport/drivers/drivers.types'
 import { getExpirationStatus } from '~/utils/expiration'
 
 export interface SelectItem {

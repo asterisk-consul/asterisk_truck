@@ -1,7 +1,7 @@
 import { h } from 'vue'
 import { UBadge } from '#components'
 import type { TableColumn } from '@nuxt/ui'
-import type { Product } from '~/types/logistica/master-data/product'
+import type { Product } from '~/modulos/logistica/master-data/product/product.types'
 
 export const columns: TableColumn<Product>[] = [
   {
