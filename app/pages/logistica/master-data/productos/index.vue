@@ -5,7 +5,7 @@ definePageMeta({
 })
 import { useProductsStore } from '~/modulos/logistica/master-data/product/products.store'
 import { columns } from '../../../../modulos/logistica/master-data/product/columns'
-import { productFormFields } from '~/form/productFormFields'
+import { productFormFields } from '~/modulos/logistica/master-data/product/productFormFields'
 import { useProductsMetrics } from '~/composables/logistica/useProductsMetrics'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 const store = useProductsStore()

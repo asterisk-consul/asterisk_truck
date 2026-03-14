@@ -6,15 +6,15 @@ export const documentTypeFormFields: BaseField[] = [
     label: 'Nombre del documento',
     name: 'name',
     type: 'text',
-    placeholder: 'VTV',
-    required: true
+    placeholder: 'VTV'
+    // required: true
   },
 
   {
     label: 'Entidad',
     name: 'entity',
     type: 'select',
-    required: true,
+    // required: true,
     options: [
       { label: 'Vehículo', value: 'VEHICLE' },
       { label: 'Chofer', value: 'DRIVER' }

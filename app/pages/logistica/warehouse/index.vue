@@ -10,7 +10,7 @@ import { useDepositosStore } from '~/modulos/logistica/warehouses/warehouse/depo
 import { useLocationsStore } from '~/modulos/logistica/master-data/locations/locations.store'
 
 // form
-import { warehouseFormFields } from '~/form/warehouseFormFields'
+import { warehouseFormFields } from '~/modulos/logistica/warehouses/warehouse/warehouseFormFields'
 import ModalForm from '~/components/ModalForm.vue'
 
 // composables

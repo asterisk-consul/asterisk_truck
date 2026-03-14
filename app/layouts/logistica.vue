@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { links as logistica } from '~/data/logistica'
+import { links as logistica } from '~/pages/logistica/logisticaNavigation'
 import SidebarModules from '~/components/ui/SidebarModules.vue'
 import { navigationLinks } from '~/data/navigation'
 import { useVersion } from '~/composables/useVersion'

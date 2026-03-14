@@ -12,7 +12,7 @@ export interface VehicleCombination {
   deleted_by?: string | null
   tractor?: { id: string; plate: string; brand?: string; model?: string } // ✅ corregido
   trailer?: { id: string; plate: string; brand?: string; model?: string } // ✅ corregido
-  driver?: { id: string; first_name: string; last_name: string } // ✅ corregido
+  drivers?: { id: string; first_name: string; last_name: string } // ✅ corregido
 }
 
 export interface CreateVehicleCombinationInput {

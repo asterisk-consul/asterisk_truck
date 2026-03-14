@@ -10,24 +10,24 @@ export const businessPartyFormFields: BaseField[] = [
     options: [
       { label: 'Cliente', value: 'client' },
       { label: 'Proveedor', value: 'supplier' }
-    ],
-    required: true
+    ]
+    // required: true
   },
 
   {
     label: 'Razón Social',
     name: 'name',
     type: 'text',
-    placeholder: 'Cliente Demo SRL',
-    required: true
+    placeholder: 'Cliente Demo SRL'
+    // required: true
   },
 
   {
     label: 'CUIT',
     name: 'tax_id',
     type: 'text',
-    placeholder: '30-12345678-9',
-    required: true
+    placeholder: '30-12345678-9'
+    // required: true
   },
 
   {
@@ -40,7 +40,7 @@ export const businessPartyFormFields: BaseField[] = [
   {
     label: 'Email',
     name: 'email',
-    type: 'email',
+    type: 'text',
     placeholder: 'cliente@demo.com'
   }
 ]

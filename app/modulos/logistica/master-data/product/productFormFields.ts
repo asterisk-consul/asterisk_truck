@@ -11,8 +11,8 @@ export const productFormFields: BaseField[] = [
     label: 'Nombre del producto',
     name: 'name',
     type: 'text',
-    placeholder: 'Producto Demo',
-    required: true
+    placeholder: 'Producto Demo'
+    // required: true
   },
 
   {

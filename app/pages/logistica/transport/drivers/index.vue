@@ -18,7 +18,7 @@ import { useDocuments } from '~/composables/logistica/useDocuments'
 import { useDriverMetrics } from '~/composables/logistica/useDriverMetrics'
 import type { Driver } from '~/modulos/logistica/transport/drivers/drivers.types'
 //form
-import { driverFormFields } from '~/form/driverFormFields'
+import { driverFormFields } from '~/modulos/logistica/transport/drivers/driverFormFields'
 import ModalForm from '~/components/ModalForm.vue'
 //tabla
 import { driversColumns } from '~/modulos/logistica/transport/drivers/columns'

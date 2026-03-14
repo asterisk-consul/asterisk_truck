@@ -4,7 +4,7 @@ definePageMeta({
   middleware: ['auth']
 })
 import { useBusinessPartiesStore } from '~/modulos/logistica/master-data/bussiness-parties/bussines-parties.store'
-import { businessPartyFormFields } from '~/form/businessPartyFormFields'
+import { businessPartyFormFields } from '~/modulos/logistica/master-data/bussiness-parties/businessPartyFormFields'
 import { BusinessPartyColumns } from '~/modulos/logistica/master-data/bussiness-parties/columns'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 

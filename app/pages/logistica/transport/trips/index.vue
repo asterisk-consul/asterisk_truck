@@ -16,7 +16,7 @@ import type {
   UpdateTripInput
 } from '~/modulos/logistica/transport/trips/trips.types'
 //form
-import { tripsFormFields } from '~/form/tripFormFields'
+import { tripsFormFields } from '~/modulos/logistica/transport/trips/tripFormFields'
 import ModalForm from '~/components/ModalForm.vue'
 //composables
 import { useLocations } from '~/composables/logistica/useLocations'

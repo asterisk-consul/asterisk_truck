@@ -5,7 +5,7 @@ definePageMeta({
 })
 import { storeToRefs } from 'pinia'
 import { useDocumentTypesStore } from '~/modulos/logistica/documents/delivery-types/document-types.store'
-import { documentTypeFormFields } from '~/form/documentTypeFormFields'
+import { documentTypeFormFields } from '~/modulos/logistica/documents/delivery-types/documentTypeFormFields'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 
 import type {

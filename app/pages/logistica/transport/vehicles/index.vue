@@ -9,7 +9,7 @@ import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 import { useVehiclesStore } from '~/modulos/logistica/transport/vehicles/vehicles.store'
 import { useDocumentTypesStore } from '~/modulos/logistica/documents/delivery-types/document-types.store'
 //form
-import { vehicleFormFields } from '~/form/vehicleFormFields'
+import { vehicleFormFields } from '~/modulos/logistica/transport/vehicles/vehicleFormFields'
 import ModalForm from '~/components/ModalForm.vue'
 import { mapVehicleDocumentsToForm } from '~/mappers/mapVehicleDocumentsToForm'
 //composables

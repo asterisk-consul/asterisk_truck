@@ -2,42 +2,64 @@ import { h } from 'vue'
 import { UBadge } from '#components'
 import type { TableColumn } from '@nuxt/ui'
 import type { VehicleCombination } from '~/modulos/logistica/transport/vehicles-combinations/vehicles-combinations.types'
+type Row = VehicleCombination
+import StatusToggle from '@/components/ui/PopoverTableActive.vue'
 
-function formatDate(date?: string | null) {
-  if (!date) return '—'
-  return new Date(date).toLocaleDateString('es-AR', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  })
-}
+type OptionValue = string | boolean
 
-export const columns: TableColumn<VehicleCombination>[] = [
+type EditableField = 'unit_number'
+
+import { useSelectColumn } from '@/composables/table/useSelectColumn'
+import { useIdColumn } from '@/composables/table/useIdColumn'
+import { useDateColumn } from '@/composables/useDateColumn'
+
+const { editableCell } = useInlineEdit<VehicleCombination, EditableField>()
+const createdDate = useDateColumn('es-AR')
+
+export const VehicleCombinationColumns = (actions: {
+  onInlineSave?: (row: Row, field: EditableField, value: EditableValue) => void
+  onToggleActive?: (row: Row, value: boolean) => void
+  onEdit?: (row: Row) => void
+}): TableColumn<Row>[] => [
+  // ♻️ si querés selección múltiple
+  useSelectColumn<Row>(),
+
+  // ♻️ si Driver tiene id:string y querés click para editar
+  useIdColumn<Row>(actions.onEdit),
+
   {
     accessorKey: 'unit_number',
     header: 'N° Unidad',
-    cell: ({ row }) => row.original.unit_number || '—'
+    cell: ({ row }) => editableCell('unit_number', row.original, actions)
   },
-  {
-    id: 'status',
-    header: 'Estado',
-    cell: ({ row }) => {
-      const validUntil = row.original.valid_until
-      const isActive = !validUntil || new Date(validUntil) >= new Date()
 
-      return h(UBadge, {
-        label: isActive ? 'Activo' : 'Histórico',
-        color: isActive ? 'success' : 'neutral',
-        variant: 'subtle'
+  {
+    accessorKey: 'status',
+    header: 'Estado',
+    cell: ({ row }) =>
+      h(StatusToggle, {
+        modelValue:
+          !row.original.valid_until ||
+          new Date(row.original.valid_until) >= new Date(),
+        title: 'Cambiar estado',
+        options: [
+          { label: 'Activo', value: true, color: 'success' },
+          { label: 'Histórico', value: false, color: 'neutral' }
+        ],
+        'onUpdate:modelValue': (value: OptionValue) =>
+          actions.onToggleActive?.(row.original, value as boolean)
       })
-    }
   },
   {
     id: 'tractor',
     header: 'Tractor',
     cell: ({ row }) => {
       const t = row.original.tractor
-      return t ? `${t.plate} - ${t.brand || ''} ${t.model || ''}`.trim() : '—'
+      if (!t) return '—'
+
+      // Solo añadir guion si hay brand o model
+      const details = [t.brand, t.model].filter(Boolean).join(' ')
+      return details ? `${t.plate} - ${details}` : t.plate
     }
   },
   {
@@ -45,30 +67,41 @@ export const columns: TableColumn<VehicleCombination>[] = [
     header: 'Trailer',
     cell: ({ row }) => {
       const t = row.original.trailer
-      return t ? `${t.plate} - ${t.brand || ''} ${t.model || ''}`.trim() : '—'
+      if (!t) return '—'
+
+      const details = [t.brand, t.model].filter(Boolean).join(' ')
+      return details ? `${t.plate} - ${details}` : t.plate
     }
   },
   {
     id: 'driver',
     header: 'Chofer',
     cell: ({ row }) => {
-      const d = row.original.driver
+      const d = row.original.drivers
+
       return d ? `${d.first_name} ${d.last_name}` : '—'
     }
   },
+
   {
-    accessorKey: 'valid_from',
+    accessorKey: 'valid_from', // 👈 camelCase si normalizaste API
     header: 'Válido desde',
-    cell: ({ row }) => formatDate(row.original.valid_from)
+    meta: createdDate.meta,
+    filterFn: createdDate.filterFn,
+    cell: ({ row }) => createdDate.format(row.getValue<string>('valid_from'))
   },
   {
-    accessorKey: 'valid_until',
+    accessorKey: 'valid_until', // 👈 camelCase si normalizaste API
     header: 'Válido hasta',
-    cell: ({ row }) => formatDate(row.original.valid_until)
+    meta: createdDate.meta,
+    filterFn: createdDate.filterFn,
+    cell: ({ row }) => createdDate.format(row.getValue<string>('valid_until'))
   },
   {
-    accessorKey: 'created_at',
+    accessorKey: 'created_at', // 👈 camelCase si normalizaste API
     header: 'Creado',
-    cell: ({ row }) => formatDate(row.original.created_at)
+    meta: createdDate.meta,
+    filterFn: createdDate.filterFn,
+    cell: ({ row }) => createdDate.format(row.getValue<string>('created_at'))
   }
 ]

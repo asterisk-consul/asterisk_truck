@@ -3,7 +3,7 @@ definePageMeta({
   middleware: ['auth']
 })
 
-import { links } from '~/data/logistica'
+import { links } from '~/pages/logistica/logisticaNavigation'
 import SidebarModules from '~/components/ui/SidebarModules.vue'
 </script>
 

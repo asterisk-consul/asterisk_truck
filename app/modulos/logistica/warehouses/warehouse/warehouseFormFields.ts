@@ -11,8 +11,8 @@ export const warehouseFormFields: BaseField[] = [
     label: 'Nombre del depósito',
     name: 'name',
     type: 'text',
-    placeholder: 'Depósito Central',
-    required: true
+    placeholder: 'Depósito Central'
+    // required: true
   },
 
   {

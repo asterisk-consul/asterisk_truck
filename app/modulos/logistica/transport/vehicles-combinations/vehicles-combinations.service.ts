@@ -52,6 +52,14 @@ export const useVehicleCombinationsService = () => {
       }
     )
 
+  const activate = (id: string) =>
+    $fetch<VehicleCombination>(
+      `/api/logistica/transport/vehicles-combinations/${id}/activate`,
+      {
+        method: 'PATCH'
+      }
+    )
+
   const remove = (id: string) =>
     $fetch<{ deleted: boolean }>(
       `/api/logistica/transport/vehicles-combinations/${id}`,
@@ -73,6 +81,7 @@ export const useVehicleCombinationsService = () => {
     update,
     finish,
     remove,
+    activate,
     historyByVehicle
   }
 }

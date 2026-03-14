@@ -109,6 +109,19 @@ export const useVehicleCombinationsStore = defineStore(
         loading.value = false
       }
     }
+    const activate = async (id: string) => {
+      loading.value = true
+      error.value = null
+
+      try {
+        await service.activate(id)
+      } catch (err: any) {
+        error.value = err?.data?.message || err.message
+        throw err
+      } finally {
+        loading.value = false
+      }
+    }
 
     const remove = async (id: string) => {
       loading.value = true
@@ -140,6 +153,7 @@ export const useVehicleCombinationsStore = defineStore(
       create,
       update,
       finish,
+      activate,
       remove,
       clearError
     }
