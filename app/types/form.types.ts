@@ -17,7 +17,7 @@ export interface BaseField {
   label?: string
   type: FieldType
   placeholder?: string
-  disabled?: boolean
+  disabled?: boolean | ((state: Record<string, any>) => boolean) // <-- función opcional
   span?: 1 | 2
   options?: { label: string; value: any }[]
 }

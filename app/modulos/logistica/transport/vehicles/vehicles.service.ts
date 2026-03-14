@@ -31,7 +31,7 @@ export const useVehiclesService = () => {
     })
 
   const activate = (id: string) =>
-    $fetch<void>(`${baseUrl}/${id}/activate`, {
+    $fetch<void>(`${baseUrl}/${id}/active`, {
       method: 'PATCH'
     })
 

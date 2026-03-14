@@ -7,7 +7,7 @@ const props = defineProps<{
   open: boolean
   fields: BaseField[]
   title?: string
-  initialValues?: Partial<T> // ← si existe = EDIT, si no = CREATE
+  initialValues?: Partial<T>
 }>()
 
 const emit = defineEmits<{
@@ -18,7 +18,6 @@ const emit = defineEmits<{
 /* ---------------------------------------
    CONTROL MODAL
 --------------------------------------- */
-
 const modalOpen = computed({
   get: () => props.open,
   set: (val: boolean) => emit('update:open', val)
@@ -26,28 +25,25 @@ const modalOpen = computed({
 
 function toCalendarDate(value: unknown): CalendarDate | null {
   if (!value) return null
-
   if (value instanceof CalendarDate) return value
-
   if (typeof value === 'string') {
     try {
-      return parseDate(value.slice(0, 10)) // YYYY-MM-DD
+      return parseDate(value.slice(0, 10))
     } catch {
       return null
     }
   }
-
   return null
 }
 
 function calendarDateToISO(date: CalendarDate | null) {
   if (!date) return null
-  return date.toString() // YYYY-MM-DD
+  return date.toString()
 }
+
 /* ---------------------------------------
    STATE
 --------------------------------------- */
-
 const state = reactive<Record<string, any>>({})
 
 function resetState() {
@@ -75,12 +71,10 @@ function buildInitialState() {
       case 'checkbox':
         state[field.name] = false
         break
-
       case 'select':
       case 'date':
         state[field.name] = null
         break
-
       default:
         state[field.name] = ''
     }
@@ -90,8 +84,6 @@ function buildInitialState() {
 /* ---------------------------------------
    WATCHERS
 --------------------------------------- */
-
-// Reconstruir al abrir o cuando cambian datos iniciales
 watch(
   () => [props.open, props.initialValues, props.fields],
   ([open]) => {
@@ -100,7 +92,6 @@ watch(
   { immediate: true, deep: true }
 )
 
-// Limpiar al cerrar
 watch(
   () => props.open,
   (open) => {
@@ -109,29 +100,36 @@ watch(
 )
 
 /* ---------------------------------------
+   REFRIGERATION RULE: CAMION → Normal
+--------------------------------------- */
+watch(
+  () => state.type,
+  (newType) => {
+    if (newType === 'CAMION') {
+      state.refrigeration = false
+    }
+  }
+)
+
+/* ---------------------------------------
    DATE FORMAT
 --------------------------------------- */
-
 function formatDate(date: CalendarDate | null) {
   if (!date) return ''
-
   const y = date.year
   const m = String(date.month).padStart(2, '0')
   const d = String(date.day).padStart(2, '0')
-
   return `${d}/${m}/${y}`
 }
 
 /* ---------------------------------------
    SUBMIT
 --------------------------------------- */
-
 function handleSubmit() {
   const payload: Record<string, any> = {}
 
   for (const key in state) {
     const value = state[key]
-
     if (value instanceof CalendarDate) {
       payload[key] = calendarDateToISO(value)
     } else {
@@ -158,7 +156,6 @@ function handleSubmit() {
         <h3 class="text-lg font-semibold">
           {{ title ?? 'Formulario' }}
         </h3>
-
         <UButton
           icon="i-heroicons-x-mark"
           color="neutral"
@@ -191,7 +188,11 @@ function handleSubmit() {
                 <UCheckbox
                   v-if="field.type === 'checkbox'"
                   v-model="state[field.name]"
-                  :disabled="field.disabled"
+                  :disabled="
+                    typeof field.disabled === 'function'
+                      ? field.disabled(state)
+                      : field.disabled
+                  "
                 />
 
                 <!-- SELECT -->
@@ -199,7 +200,11 @@ function handleSubmit() {
                   v-else-if="field.type === 'select'"
                   v-model="state[field.name]"
                   :items="field.options"
-                  :disabled="field.disabled"
+                  :disabled="
+                    typeof field.disabled === 'function'
+                      ? field.disabled(state)
+                      : field.disabled
+                  "
                   class="w-full"
                 />
 
@@ -220,22 +225,28 @@ function handleSubmit() {
                   </template>
                 </UPopover>
 
-                <!-- TEXTAREA -->
                 <UTextarea
                   v-else-if="field.type === 'textarea'"
                   v-model="state[field.name]"
                   :placeholder="field.placeholder"
-                  :disabled="field.disabled"
+                  :disabled="
+                    typeof field.disabled === 'function'
+                      ? field.disabled(state)
+                      : field.disabled
+                  "
                   class="w-full"
                 />
 
-                <!-- INPUT -->
                 <UInput
                   v-else
                   v-model="state[field.name]"
                   :type="field.type"
                   :placeholder="field.placeholder"
-                  :disabled="field.disabled"
+                  :disabled="
+                    typeof field.disabled === 'function'
+                      ? field.disabled(state)
+                      : field.disabled
+                  "
                   class="w-full"
                 />
               </UFormField>
@@ -247,7 +258,6 @@ function handleSubmit() {
             <UButton color="neutral" variant="soft" @click="modalOpen = false">
               Cancelar
             </UButton>
-
             <UButton type="submit" color="primary" size="lg">Guardar</UButton>
           </div>
         </UForm>

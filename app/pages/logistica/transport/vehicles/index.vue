@@ -15,7 +15,7 @@ import { mapVehicleDocumentsToForm } from '~/mappers/mapVehicleDocumentsToForm'
 //composables
 import { useDocuments } from '~/composables/logistica/useDocuments'
 //tabla columns
-import { vehiclesColumns } from '../../../../modulos/logistica/transport/vehicles/vehicles.columns'
+import { vehiclesColumns } from '~/modulos/logistica/transport/vehicles/vehicles.columns'
 import type {
   Vehicle,
   CreateVehicleInput,
@@ -91,6 +91,37 @@ const columns = vehiclesColumns({
       await store.update(row.id, updateData)
     } catch {
       row[field] = prev
+    }
+  },
+  onToggleActive: async (row, value) => {
+    const prev = row.active
+    row.active = value
+
+    try {
+      if (value) await store.activate(row.id)
+      else await store.deactivate(row.id)
+    } catch {
+      row.active = prev
+    }
+  },
+  onToggleRefrigeration: async (row, value) => {
+    const prev = row.refrigeration
+    row.refrigeration = value
+
+    try {
+      await store.update(row.id, { refrigeration: value })
+    } catch {
+      row.refrigeration = prev
+    }
+  },
+  onToggleType(row, value) {
+    const prev = row.type
+    row.type = value
+
+    try {
+      store.update(row.id, { type: value })
+    } catch {
+      row.type = prev
     }
   }
 })

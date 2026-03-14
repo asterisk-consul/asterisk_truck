@@ -12,12 +12,14 @@ interface Option {
     | 'primary'
     | 'secondary'
     | 'neutral'
+  disabled?: boolean
 }
 
 const props = defineProps<{
   modelValue: OptionValue
   options: Option[]
   title?: string
+  disabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -44,7 +46,10 @@ const current = computed(() =>
           size="xs"
           :color="option.color"
           :variant="modelValue === option.value ? 'solid' : 'ghost'"
-          @click.stop.prevent="emit('update:modelValue', option.value)"
+          :disabled="option.disabled"
+          @click.stop.prevent="
+            !option.disabled && emit('update:modelValue', option.value)
+          "
         >
           {{ option.label }}
         </UButton>

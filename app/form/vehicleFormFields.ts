@@ -56,7 +56,8 @@ export const vehicleFormFields: BaseField[] = [
   {
     label: 'Refrigeración',
     name: 'refrigeration',
-    type: 'checkbox'
+    type: 'checkbox',
+    disabled: (state) => state.type === 'CAMION'
   },
 
   /* ---------------- DOCUMENTOS ---------------- */

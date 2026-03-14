@@ -5,6 +5,9 @@ import type {
   Vehicle,
   VehicleDocument
 } from '~/modulos/logistica/transport/vehicles/vehicles.types'
+import StatusToggle from '@/components/ui/PopoverTableActive.vue'
+
+type OptionValue = string | boolean
 
 type EditableField = 'plate'
 
@@ -31,7 +34,9 @@ function getDocumentColor(expiration: string) {
 type Row = Vehicle
 export const vehiclesColumns = (actions: {
   onInlineSave?: (row: Row, field: EditableField, value: EditableValue) => void
-  // onToggleActive?: (row: Row, value: boolean) => void
+  onToggleActive?: (row: Row, value: boolean) => void
+  onToggleRefrigeration?: (row: Row, value: boolean) => void
+  onToggleType?: (row: Row, value: 'CAMION' | 'SEMI') => void
   onEdit?: (row: Row) => void
 }): TableColumn<Row>[] => [
   // ♻️ si querés selección múltiple
@@ -45,10 +50,20 @@ export const vehiclesColumns = (actions: {
     header: 'Patente',
     cell: ({ row }) => editableCell('plate', row.original, actions)
   },
-
   {
     accessorKey: 'type',
-    header: 'Tipo'
+    header: 'Tipo',
+    cell: ({ row }: { row: { original: Vehicle } }) =>
+      h(StatusToggle, {
+        modelValue: row.original.type, // 'CAMION' | 'SEMI'
+        title: 'Cambiar tipo de vehículo',
+        options: [
+          { label: 'Camión', value: 'CAMION', color: 'primary' },
+          { label: 'Semi', value: 'SEMI', color: 'warning' }
+        ],
+        'onUpdate:modelValue': (value: OptionValue) =>
+          actions.onToggleType?.(row.original, value as 'CAMION' | 'SEMI')
+      })
   },
 
   {
@@ -63,20 +78,24 @@ export const vehiclesColumns = (actions: {
   },
 
   {
-    accessorKey: 'refrigeration',
-    header: 'Frío',
-    cell: ({ row }) => {
-      const refrigeration = row.original.refrigeration
-
-      return h(
-        UBadge,
-        {
-          variant: 'subtle',
-          color: refrigeration ? 'info' : 'neutral'
-        },
-        () => (refrigeration ? 'Refrigerado' : 'Normal')
-      )
-    }
+    accessorKey: 'type',
+    header: 'Tipo',
+    cell: ({ row }: { row: { original: Vehicle } }) =>
+      h(StatusToggle, {
+        modelValue: row.original.refrigeration,
+        title: 'Cambiar tipo de refrigeración',
+        options: [
+          {
+            label: 'Refrigerado',
+            value: true,
+            color: 'info',
+            disabled: row.original.type === 'CAMION'
+          },
+          { label: 'Normal', value: false, color: 'neutral' }
+        ],
+        'onUpdate:modelValue': (value: OptionValue) =>
+          actions.onToggleRefrigeration?.(row.original, value as boolean)
+      })
   },
 
   {
@@ -102,6 +121,23 @@ export const vehiclesColumns = (actions: {
         )
       )
     }
+  },
+  {
+    accessorKey: 'active',
+    header: 'Estado',
+
+    accessorFn: (row) => (row.active ? 'activo' : 'inactivo'),
+    cell: ({ row }) =>
+      h(StatusToggle, {
+        modelValue: !!row.original.active,
+        title: 'Cambiar estado',
+        options: [
+          { label: 'Activo', value: true, color: 'success' },
+          { label: 'Inactivo', value: false, color: 'error' }
+        ],
+        'onUpdate:modelValue': (value: OptionValue) =>
+          actions.onToggleActive?.(row.original, value as boolean)
+      })
   },
 
   // ♻️ fecha reusable

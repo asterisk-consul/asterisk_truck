@@ -5,7 +5,7 @@
     "tsconfig.json": "tsconfig.*.json, env.d.ts",
     "nuxt.config.ts": ".prettierrc, eslint.config.*, .editorconfig",
     ".env": ".env.*, .env.example",
-    "README.md": "renovate.json",
+    "README.md": "renovate.json, CHANGELOG.md",
     ".gitignore": ".gitattributes",
     "pnpm-workspace.yaml": "pnpm-lock.yaml"
   },

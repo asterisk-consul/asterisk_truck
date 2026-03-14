@@ -5,7 +5,7 @@
 ### Changed
 
 - [ ] Carga de clientes [DON-111](https://asteriskconsul-1753224743977.atlassian.net/browse/DON-111)
-- [ ] Validacion en tipo de vehiculo [DON-110](https://asteriskconsul-1753224743977.atlassian.net/browse/DON-110)
+- [x] Validacion en tipo de vehiculo [DON-110](https://asteriskconsul-1753224743977.atlassian.net/browse/DON-110)
 - [x] timeaout de la ui [DON-109](https://asteriskconsul-1753224743977.atlassian.net/browse/DON-109)
 - [ ] Nueva flota campo chofer [DON-108](https://asteriskconsul-1753224743977.atlassian.net/browse/DON-108)
 - [ ] Actualizacion de regitros nueva flota [DON-107](https://asteriskconsul-1753224743977.atlassian.net/browse/DON-107)
