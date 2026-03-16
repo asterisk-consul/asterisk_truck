@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
 definePageMeta({
   layout: 'logistica',
   middleware: ['auth']
@@ -7,13 +8,13 @@ import { storeToRefs } from 'pinia'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 //stores
 import { useVehiclesStore } from '~/modulos/logistica/transport/vehicles/vehicles.store'
-import { useDocumentTypesStore } from '~/modulos/logistica/documents/delivery-types/document-types.store'
+import { useDocumentTypesStore } from '~/modulos/logistica/documents/documents-types/document-types.store'
 //form
 import { vehicleFormFields } from '~/modulos/logistica/transport/vehicles/vehicleFormFields'
 import ModalForm from '~/components/ModalForm.vue'
 import { mapVehicleDocumentsToForm } from '~/mappers/mapVehicleDocumentsToForm'
 //composables
-import { useDocuments } from '~/composables/logistica/useDocuments'
+import { useDocuments } from '~/modulos/logistica/documents/documents-types/useDocuments'
 //tabla columns
 import { vehiclesColumns } from '~/modulos/logistica/transport/vehicles/vehicles.columns'
 import type {
@@ -25,6 +26,9 @@ import type {
 type EditableField = 'plate'
 
 type EditableValue = string | null | undefined
+function toggleModuleSidebar() {
+  moduleCollapsed.value = !moduleCollapsed.value
+}
 /* ---------------------------------------
    STATE
 --------------------------------------- */

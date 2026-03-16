@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
-import { useDocumentTypesService } from '~/modulos/logistica/documents/delivery-types/document-types.service'
+import { useDocumentTypesService } from '~/modulos/logistica/documents/documents-types/document-types.service'
 import type {
   DocumentType,
   CreateDocumentTypeInput,
   DocumentEntity,
   UpdateDocumentTypeInput
-} from '~/modulos/logistica/documents/delivery-types/document-types.types'
+} from '~/modulos/logistica/documents/documents-types/document-types.types'
 
 export const useDocumentTypesStore = defineStore('documentTypes', () => {
   // ========================================

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
+import type { ButtonProps } from '@nuxt/ui'
 definePageMeta({
   layout: 'logistica',
   middleware: ['auth']
@@ -10,18 +12,22 @@ import type {
 import { storeToRefs } from 'pinia'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 
-import { useDocumentTypesStore } from '~/modulos/logistica/documents/delivery-types/document-types.store'
+import { useDocumentTypesStore } from '~/modulos/logistica/documents/documents-types/document-types.store'
 import { useChoferesStore } from '~/modulos/logistica/transport/drivers/choferes.store'
 //composable
 import { mapDriverDocumentsToForm } from '~/mappers/mapDriverDocumentsToForm'
-import { useDocuments } from '~/composables/logistica/useDocuments'
-import { useDriverMetrics } from '~/composables/logistica/useDriverMetrics'
+import { useDocuments } from '~/modulos/logistica/documents/documents-types/useDocuments'
+import { useDriverMetrics } from '~/modulos/logistica/transport/drivers/useDriverMetrics'
 import type { Driver } from '~/modulos/logistica/transport/drivers/drivers.types'
 //form
 import { driverFormFields } from '~/modulos/logistica/transport/drivers/driverFormFields'
 import ModalForm from '~/components/ModalForm.vue'
 //tabla
 import { driversColumns } from '~/modulos/logistica/transport/drivers/columns'
+
+function toggleModuleSidebar() {
+  moduleCollapsed.value = !moduleCollapsed.value
+}
 
 const loading = ref(true)
 const store = useChoferesStore()
@@ -154,15 +160,35 @@ function buildDriverDocuments(form: any) {
 
   return docs
 }
+const links = ref<ButtonProps[]>([
+  {
+    label: 'Nuevo  Chofer',
+    icon: 'i-heroicons-plus',
+    onClick: openCreate,
+    color: 'primary',
+    variant: 'solid'
+  }
+])
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-row items-center justify-between">
-      <h3>Choferes</h3>
-      <UButton icon="i-heroicons-plus" @click="openCreate">
-        Nuevo Chofer
-      </UButton>
+  <UPage class="space-y-4">
+    <div class="flex flex-col">
+      <div>
+        <UButton
+          icon="i-lucide-layout-panel-left"
+          variant="ghost"
+          color="neutral"
+          label="Menu"
+          @click="toggleModuleSidebar"
+        />
+      </div>
+      <UPageHeader
+        title="Choferes"
+        description="Listado de Choferes"
+        :links="links"
+        class="mb-4 w-full"
+      />
     </div>
     <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
       <UCard>
@@ -191,7 +217,7 @@ function buildDriverDocuments(form: any) {
       </UCard>
     </div>
     <LogisticaTable :loading="loading" :data="drivers" :columns="columns" />
-  </div>
+  </UPage>
   <ModalForm
     v-model:open="modalOpen"
     :fields="fields"

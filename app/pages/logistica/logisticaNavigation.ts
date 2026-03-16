@@ -9,6 +9,11 @@ export const links: NavigationMenuItem[][] = [
       defaultOpen: false,
       children: [
         {
+          label: 'Corredores',
+          icon: 'i-lucide-map',
+          to: '/logistica/transport/corridors/'
+        },
+        {
           label: 'Choferes',
           icon: 'i-heroicons-users',
           to: '/logistica/transport/drivers/'

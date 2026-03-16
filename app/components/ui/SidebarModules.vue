@@ -1,20 +1,29 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
-const open = ref(false)
+
+const collapsed = defineModel<boolean>('collapsed')
+
 defineProps<{
   links: NavigationMenuItem[][]
 }>()
 </script>
 
 <template>
-  <UDashboardSidebar resizable :ui="{ footer: 'border-t border-default' }">
-    <UNavigationMenu :items="links[0]" orientation="vertical" tooltip popover />
-
-    <UNavigationMenu
-      :items="links[1]"
-      orientation="vertical"
-      tooltip
-      class="mt-auto"
-    />
+  <UDashboardSidebar
+    collapsible
+    resizable
+    v-model:collapsed="collapsed"
+    class="border-r border-default"
+  >
+    <template #default="{ collapsed }">
+      <template v-for="(group, index) in links" :key="index">
+        <UNavigationMenu
+          :collapsed="collapsed"
+          :items="group"
+          orientation="vertical"
+          tooltip
+        />
+      </template>
+    </template>
   </UDashboardSidebar>
 </template>

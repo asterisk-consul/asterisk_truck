@@ -19,15 +19,19 @@ import type {
 import { tripsFormFields } from '~/modulos/logistica/transport/trips/tripFormFields'
 import ModalForm from '~/components/ModalForm.vue'
 //composables
-import { useLocations } from '~/composables/logistica/useLocations'
-import { useVehiclesCombinations } from '~/composables/logistica/useVehicleCombinations'
-import { useTransferRate } from '~/composables/logistica/useTransferRate'
+import { useLocations } from '~/modulos/logistica/master-data/locations/useLocations'
+import { useVehiclesCombinations } from '~/modulos/logistica/transport/vehicles-combinations/useVehicleCombinations'
+import { useTransferRate } from '~/modulos/logistica/transport/transfer-rates/useTransferRate'
 //tabla columns
 import { tripsColumns } from '~/modulos/logistica/transport/trips/columns'
 
 type EditableField = 'reference_number' | 'kilometers'
 type EditableValue = string | null | undefined
-
+const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
+import type { ButtonProps } from '@nuxt/ui'
+function toggleModuleSidebar() {
+  moduleCollapsed.value = !moduleCollapsed.value
+}
 const loading = ref(true)
 const store = useTripsStore()
 const vehiculoStore = useVehicleCombinationsStore()
@@ -170,16 +174,39 @@ async function handleSubmit(data: any) {
   await store.fetchAll('a060f7ff-0281-4df4-b5b3-cbdf940be31e')
   modalOpen.value = false
 }
+
+const links = ref<ButtonProps[]>([
+  {
+    label: 'Nuevo Viaje',
+    icon: 'i-heroicons-plus',
+    onClick: openCreate,
+    color: 'primary',
+    variant: 'solid'
+  }
+])
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-row items-center justify-between">
-      <h3>Viajes</h3>
-      <UButton icon="i-heroicons-plus" @click="openCreate">Nuevo Viaje</UButton>
+  <UPage class="space-y-4">
+    <div class="flex flex-col">
+      <div>
+        <UButton
+          icon="i-lucide-layout-panel-left"
+          variant="ghost"
+          color="neutral"
+          label="Menu"
+          @click="toggleModuleSidebar"
+        />
+      </div>
+      <UPageHeader
+        title="Viajes"
+        description="Listado de Viajes"
+        :links="links"
+        class="mb-4 w-full"
+      />
     </div>
     <LogisticaTable :loading="loading" :data="items" :columns="columns" />
-  </div>
+  </UPage>
   <ModalForm
     v-model:open="modalOpen"
     :fields="fields"

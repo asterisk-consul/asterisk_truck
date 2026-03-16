@@ -13,7 +13,7 @@ type EditableField = 'plate'
 
 import { useSelectColumn } from '@/composables/table/useSelectColumn'
 import { useIdColumn } from '@/composables/table/useIdColumn'
-import { useDateColumn } from '@/composables/useDateColumn'
+import { useDateColumn } from '~/composables/table/useDateColumn'
 
 const { editableCell } = useInlineEdit<Vehicle, EditableField>()
 const createdDate = useDateColumn('es-AR')

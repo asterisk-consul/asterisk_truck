@@ -1,8 +1,8 @@
 import type { TableColumn } from '@nuxt/ui'
 import type { Location } from '~/modulos/logistica/master-data/locations/locations'
 
-import { useInlineEdit } from '@/composables/useInlineEdit'
-import { useDateColumn } from '@/composables/useDateColumn'
+import { useInlineEdit } from '~/composables/table/useInlineEdit'
+import { useDateColumn } from '~/composables/table/useDateColumn'
 import { useSelectColumn } from '@/composables/table/useSelectColumn'
 import { useIdColumn } from '@/composables/table/useIdColumn'
 

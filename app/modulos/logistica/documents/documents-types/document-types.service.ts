@@ -3,7 +3,7 @@ import type {
   CreateDocumentTypeInput,
   DocumentEntity,
   UpdateDocumentTypeInput
-} from '~/modulos/logistica/documents/delivery-types/document-types.types'
+} from '~/modulos/logistica/documents/documents-types/document-types.types'
 
 export const useDocumentTypesService = () => {
   const urlBase = '/api/transport-document'

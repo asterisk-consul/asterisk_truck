@@ -5,8 +5,8 @@ import type { Trip } from '~/modulos/logistica/transport/trips/trips.types'
 import StatusToggle from '@/components/ui/PopoverTableActive.vue'
 type OptionValue = string | boolean
 
-import { useInlineEdit } from '@/composables/useInlineEdit'
-import { useDateColumn } from '@/composables/useDateColumn'
+import { useInlineEdit } from '~/composables/table/useInlineEdit'
+import { useDateColumn } from '~/composables/table/useDateColumn'
 import { useSelectColumn } from '@/composables/table/useSelectColumn'
 import { useIdColumn } from '@/composables/table/useIdColumn'
 

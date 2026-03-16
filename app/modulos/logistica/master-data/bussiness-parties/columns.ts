@@ -3,8 +3,8 @@ import { UBadge } from '#components'
 import type { TableColumn } from '@nuxt/ui'
 import type { BusinessParty } from '~/modulos/logistica/master-data/bussiness-parties/bussines-parties.types'
 
-import { useInlineEdit } from '@/composables/useInlineEdit'
-import { useDateColumn } from '@/composables/useDateColumn'
+import { useInlineEdit } from '~/composables/table/useInlineEdit'
+import { useDateColumn } from '~/composables/table/useDateColumn'
 import { useSelectColumn } from '@/composables/table/useSelectColumn'
 import { useIdColumn } from '@/composables/table/useIdColumn'
 

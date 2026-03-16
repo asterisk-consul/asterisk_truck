@@ -4,7 +4,7 @@ import type { TableColumn } from '@nuxt/ui'
 import type { Driver } from '~/modulos/logistica/transport/drivers/drivers.types'
 import StatusToggle from '@/components/ui/PopoverTableActive.vue'
 
-import { useDateColumn } from '@/composables/useDateColumn'
+import { useDateColumn } from '~/composables/table/useDateColumn'
 import { useSelectColumn } from '@/composables/table/useSelectColumn'
 import { useIdColumn } from '@/composables/table/useIdColumn'
 

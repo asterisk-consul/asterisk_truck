@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
 definePageMeta({
   layout: 'logistica',
   middleware: ['auth']
@@ -15,15 +16,17 @@ import { vehicleCombinationsFormFields } from '~/modulos/logistica/transport/veh
 import ModalForm from '~/components/ModalForm.vue'
 //composables
 
-import { useDriverMetrics } from '~/composables/logistica/useDriverMetrics'
-import { useVehicles } from '~/composables/logistica/useVehicles'
+import { useDriverMetrics } from '~/modulos/logistica/transport/drivers/useDriverMetrics'
+import { useVehicles } from '~/modulos/logistica/transport/vehicles/useVehicles'
 //tabla columns
 import { VehicleCombinationColumns } from '~/modulos/logistica/transport/vehicles-combinations/columns'
 import type {
   VehicleCombination,
   UpdateVehicleCombinationInput
 } from '~/modulos/logistica/transport/vehicles-combinations/vehicles-combinations.types'
+
 type EditableField = 'unit_number'
+type EditableValue = string | null | undefined
 
 const COMPANY_ID = 'a060f7ff-0281-4df4-b5b3-cbdf940be31e'
 
@@ -40,6 +43,10 @@ const { drivers } = storeToRefs(choferStore)
 
 const { tractorOptions, trailerOptions } = useVehicles(vehicles)
 const { items: driverItems } = useDriverMetrics(drivers)
+
+function toggleModuleSidebar() {
+  moduleCollapsed.value = !moduleCollapsed.value
+}
 /* ---------------------------------------
    MODAL CONTROL
 --------------------------------------- */
