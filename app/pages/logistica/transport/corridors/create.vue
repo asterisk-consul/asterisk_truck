@@ -4,7 +4,7 @@ definePageMeta({
   middleware: ['auth']
 })
 import { useCorridorsStore } from '~/modulos/logistica/transport/corridors/corridors.store'
-import type { CreateCorridorDto } from '~/modulos/logistica/transport/corridors/corridors.types'
+import type { CreateCorridorDto } from '~/modulos/logistica/transport/corridors/types/corridors.types'
 
 import CorridorForm from '~/modulos/logistica/transport/corridors/components/CorridorsForm.vue'
 
@@ -12,8 +12,10 @@ const router = useRouter()
 const store = useCorridorsStore()
 
 const submit = async (dto: CreateCorridorDto) => {
+  console.log(dto)
   const corridor = await store.createCorridor(dto)
-  router.push(`/corridors/${corridor.id}`)
+  console.log(corridor)
+  router.push(`logistica/transport/corridors/${corridor.id}`)
 }
 </script>
 

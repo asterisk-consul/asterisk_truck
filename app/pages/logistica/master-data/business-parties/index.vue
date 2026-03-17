@@ -8,6 +8,12 @@ import { businessPartyFormFields } from '~/modulos/logistica/master-data/bussine
 import { BusinessPartyColumns } from '~/modulos/logistica/master-data/bussiness-parties/columns'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 
+const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
+import type { ButtonProps } from '@nuxt/ui'
+function toggleModuleSidebar() {
+  moduleCollapsed.value = !moduleCollapsed.value
+}
+
 const store = useBusinessPartiesStore()
 
 const { items } = storeToRefs(store)
@@ -35,19 +41,39 @@ const saveLocation = async (data: any) => {
   await store.fetchAll('a060f7ff-0281-4df4-b5b3-cbdf940be31e')
   open.value = false
 }
+const links: ButtonProps[] = [
+  {
+    label: 'Nueva Parte Interesada',
+    icon: 'i-heroicons-plus',
+    color: 'primary',
+    variant: 'solid',
+    onClick: openCreate
+  }
+]
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-row items-center justify-between">
-      <h3>Partes Interesadas</h3>
-      <UButton icon="i-heroicons-plus" @click="open = true">
-        Crear Parte Interesada
-      </UButton>
+  <UPage class="space-y-4">
+    <div class="flex flex-col">
+      <div>
+        <UButton
+          icon="i-lucide-layout-panel-left"
+          variant="ghost"
+          color="neutral"
+          label="Menu"
+          @click="toggleModuleSidebar"
+        />
+      </div>
+      <UPageHeader
+        title="Partes Interesadas"
+        description="Listado de Partes Interesadas"
+        :links="links"
+        class="mb-4 w-full"
+      />
     </div>
 
     <LogisticaTable :loading="loading" :data="items" :columns="columns" />
-  </div>
+  </UPage>
   <ModalForm
     v-model:open="open"
     :fields="businessPartyFormFields"

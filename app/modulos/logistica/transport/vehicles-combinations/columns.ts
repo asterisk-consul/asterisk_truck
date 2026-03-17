@@ -2,6 +2,10 @@ import { h } from 'vue'
 import { UBadge } from '#components'
 import type { TableColumn } from '@nuxt/ui'
 import type { VehicleCombination } from '~/modulos/logistica/transport/vehicles-combinations/vehicles-combinations.types'
+import {
+  useInlineEdit,
+  type EditableValue
+} from '~/composables/table/useInlineEdit'
 type Row = VehicleCombination
 import StatusToggle from '@/components/ui/PopoverTableActive.vue'
 

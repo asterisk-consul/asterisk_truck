@@ -2,7 +2,7 @@
 import type {
   Corridor,
   CreateCorridorDto
-} from '~/modulos/logistica/transport/corridors/corridors.types'
+} from '~/modulos/logistica/transport/corridors/types/corridors.types'
 import { useCorridorsStore } from '~/modulos/logistica/transport/corridors/corridors.store'
 
 const props = defineProps<{

@@ -28,18 +28,13 @@ export const links: NavigationMenuItem[][] = [
     {
       label: 'Depósitos',
       icon: 'i-heroicons-building-storefront',
-      to: '/',
+      to: '/logistica/warehouse/',
       defaultOpen: false,
       children: [
         {
           label: 'Productos',
           icon: 'i-heroicons-cube',
           to: '/logistica/master-data/productos/'
-        },
-        {
-          label: 'Depósitos',
-          icon: 'i-heroicons-building-storefront',
-          to: '/logistica/warehouse/'
         }
       ]
     },

@@ -6,7 +6,7 @@ import { useLocations } from '~/modulos/logistica/master-data/locations/useLocat
 import type {
   CorridorWithRelations,
   CreateCorridorDto
-} from '~/modulos/logistica/transport/corridors/corridors.types'
+} from '~/modulos/logistica/transport/corridors/types/corridors.types'
 
 const COMPANY_ID = 'a060f7ff-0281-4df4-b5b3-cbdf940be31e'
 
@@ -100,21 +100,27 @@ const submit = () => {
 
 <template>
   <UForm @submit="submit" class="space-y-6">
-    <UFormField label="Nombre">
-      <UInput v-model="form.name" placeholder="Ruta Córdoba - Rosario" />
+    <UFormField label="Nombre" class="w-full">
+      <UInput
+        v-model="form.name"
+        placeholder="Ruta Córdoba - Rosario"
+        class="w-full"
+      />
     </UFormField>
 
     <div class="grid grid-cols-2 gap-4">
-      <UFormField label="Origen">
+      <UFormField label="Origen" class="w-full">
         <USelect
+          class="w-full"
           v-model="form.origin_location_id"
           :items="originItems"
           placeholder="Seleccionar origen"
         />
       </UFormField>
 
-      <UFormField label="Destino">
+      <UFormField label="Destino" class="w-full">
         <USelect
+          class="w-full"
           v-model="form.destination_location_id"
           :items="destinationItems"
           placeholder="Seleccionar destino"
@@ -123,16 +129,20 @@ const submit = () => {
     </div>
 
     <div>
-      <div class="flex justify-between mb-2">
+      <div class="flex justify-between mb-2 w-full">
         <h3 class="font-semibold">Paradas</h3>
-        <UButton size="sm" @click="addStop">Agregar parada</UButton>
+        <UButton size="sm" variant="soft" color="warning" @click="addStop">
+          Agregar parada
+        </UButton>
       </div>
 
       <div class="space-y-2">
         <UCard
           v-for="(stop, index) in form.stops"
           :key="index"
-          class="flex items-center gap-3"
+          :ui="{
+            body: 'flex items-center gap-3'
+          }"
         >
           <span class="text-sm w-6">{{ index + 1 }}</span>
 

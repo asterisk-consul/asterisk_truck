@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
 import { storeToRefs } from 'pinia'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 
@@ -16,6 +15,11 @@ import ModalForm from '~/components/ModalForm.vue'
 
 // composables
 import { useLocations } from '~/modulos/logistica/master-data/locations/useLocations'
+const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
+import type { ButtonProps } from '@nuxt/ui'
+function toggleModuleSidebar() {
+  moduleCollapsed.value = !moduleCollapsed.value
+}
 
 // types
 import type {
@@ -31,10 +35,6 @@ definePageMeta({
   layout: 'logistica',
   middleware: ['auth']
 })
-
-function toggleModuleSidebar() {
-  moduleCollapsed.value = !moduleCollapsed.value
-}
 
 /* ---------------------------------------
    STATE
@@ -166,20 +166,39 @@ async function handleSubmit(data: any) {
 
   modalOpen.value = false
 }
+const links = ref<ButtonProps[]>([
+  {
+    label: 'Nuevo Depositos',
+    icon: 'i-heroicons-plus',
+    onClick: openCreate,
+    color: 'primary',
+    variant: 'solid'
+  }
+])
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-row items-center justify-between">
-      <h3>Depósitos</h3>
-
-      <UButton icon="i-heroicons-plus" @click="openCreate">
-        Nuevo Depósito
-      </UButton>
+  <UPage class="space-y-4">
+    <div class="flex flex-col">
+      <div>
+        <UButton
+          icon="i-lucide-layout-panel-left"
+          variant="ghost"
+          color="neutral"
+          label="Menu"
+          @click="toggleModuleSidebar"
+        />
+      </div>
+      <UPageHeader
+        title="Depositos"
+        description="Listado de Depositos"
+        :links="links"
+        class="mb-4 w-full"
+      />
     </div>
 
     <LogisticaTable :loading="loading" :data="warehouses" :columns="columns" />
-  </div>
+  </UPage>
 
   <ModalForm
     v-model:open="modalOpen"

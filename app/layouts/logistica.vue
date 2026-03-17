@@ -18,7 +18,7 @@ provide('moduleSidebarCollapsed', moduleCollapsed)
 <template>
   <UDashboardGroup unit="rem">
     <!-- SIDEBAR PRINCIPAL -->
-    <MainSidebar v-model:collapsed="mainCollapsed" />
+    <MainSidebar v-model:collapsed="mainCollapsed" with-footer />
 
     <NotificationsSlideover />
 

@@ -13,7 +13,7 @@ import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 import { corridorsColumns } from '~/modulos/logistica/transport/corridors/corridorsColums'
 import { useCorridorsStore } from '~/modulos/logistica/transport/corridors/corridors.store'
 
-import type { CorridorWithRelations } from '~/modulos/logistica/transport/corridors/corridors.types'
+import type { CorridorWithRelations } from '~/modulos/logistica/transport/corridors/types/corridors.types'
 
 /* ---------------------------------------
 STORE
@@ -33,15 +33,15 @@ function openCreate() {
 }
 
 function openEdit(row: CorridorWithRelations) {
-  router.push(`logistica/transport/corridors/${row.id}/edit`)
+  router.push(`/logistica/transport/corridors/${row.id}/edit`)
 }
 
 function openDetail(row: CorridorWithRelations) {
-  router.push(`logistica/transport/corridors/${row.id}`)
+  router.push(`/logistica/transport/corridors/${row.id}`)
 }
 
 const columns = corridorsColumns({
-  onEdit: openEdit
+  onEdit: openDetail
   // onRowClick: openDetail
 })
 
@@ -49,9 +49,7 @@ const columns = corridorsColumns({
 LIFECYCLE
 --------------------------------------- */
 
-onMounted(async () => {
-  await store.fetchCorridors()
-})
+await store.fetchCorridors()
 const links = ref<ButtonProps[]>([
   {
     label: 'Nuevo corredor',

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
 definePageMeta({
   layout: 'logistica',
   middleware: ['auth']
@@ -12,7 +11,7 @@ import { useDocumentTypesStore } from '~/modulos/logistica/documents/documents-t
 //form
 import { vehicleFormFields } from '~/modulos/logistica/transport/vehicles/vehicleFormFields'
 import ModalForm from '~/components/ModalForm.vue'
-import { mapVehicleDocumentsToForm } from '~/mappers/mapVehicleDocumentsToForm'
+import { mapVehicleDocumentsToForm } from '~/modulos/logistica/transport/vehicles-combinations/mappers/mapVehicleDocumentsToForm'
 //composables
 import { useDocuments } from '~/modulos/logistica/documents/documents-types/useDocuments'
 //tabla columns
@@ -23,12 +22,15 @@ import type {
   UpdateVehicleInput
 } from '~/modulos/logistica/transport/vehicles/vehicles.types'
 
-type EditableField = 'plate'
-
-type EditableValue = string | null | undefined
+const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
+import type { ButtonProps } from '@nuxt/ui'
 function toggleModuleSidebar() {
   moduleCollapsed.value = !moduleCollapsed.value
 }
+
+type EditableField = 'plate'
+
+type EditableValue = string | null | undefined
 /* ---------------------------------------
    STATE
 --------------------------------------- */
@@ -223,18 +225,38 @@ function mapCreateVehiclePayload(form: any): CreateVehicleInput {
 function mapUpdateVehiclePayload(form: any): UpdateVehicleInput {
   return mapVehicleBase(form, editingRow.value) // ← pasar editingRow
 }
+const links = ref<ButtonProps[]>([
+  {
+    label: 'Nuevo Vehiculo',
+    icon: 'i-heroicons-plus',
+    onClick: openCreate,
+    color: 'primary',
+    variant: 'solid'
+  }
+])
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-row items-center justify-between">
-      <h3>Vehiculos</h3>
-      <UButton icon="i-heroicons-plus" @click="openCreate">
-        Nuevo Vehiculo
-      </UButton>
+  <UPage class="space-y-4">
+    <div class="flex flex-col">
+      <div>
+        <UButton
+          icon="i-lucide-layout-panel-left"
+          variant="ghost"
+          color="neutral"
+          label="Menu"
+          @click="toggleModuleSidebar"
+        />
+      </div>
+      <UPageHeader
+        title="Vehiculos"
+        description="Listado de Vehiculos"
+        :links="links"
+        class="mb-4 w-full"
+      />
     </div>
     <LogisticaTable :loading="loading" :data="items" :columns="columns" />
-  </div>
+  </UPage>
   <ModalForm
     v-model:open="modalOpen"
     :fields="fields"

@@ -3,7 +3,7 @@ import type {
   Corridor,
   CorridorRoute,
   CreateCorridorDto
-} from './corridors.types'
+} from './types/corridors.types'
 import { useCorridorsService } from './corridors.service'
 
 export const useCorridorsStore = defineStore('corridors', () => {

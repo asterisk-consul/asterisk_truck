@@ -6,6 +6,10 @@ import type {
   VehicleDocument
 } from '~/modulos/logistica/transport/vehicles/vehicles.types'
 import StatusToggle from '@/components/ui/PopoverTableActive.vue'
+import {
+  useInlineEdit,
+  type EditableValue
+} from '~/composables/table/useInlineEdit'
 
 type OptionValue = string | boolean
 

@@ -57,12 +57,13 @@ const versions = useVersion()
     <template v-if="withFooter" #footer="{ collapsed }">
       <div class="flex flex-col w-full">
         <UserMenu :collapsed="collapsed" />
+
         <div class="py-3 flex justify-center">
           <div class="flex items-center text-xs text-muted">
-            <span>v{{ versions.version }}</span>
+            <span class="font-medium">v{{ versions.version }}</span>
 
             <UBadge
-              v-if="versions.stage"
+              v-if="versions.stage && !collapsed"
               size="xs"
               variant="soft"
               color="neutral"

@@ -2,7 +2,7 @@ import type {
   CorridorStop,
   CorridorStopDto,
   CorridorWithRelations
-} from './corridors.types'
+} from './types/corridors.types'
 
 // ==========================================
 // STOP → DTO

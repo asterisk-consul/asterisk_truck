@@ -2,7 +2,7 @@ import { h } from 'vue'
 import { UBadge } from '#components'
 import type { TableColumn } from '@nuxt/ui'
 
-import type { CorridorWithRelations } from './corridors.types'
+import type { CorridorWithRelations } from './types/corridors.types'
 
 import { useDateColumn } from '~/composables/table/useDateColumn'
 import { useSelectColumn } from '@/composables/table/useSelectColumn'

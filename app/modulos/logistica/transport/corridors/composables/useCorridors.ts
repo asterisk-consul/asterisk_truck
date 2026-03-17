@@ -1,7 +1,7 @@
 import type {
   CorridorWithRelations,
   CreateCorridorDto
-} from '../corridors.types'
+} from '../types/corridors.types'
 
 import { mapStopsToDto } from '../corridors.mappers'
 

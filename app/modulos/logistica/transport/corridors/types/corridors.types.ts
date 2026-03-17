@@ -65,3 +65,28 @@ export interface CorridorWithRelations extends Corridor {
   destination_location?: CorridorLocation
   corridorStops?: CorridorStop[]
 }
+
+interface BaseLocation {
+  id: string
+  name: string
+  latitude: number
+  longitude: number
+}
+
+export interface RoutePoint {
+  name?: string
+  address?: string | null
+  city?: string | null
+  province?: string | null
+  type: 'origin' | 'stop' | 'destination'
+}
+
+export interface CorridorRoute {
+  id: string
+  name: string
+  latitude: number
+  longitude: number
+  total_distance_km: number
+  estimated_minutes: number
+  route: RoutePoint[]
+}
