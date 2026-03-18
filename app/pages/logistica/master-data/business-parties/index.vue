@@ -26,6 +26,11 @@ onMounted(async () => {
   loading.value = store.loading
 })
 
+const columns = BusinessPartyColumns({})
+const openCreate = () => {
+  open.value = true
+}
+
 const saveLocation = async (data: any) => {
   const payload = {
     company_id: 'a060f7ff-0281-4df4-b5b3-cbdf940be31e',

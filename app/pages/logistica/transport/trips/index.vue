@@ -10,6 +10,8 @@ import { useTripsStore } from '~/modulos/logistica/transport/trips/trips.store'
 import { useVehicleCombinationsStore } from '~/modulos/logistica/transport/vehicles-combinations/vehicle-combinations.store'
 import { useLocationsStore } from '~/modulos/logistica/master-data/locations/locations.store'
 import { useTransferRatesStore } from '~/modulos/logistica/transport/transfer-rates/transfer-rates.store'
+import { useBusinessPartiesStore } from '~/modulos/logistica/master-data/bussiness-parties/bussines-parties.store'
+//types
 import type {
   Trip,
   CreateTripInput,
@@ -22,6 +24,7 @@ import ModalForm from '~/components/ModalForm.vue'
 import { useLocations } from '~/modulos/logistica/master-data/locations/useLocations'
 import { useVehiclesCombinations } from '~/modulos/logistica/transport/vehicles-combinations/useVehicleCombinations'
 import { useTransferRate } from '~/modulos/logistica/transport/transfer-rates/useTransferRate'
+import { useBusinessParties } from '~/modulos/logistica/master-data/bussiness-parties/composable/useBusinessParties'
 //tabla columns
 import { tripsColumns } from '~/modulos/logistica/transport/trips/columns'
 
@@ -37,11 +40,13 @@ const store = useTripsStore()
 const vehiculoStore = useVehicleCombinationsStore()
 const locationsStore = useLocationsStore()
 const tableRenderers = useTransferRatesStore()
+const businessPartiesStore = useBusinessPartiesStore()
 
 const { items } = storeToRefs(store)
 const { items: vehicleCombinations } = storeToRefs(vehiculoStore)
 const { items: locations } = storeToRefs(locationsStore)
 const { items: rates } = storeToRefs(tableRenderers)
+const { items: businessParties } = storeToRefs(businessPartiesStore)
 
 const { items: combinationOptions } =
   useVehiclesCombinations(vehicleCombinations)
@@ -49,6 +54,8 @@ const { items: combinationOptions } =
 const { items: locationsItems } = useLocations(locations)
 
 const { items: ratesItems } = useTransferRate(rates)
+
+const { items: businessPartiesItems } = useBusinessParties(businessParties)
 
 /* ---------------------------------------
    MODAL CONTROL
@@ -124,6 +131,9 @@ const fields = computed(() =>
     if (field.name === 'rate_id') {
       return { ...field, options: ratesItems.value }
     }
+    if (field.name === 'business_party_id') {
+      return { ...field, options: businessPartiesItems.value }
+    }
     return field
   })
 )
@@ -138,6 +148,7 @@ onMounted(async () => {
   await vehiculoStore.fetchAll(companyId)
   await locationsStore.fetchAll()
   await tableRenderers.fetchAll(companyId)
+  await businessPartiesStore.fetchAll(companyId)
   loading.value = store.loading
 })
 

@@ -6,11 +6,9 @@ const { mainCollapsed } = useSidebarState()
 
 const moduleCollapsed = ref(false)
 
-// 👇 cuando se abre el módulo, colapsa el sidebar principal
-watch(moduleCollapsed, (val) => {
-  if (!val) mainCollapsed.value = true
+watchEffect(() => {
+  mainCollapsed.value = true
 })
-/* SIDEBAR STATES */
 
 provide('moduleSidebarCollapsed', moduleCollapsed)
 </script>

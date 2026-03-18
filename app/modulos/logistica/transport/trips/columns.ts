@@ -34,6 +34,8 @@ const tripStatusConfig: Record<
 }
 type Row = Trip
 type EditableField = 'reference_number' | 'kilometers'
+
+type EditableValue = string | number | boolean
 export const tripsColumns = (actions: {
   onToggleStatus?: (row: Row, value: TripStatus) => void
   onInlineSave?: (row: Row, field: EditableField, value: EditableValue) => void
@@ -67,6 +69,7 @@ export const tripsColumns = (actions: {
           actions.onToggleStatus?.(row.original, value as TripStatus)
       })
   },
+
   {
     id: 'vehicle_combination',
     header: 'Combinación',

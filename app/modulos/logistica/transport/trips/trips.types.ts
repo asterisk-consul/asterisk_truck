@@ -1,3 +1,16 @@
+// Stops dentro de una ruta dinámica
+export interface CorridorStop {
+  location_id: string
+  stop_order: number
+}
+
+// Ruta dinámica (corredor inline)
+export interface Route {
+  origin_location_id: string
+  destination_location_id: string
+  stops: CorridorStop[]
+}
+
 export interface TripRate {
   id: string
   trip_id: string
@@ -8,7 +21,7 @@ export interface TripRate {
   transfer_rates: {
     name: string
     rate_type: string
-  } // opcional, detalles de la tarifa de transferencia
+  }
 }
 
 export interface Trip {
@@ -18,10 +31,13 @@ export interface Trip {
   vehicle_combination_id?: string | null
   origin_location_id?: string | null
   destination_location_id?: string | null
+  corridor_id?: string | null // ✅ NUEVO
+  route?: Route | null // ✅ NUEVO corredor dinámico
   departure_time?: string
   arrival_time?: string
   status: string
   kilometers?: number | null
+  business_party_id?: string | null // ✅ NUEVO
   created_at: string
   updated_at: string
   vehicle_combination?: VehicleCombination
@@ -39,10 +55,13 @@ export interface CreateTripInput {
   vehicle_combination_id?: string
   origin_location_id?: string
   destination_location_id?: string
+  corridor_id?: string // ✅ NUEVO
+  route?: Route // ✅ NUEVO corredor dinámico
   departure_time?: string
   arrival_time?: string
   status: string
   kilometers?: number
+  business_party_id?: string // ✅ NUEVO
 }
 
 export interface UpdateTripInput extends Partial<CreateTripInput> {}

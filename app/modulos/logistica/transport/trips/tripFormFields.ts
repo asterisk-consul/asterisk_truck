@@ -13,24 +13,38 @@ export const tripsFormFields: BaseField[] = [
   },
 
   {
+    label: 'Cliente',
+    name: 'business_party_id',
+    type: 'select',
+    options: [] // ← business parties
+  },
+
+  {
+    label: 'Código de viaje',
+    name: 'trip_code',
+    type: 'text',
+    placeholder: 'VIAJE-001'
+  },
+
+  {
     label: 'Combinación de vehículo',
     name: 'vehicle_combination_id',
     type: 'select',
-    options: [] // Llenar con combinaciones disponibles
+    options: []
   },
 
   {
     label: 'Origen',
     name: 'origin_location_id',
     type: 'select',
-    options: [] // Llenar con ubicaciones de origen
+    options: []
   },
 
   {
     label: 'Destino',
     name: 'destination_location_id',
     type: 'select',
-    options: [] // Llenar con ubicaciones de destino
+    options: []
   },
 
   {
@@ -70,7 +84,7 @@ export const tripsFormFields: BaseField[] = [
     label: 'Tarifa',
     name: 'rate_id',
     type: 'select',
-    options: [] // Llenar con transfer rates disponibles
+    options: []
   },
   {
     label: 'Valor Tarifa',
