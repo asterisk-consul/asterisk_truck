@@ -1,10 +1,9 @@
 import { reactive, computed } from 'vue'
 import type {
-  CorridorWithRelations,
+  Corridor,
   CreateCorridorDto,
   CorridorStop
 } from '../types/corridors.types'
-// o donde corresponda
 import { mapStopsToDto } from '../corridors.mappers'
 
 export interface SelectMenuItem {
@@ -14,7 +13,8 @@ export interface SelectMenuItem {
 
 export function useCorridorForm(
   companyId?: string,
-  corridor?: CorridorWithRelations
+  corridor?: Corridor, // ✅ uno solo, para el form
+  corridors?: Ref<Corridor[]> // ✅ array, para el select
 ) {
   const form = reactive<CreateCorridorDto>({
     company_id: companyId ?? '',
@@ -26,21 +26,14 @@ export function useCorridorForm(
   })
 
   const items = computed<SelectMenuItem[]>(() =>
-    (corridor?.corridorStops ?? [])
-      .filter(
-        (
-          stop
-        ): stop is CorridorStop & { location: { id: string; name: string } } =>
-          stop.location?.id != null && stop.location?.name != null
-      )
-      .map((stop) => ({
-        label: stop.location.name,
-        value: stop.location.id
-      }))
+    (corridors?.value ?? []).map((c) => ({
+      label: c.name ?? `Corredor ${c.id.slice(0, 8)}`,
+      value: c.id
+    }))
   )
 
   return {
     form,
-    items // faltaba retornarlo
+    items
   }
 }

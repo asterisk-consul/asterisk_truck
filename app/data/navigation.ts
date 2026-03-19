@@ -40,9 +40,9 @@ export const navigationLinks = [
     {
       label: 'logistica',
       to: '/logistica',
-      icon: 'i-lucide-truck',
-      defaultOpen: false,
-      children: [{ label: 'Demostracion', to: '/logistica/operaciones' }]
+      icon: 'i-lucide-truck'
+      // defaultOpen: false,
+      // children: [{ label: 'Demostracion', to: '/logistica/operaciones' }]
     },
     {
       label: 'Ajustes',

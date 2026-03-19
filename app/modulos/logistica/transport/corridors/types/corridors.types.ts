@@ -2,12 +2,7 @@
 // LOCATION
 // ==========================================
 
-export interface CorridorLocation {
-  id: string
-  name: string
-  lat?: number
-  lng?: number
-}
+import type { Location } from '~/modulos/logistica/master-data/locations/types/locations.types'
 
 // ==========================================
 // STOPS
@@ -20,7 +15,7 @@ export interface CorridorStopDto {
 }
 
 export interface CorridorStop extends CorridorStopDto {
-  location?: CorridorLocation
+  location?: Location
 }
 
 // ==========================================
@@ -52,7 +47,9 @@ export interface Corridor {
 
   total_distance_km?: number
   estimated_minutes?: number
-
+  origin_location?: Location
+  destination_location?: Location
+  corridorStops?: CorridorStop[]
   is_template: boolean
 }
 
@@ -61,8 +58,8 @@ export interface Corridor {
 // ==========================================
 
 export interface CorridorWithRelations extends Corridor {
-  origin_location?: CorridorLocation
-  destination_location?: CorridorLocation
+  origin_location?: Location
+  destination_location?: Location
   corridorStops?: CorridorStop[]
 }
 

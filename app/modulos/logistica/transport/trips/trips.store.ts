@@ -8,7 +8,7 @@ import type {
   TripRate,
   CreateTripRateInput,
   UpdateTripRateInput
-} from '~/modulos/logistica/transport/trips/trips.types'
+} from '~/modulos/logistica/transport/trips/types/trips.types'
 
 export const useTripsStore = defineStore('trips', () => {
   const items = ref<Trip[]>([])

@@ -5,6 +5,8 @@ import type {
 } from '~/modulos/logistica/transport/corridors/types/corridors.types'
 import { useCorridorsStore } from '~/modulos/logistica/transport/corridors/corridors.store'
 
+import CorridorForm from '~/modulos/logistica/transport/corridors/components/CorridorsForm.vue'
+
 const props = defineProps<{
   corridor?: Corridor
 }>()
@@ -34,10 +36,12 @@ const submit = async (dto: CreateCorridorDto) => {
       </h3>
     </template>
 
-    <CorridorForm
-      :corridor="corridor"
-      @submit="submit"
-      @cancel="open = false"
-    />
+    <template #body>
+      <CorridorForm
+        :corridor="corridor"
+        @submit="submit"
+        @cancel="open = false"
+      />
+    </template>
   </UModal>
 </template>

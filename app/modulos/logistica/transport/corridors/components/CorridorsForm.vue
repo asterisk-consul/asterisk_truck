@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { useLocationsStore } from '~/modulos/logistica/master-data/locations/locations.store'
-import { useLocations } from '~/modulos/logistica/master-data/locations/useLocations'
+import { useLocationsStore } from '~/modulos/logistica/master-data/locations/store/locations.store'
+import { useLocations } from '~/modulos/logistica/master-data/locations/composables/useLocations'
 
 import type {
   CorridorWithRelations,

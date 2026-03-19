@@ -10,9 +10,6 @@ export type StatusOption = {
   value: string
 }
 
-/**
- * Opciones de estado
- */
 export const statusOptions: StatusOption[] = [
   { label: 'Planificado', value: 'PLANNED' },
   { label: 'En progreso', value: 'IN_PROGRESS' },
@@ -20,16 +17,19 @@ export const statusOptions: StatusOption[] = [
   { label: 'Cancelado', value: 'CANCELLED' }
 ]
 
-export type TripForm = CreateTripInput & {
-  business_party?: SelectMenuItem
+export type TripForm = Omit<CreateTripInput, 'status'> & {
+  status?: string // opcional en el form, se resuelve desde statusOption
   statusOption?: StatusOption
+  business_party?: SelectMenuItem | null
 }
 
-/**
- * Limpieza
- */
+const toDatetimeLocal = (iso?: string | null): string | null => {
+  if (!iso) return null
+  return iso.slice(0, 16)
+}
+
 export const clean = (value?: string) =>
-  value && value.trim() !== '' ? value : undefined
+  value?.trim() !== '' ? value : undefined
 
 /**
  * Entity → Form
@@ -40,13 +40,14 @@ export const mapTripToForm = (
 ): TripForm => ({
   company_id: t.company_id,
   reference_number: t.reference_number ?? undefined,
+  week: t.week ?? undefined,
   vehicle_combination_id: t.vehicle_combination_id ?? undefined,
   origin_location_id: t.origin_location_id ?? undefined,
   destination_location_id: t.destination_location_id ?? undefined,
   corridor_id: t.corridor_id ?? undefined,
   route: t.route ?? undefined,
-  departure_time: t.departure_time,
-  arrival_time: t.arrival_time,
+  departure_time: toDatetimeLocal(t.departure_time),
+  arrival_time: toDatetimeLocal(t.arrival_time),
   status: t.status,
   statusOption: statusOptions.find((s) => s.value === t.status),
   kilometers: t.kilometers ?? undefined,
@@ -59,15 +60,27 @@ export const mapTripToForm = (
  */
 export const mapFormToDto = (f: TripForm): CreateTripInput => ({
   company_id: f.company_id,
+
   reference_number: clean(f.reference_number),
-  vehicle_combination_id: f.vehicle_combination_id,
-  origin_location_id: f.origin_location_id,
-  destination_location_id: f.destination_location_id,
-  corridor_id: f.corridor_id,
-  route: f.route,
-  departure_time: f.departure_time,
-  arrival_time: f.arrival_time,
-  status: f.statusOption?.value ?? f.status,
-  kilometers: f.kilometers,
-  business_party_id: f.business_party?.value
+
+  week: f.week,
+
+  vehicle_combination_id: f.vehicle_combination_id ?? null,
+  origin_location_id: f.origin_location_id ?? null,
+  destination_location_id: f.destination_location_id ?? null,
+  corridor_id: f.corridor_id ?? null,
+
+  route: f.route ?? undefined,
+
+  departure_time: f.departure_time
+    ? new Date(f.departure_time).toISOString()
+    : null,
+
+  arrival_time: f.arrival_time ? new Date(f.arrival_time).toISOString() : null,
+
+  status: f.statusOption?.value ?? f.status ?? 'PLANNED',
+
+  kilometers: f.kilometers ?? null,
+
+  business_party_id: f.business_party?.value ?? f.business_party_id ?? null
 })

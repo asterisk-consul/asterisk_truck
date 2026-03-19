@@ -36,7 +36,7 @@ const tripStatusConfig: Record<
 }
 
 type Row = Trip
-type EditableField = 'reference_number' | 'kilometers'
+type EditableField = 'reference_number' | 'kilometers' | 'week'
 
 export const tripsColumns = (actions: {
   onToggleStatus?: (row: Row, value: TripStatus) => void
@@ -48,8 +48,13 @@ export const tripsColumns = (actions: {
 
   {
     accessorKey: 'reference_number',
-    header: 'Referencia',
+    header: 'Referencia de Viaje',
     cell: ({ row }) => editableCell('reference_number', row.original, actions)
+  },
+  {
+    accessorKey: 'week',
+    header: 'Semana',
+    cell: ({ row }) => editableCell('week', row.original, actions)
   },
   {
     accessorKey: 'status',
@@ -71,7 +76,11 @@ export const tripsColumns = (actions: {
           actions.onToggleStatus?.(row.original, value as TripStatus)
       })
   },
-
+  {
+    id: 'business_party',
+    header: 'Cliente',
+    cell: ({ row }) => row.original.business_party?.name
+  },
   {
     id: 'vehicle_combination',
     header: 'Combinación',
@@ -83,11 +92,19 @@ export const tripsColumns = (actions: {
       return vc.unit_number || `VC-${vc.id.slice(0, 8)}`
     }
   },
+  {
+    accessorKey: 'corridos',
+    header: 'Corredor',
+    cell: ({ row }) => {
+      const corridor = row.original.corridors
 
+      return corridor?.name || '—'
+    }
+  },
   {
     accessorKey: 'kilometers',
     header: 'Km',
-    cell: ({ row }) => editableCell('kilometers', row.original, actions)
+    cell: ({ row }) => row.original.corridors?.total_distance_km
   },
   {
     id: 'trip_rates',

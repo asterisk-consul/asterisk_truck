@@ -1,13 +1,13 @@
 import { computed, type Ref } from 'vue'
-import type { Location } from '~/modulos/logistica/master-data/locations/locations'
+import type { Location } from '~/modulos/logistica/master-data/locations/types/locations.types'
 
-export interface SelectItem {
+export interface SelectItemMenu {
   label: string
   value: string
 }
 
 export function useLocations(locations: Ref<Location[]>) {
-  const items = computed<SelectItem[]>(() =>
+  const items = computed<SelectItemMenu[]>(() =>
     locations.value.map((location) => {
       const city = location.city ?? ''
       const address = location.address ?? ''

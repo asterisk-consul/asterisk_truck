@@ -2,7 +2,7 @@ import type {
   VehicleCombination,
   CreateVehicleCombinationInput,
   UpdateVehicleCombinationInput
-} from '~/modulos/logistica/transport/vehicles-combinations/vehicles-combinations.types'
+} from '~/modulos/logistica/transport/vehicles-combinations/types/vehicles-combinations.types'
 
 export const useVehicleCombinationsService = () => {
   const getAll = (company_id: string) =>
@@ -59,6 +59,16 @@ export const useVehicleCombinationsService = () => {
         method: 'PATCH'
       }
     )
+  const getAvailable = (company_id: string, date: string) =>
+    $fetch<VehicleCombination[]>(
+      '/api/logistica/transport/vehicles-combinations/available',
+      {
+        query: {
+          company_id,
+          date
+        }
+      }
+    )
 
   const remove = (id: string) =>
     $fetch<{ deleted: boolean }>(
@@ -82,6 +92,7 @@ export const useVehicleCombinationsService = () => {
     finish,
     remove,
     activate,
-    historyByVehicle
+    historyByVehicle,
+    getAvailable
   }
 }

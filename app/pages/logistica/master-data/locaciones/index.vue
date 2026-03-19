@@ -3,7 +3,7 @@ definePageMeta({
   layout: 'logistica',
   middleware: ['auth']
 })
-import { useLocationsStore } from '~/modulos/logistica/master-data/locations/locations.store'
+import { useLocationsStore } from '~/modulos/logistica/master-data/locations/store/locations.store'
 import { LocationColumns } from '../../../../modulos/logistica/master-data/locations/columns'
 import { locationFormFields } from '~/modulos/logistica/master-data/locations/locationsFormFields'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
@@ -23,7 +23,7 @@ import type {
   CreateLocationInput,
   UpdateLocationInput,
   Location
-} from '~/modulos/logistica/master-data/locations/locations'
+} from '~/modulos/logistica/master-data/locations/types/locations.types'
 
 type EditableField = 'city' | 'province' | 'country' | 'postalCode'
 

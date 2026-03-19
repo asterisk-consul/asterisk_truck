@@ -28,7 +28,6 @@ onMounted(async () => {
 })
 
 const submit = async (dto: CreateCorridorDto) => {
-  console.log(dto)
   await store.updateCorridor(id, dto)
   router.push(`/logistica/transport/corridors/${id}`)
 }

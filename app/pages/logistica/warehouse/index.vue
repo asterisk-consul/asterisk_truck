@@ -7,14 +7,14 @@ type EditableValue = string | null | undefined
 
 // stores
 import { useDepositosStore } from '~/modulos/logistica/warehouses/warehouse/depositos.store'
-import { useLocationsStore } from '~/modulos/logistica/master-data/locations/locations.store'
+import { useLocationsStore } from '~/modulos/logistica/master-data/locations/store/locations.store'
 
 // form
 import { warehouseFormFields } from '~/modulos/logistica/warehouses/warehouse/warehouseFormFields'
 import ModalForm from '~/components/ModalForm.vue'
 
 // composables
-import { useLocations } from '~/modulos/logistica/master-data/locations/useLocations'
+import { useLocations } from '~/modulos/logistica/master-data/locations/composables/useLocations'
 const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
 import type { ButtonProps } from '@nuxt/ui'
 function toggleModuleSidebar() {

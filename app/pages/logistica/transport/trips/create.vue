@@ -3,25 +3,53 @@ definePageMeta({
   layout: 'logistica',
   middleware: ['auth']
 })
-import { useCorridorsStore } from '~/modulos/logistica/transport/corridors/corridors.store'
-import type { CreateCorridorDto } from '~/modulos/logistica/transport/corridors/types/corridors.types'
+import { useTripsStore } from '~/modulos/logistica/transport/trips/trips.store'
+import type { CreateTripInput } from '~/modulos/logistica/transport/trips/types/trips.types'
 
-import CorridorForm from '~/modulos/logistica/transport/corridors/components/CorridorsForm.vue'
+import TripsForm from '~/modulos/logistica/transport/trips/components/TripsForm.vue'
 
 const router = useRouter()
-const store = useCorridorsStore()
+const store = useTripsStore()
 
-const submit = async (dto: CreateCorridorDto) => {
-  const corridor = await store.createCorridor(dto)
-  router.push(`logistica/transport/corridors/${corridor.id}`)
+const companyId = 'a060f7ff-0281-4df4-b5b3-cbdf940be31e'
+
+const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
+import type { ButtonProps } from '@nuxt/ui'
+function toggleModuleSidebar() {
+  moduleCollapsed.value = !moduleCollapsed.value
+}
+
+const submit = async (dto: CreateTripInput) => {
+  console.log(dto)
+  await store.create(dto)
+
+  router.push(`/logistica/transport/trips/`)
 }
 </script>
 
 <template>
   <UPage>
-    <UPageHeader title="Crear corredor" />
-    <UCard>
-      <CorridorForm @submit="submit" @cancel="router.back()" />
+    <div class="flex flex-col">
+      <div>
+        <UButton
+          icon="i-lucide-layout-panel-left"
+          variant="ghost"
+          color="neutral"
+          label="Menu"
+          @click="toggleModuleSidebar"
+        />
+      </div>
+      <UPageHeader title="Crear Viaje" />
+    </div>
+    <UCard title="Viaje">
+      <template #header>
+        <UButton variant="ghost" @click="router.back()">Volver</UButton>
+      </template>
+      <TripsForm
+        :company-id="companyId"
+        @submit="submit"
+        @cancel="router.back()"
+      />
     </UCard>
   </UPage>
 </template>

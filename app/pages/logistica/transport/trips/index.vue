@@ -18,13 +18,17 @@ import type {
 //tabla columns
 import { tripsColumns } from '~/modulos/logistica/transport/trips/columns'
 
-type EditableField = 'reference_number' | 'kilometers'
-type EditableValue = string | null | undefined
+type EditableField = 'reference_number' | 'kilometers' | 'week'
+
+type EditableValue<K extends EditableField> = Trip[K]
+
 const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
 import type { ButtonProps } from '@nuxt/ui'
+
 function toggleModuleSidebar() {
   moduleCollapsed.value = !moduleCollapsed.value
 }
+const router = useRouter()
 const loading = ref(true)
 const store = useTripsStore()
 const { items } = storeToRefs(store)
@@ -38,27 +42,19 @@ const modalMode = ref<'create' | 'edit'>('create')
 const editingRow = ref<any>(null)
 
 function openCreate() {
-  modalMode.value = 'create'
-  editingRow.value = null
-  modalOpen.value = true
+  router.push('/logistica/transport/trips/create')
 }
 
 function openEdit(row: any) {
-  modalMode.value = 'edit'
-
-  editingRow.value = {
-    ...row,
-    locationId: row.locationId ?? row.locations?.id ?? null
-  }
-  modalOpen.value = true
+  router.push(`/logistica/transport/trips/${row.id}/edit`)
 }
 
 const columns = tripsColumns({
   onEdit: openEdit,
   onInlineSave: async <K extends EditableField>(
     row: Trip,
-    field: EditableField,
-    value: EditableValue
+    field: K,
+    value: EditableValue<K>
   ) => {
     const prev = row[field]
 
@@ -92,43 +88,8 @@ const columns = tripsColumns({
 onMounted(async () => {
   const companyId = 'a060f7ff-0281-4df4-b5b3-cbdf940be31e'
   await store.fetchAll(companyId)
-
   loading.value = store.loading
 })
-
-async function handleSubmit(data: any) {
-  const { id, rate_id, rate_value, status, ...rest } = data // extract status separately
-
-  const basePayload = {
-    ...rest,
-    company_id: 'a060f7ff-0281-4df4-b5b3-cbdf940be31e',
-    kilometers: data.kilometers ? Number(data.kilometers) : undefined,
-    departure_time: data.departure_time
-      ? new Date(data.departure_time).toISOString()
-      : undefined,
-    arrival_time: data.arrival_time
-      ? new Date(data.arrival_time).toISOString()
-      : undefined
-  }
-
-  if (modalMode.value === 'create') {
-    const payload: CreateTripInput = {
-      ...basePayload,
-      status // requerido en CreateTripInput
-    }
-    await store.create(payload)
-  } else {
-    const payload: UpdateTripInput = {
-      ...basePayload,
-      status // include status in the PATCH body (not via separate endpoint)
-    }
-    console.log(payload)
-    await store.update(editingRow.value.id, payload)
-  }
-
-  await store.fetchAll('a060f7ff-0281-4df4-b5b3-cbdf940be31e')
-  modalOpen.value = false
-}
 
 const links = ref<ButtonProps[]>([
   {
