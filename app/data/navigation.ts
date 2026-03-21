@@ -64,12 +64,12 @@ export const navigationLinks = [
       icon: 'i-lucide-book-text',
       to: 'https://asterisk-consul.github.io/donandresdoc/',
       target: '_blank'
-    },
-    {
-      label: 'Ayuda',
-      icon: 'i-lucide-info',
-      to: '/changelog/',
-      target: '_blank'
     }
+    // {
+    //   label: 'Ayuda',
+    //   icon: 'i-lucide-info',
+    //   to: '/changelog/',
+    //   target: '_blank'
+    // }
   ]
 ] as NavigationMenuItem[][]

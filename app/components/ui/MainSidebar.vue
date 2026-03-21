@@ -59,7 +59,10 @@ const versions = useVersion()
         <UserMenu :collapsed="collapsed" />
 
         <div class="py-3 flex justify-center">
-          <div class="flex items-center text-xs text-muted">
+          <NuxtLink
+            to="/changelog/"
+            class="flex items-center text-xs text-muted hover:text-foreground transition-colors"
+          >
             <span class="font-medium">v{{ versions.version }}</span>
 
             <UBadge
@@ -71,7 +74,7 @@ const versions = useVersion()
             >
               {{ versions.stage }}
             </UBadge>
-          </div>
+          </NuxtLink>
         </div>
       </div>
     </template>
