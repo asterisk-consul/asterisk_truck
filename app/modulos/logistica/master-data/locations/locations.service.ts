@@ -2,7 +2,7 @@ import type {
   Location,
   CreateLocationInput,
   UpdateLocationInput
-} from '~/modulos/logistica/master-data/locations/locations'
+} from '~/modulos/logistica/master-data/locations/types/locations.types'
 
 export const useLocationsService = () => {
   const getAll = () => $fetch<Location[]>('/api/locations')

@@ -7,14 +7,19 @@ type EditableValue = string | null | undefined
 
 // stores
 import { useDepositosStore } from '~/modulos/logistica/warehouses/warehouse/depositos.store'
-import { useLocationsStore } from '~/modulos/logistica/master-data/locations/locations.store'
+import { useLocationsStore } from '~/modulos/logistica/master-data/locations/store/locations.store'
 
 // form
 import { warehouseFormFields } from '~/modulos/logistica/warehouses/warehouse/warehouseFormFields'
 import ModalForm from '~/components/ModalForm.vue'
 
 // composables
-import { useLocations } from '~/composables/logistica/useLocations'
+import { useLocations } from '~/modulos/logistica/master-data/locations/composables/useLocations'
+const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
+import type { ButtonProps } from '@nuxt/ui'
+function toggleModuleSidebar() {
+  moduleCollapsed.value = !moduleCollapsed.value
+}
 
 // types
 import type {
@@ -161,20 +166,39 @@ async function handleSubmit(data: any) {
 
   modalOpen.value = false
 }
+const links = ref<ButtonProps[]>([
+  {
+    label: 'Nuevo Depositos',
+    icon: 'i-heroicons-plus',
+    onClick: openCreate,
+    color: 'primary',
+    variant: 'solid'
+  }
+])
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-row items-center justify-between">
-      <h3>Depósitos</h3>
-
-      <UButton icon="i-heroicons-plus" @click="openCreate">
-        Nuevo Depósito
-      </UButton>
+  <UPage class="space-y-4">
+    <div class="flex flex-col">
+      <div>
+        <UButton
+          icon="i-lucide-layout-panel-left"
+          variant="ghost"
+          color="neutral"
+          label="Menu"
+          @click="toggleModuleSidebar"
+        />
+      </div>
+      <UPageHeader
+        title="Depositos"
+        description="Listado de Depositos"
+        :links="links"
+        class="mb-4 w-full"
+      />
     </div>
 
     <LogisticaTable :loading="loading" :data="warehouses" :columns="columns" />
-  </div>
+  </UPage>
 
   <ModalForm
     v-model:open="modalOpen"

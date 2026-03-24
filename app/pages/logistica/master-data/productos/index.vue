@@ -6,8 +6,15 @@ definePageMeta({
 import { useProductsStore } from '~/modulos/logistica/master-data/product/products.store'
 import { columns } from '../../../../modulos/logistica/master-data/product/columns'
 import { productFormFields } from '~/modulos/logistica/master-data/product/productFormFields'
-import { useProductsMetrics } from '~/composables/logistica/useProductsMetrics'
+import { useProductsMetrics } from '~/modulos/logistica/master-data/product/useProductsMetrics'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
+
+const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
+import type { ButtonProps } from '@nuxt/ui'
+function toggleModuleSidebar() {
+  moduleCollapsed.value = !moduleCollapsed.value
+}
+
 const store = useProductsStore()
 
 const { items } = storeToRefs(store)
@@ -30,26 +37,42 @@ const saveLocation = async (data: any) => {
   await store.create(payload)
   open.value = false
 }
+
+const openCreate = () => {
+  open.value = true
+}
+const links: ButtonProps[] = [
+  {
+    label: 'Nueva Producto',
+    icon: 'i-heroicons-plus',
+    color: 'primary',
+    variant: 'solid',
+    onClick: openCreate
+  }
+]
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-row items-center justify-between">
-      <h3>Productos</h3>
-      <UButton icon="i-heroicons-plus" @click="open = true">
-        Nueva Producto
-      </UButton>
-    </div>
-    <div class="flex flex-row items-center justify-between">
-      <UCard>
-        <div class="text-center">
-          <p class="text-xs text-gray-500">Total Productos</p>
-          <p class="text-2xl font-bold">{{ metrics.total }}</p>
-        </div>
-      </UCard>
+  <UPage class="space-y-4">
+    <div class="flex flex-col">
+      <div>
+        <UButton
+          icon="i-lucide-layout-panel-left"
+          variant="ghost"
+          color="neutral"
+          label="Menu"
+          @click="toggleModuleSidebar"
+        />
+      </div>
+      <UPageHeader
+        title="Productos"
+        description="Listado de Productos"
+        :links="links"
+        class="mb-4 w-full"
+      />
     </div>
     <LogisticaTable :loading="loading" :data="items" :columns="columns" />
-  </div>
+  </UPage>
 
   <ModalForm
     v-model:open="open"

@@ -6,6 +6,10 @@ import type {
   VehicleDocument
 } from '~/modulos/logistica/transport/vehicles/vehicles.types'
 import StatusToggle from '@/components/ui/PopoverTableActive.vue'
+import {
+  useInlineEdit,
+  type EditableValue
+} from '~/composables/table/useInlineEdit'
 
 type OptionValue = string | boolean
 
@@ -13,7 +17,7 @@ type EditableField = 'plate'
 
 import { useSelectColumn } from '@/composables/table/useSelectColumn'
 import { useIdColumn } from '@/composables/table/useIdColumn'
-import { useDateColumn } from '@/composables/useDateColumn'
+import { useDateColumn } from '~/composables/table/useDateColumn'
 
 const { editableCell } = useInlineEdit<Vehicle, EditableField>()
 const createdDate = useDateColumn('es-AR')
@@ -78,8 +82,8 @@ export const vehiclesColumns = (actions: {
   },
 
   {
-    accessorKey: 'type',
-    header: 'Tipo',
+    accessorKey: 'refrigeration',
+    header: 'Refrigeración',
     cell: ({ row }: { row: { original: Vehicle } }) =>
       h(StatusToggle, {
         modelValue: row.original.refrigeration,

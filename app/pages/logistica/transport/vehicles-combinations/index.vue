@@ -15,15 +15,23 @@ import { vehicleCombinationsFormFields } from '~/modulos/logistica/transport/veh
 import ModalForm from '~/components/ModalForm.vue'
 //composables
 
-import { useDriverMetrics } from '~/composables/logistica/useDriverMetrics'
-import { useVehicles } from '~/composables/logistica/useVehicles'
+import { useDriverMetrics } from '~/modulos/logistica/transport/drivers/useDriverMetrics'
+import { useVehicles } from '~/modulos/logistica/transport/vehicles/useVehicles'
 //tabla columns
 import { VehicleCombinationColumns } from '~/modulos/logistica/transport/vehicles-combinations/columns'
 import type {
   VehicleCombination,
   UpdateVehicleCombinationInput
 } from '~/modulos/logistica/transport/vehicles-combinations/vehicles-combinations.types'
+
+const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
+import type { ButtonProps } from '@nuxt/ui'
+function toggleModuleSidebar() {
+  moduleCollapsed.value = !moduleCollapsed.value
+}
+
 type EditableField = 'unit_number'
+type EditableValue = string | null | undefined
 
 const COMPANY_ID = 'a060f7ff-0281-4df4-b5b3-cbdf940be31e'
 
@@ -40,6 +48,7 @@ const { drivers } = storeToRefs(choferStore)
 
 const { tractorOptions, trailerOptions } = useVehicles(vehicles)
 const { items: driverItems } = useDriverMetrics(drivers)
+
 /* ---------------------------------------
    MODAL CONTROL
 --------------------------------------- */
@@ -227,18 +236,38 @@ async function handleSubmit(data: any) {
 // ========================================
 // MAP PAYLOAD
 // ========================================
+const links = ref<ButtonProps[]>([
+  {
+    label: 'Nueva Unidad',
+    icon: 'i-heroicons-plus',
+    onClick: openCreate,
+    color: 'primary',
+    variant: 'solid'
+  }
+])
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-row items-center justify-between">
-      <h3>Vehiculos</h3>
-      <UButton icon="i-heroicons-plus" @click="openCreate">
-        Nueva Unidad
-      </UButton>
+  <UPage class="space-y-4">
+    <div class="flex flex-col">
+      <div>
+        <UButton
+          icon="i-lucide-layout-panel-left"
+          variant="ghost"
+          color="neutral"
+          label="Menu"
+          @click="toggleModuleSidebar"
+        />
+      </div>
+      <UPageHeader
+        title="Unidades"
+        description="Listado de Unidades"
+        :links="links"
+        class="mb-4 w-full"
+      />
     </div>
     <LogisticaTable :loading="loading" :data="items" :columns="columns" />
-  </div>
+  </UPage>
   <ModalForm
     v-model:open="modalOpen"
     :fields="fields"

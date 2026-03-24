@@ -1,42 +1,32 @@
-import type { BusinessParty } from '~/modulos/logistica/master-data/bussiness-parties/bussines-parties.types'
+import type { BusinessParty } from '~/modulos/logistica/master-data/bussiness-parties/types/bussines-parties.types'
+const urlBase = '/api/logistica/master-data/business-parties'
 export const useBusinessPartiesService = () => {
   const findAll = (company_id: string) => {
-    return $fetch<BusinessParty[]>(
-      '/api/logistica/master-data/business-parties',
-      {
-        query: { company_id }
-      }
-    )
+    return $fetch<BusinessParty[]>(`${urlBase}`, {
+      query: { company_id }
+    })
   }
 
   const findOne = (id: string) => {
-    return $fetch<BusinessParty>(
-      `/api/logistica/master-data/business-parties/${id}`
-    )
+    return $fetch<BusinessParty>(`${urlBase}/${id}`)
   }
 
   const create = (data: Partial<BusinessParty>) => {
-    return $fetch<BusinessParty>(
-      '/api/logistica/master-data/business-parties',
-      {
-        method: 'POST',
-        body: data
-      }
-    )
+    return $fetch<BusinessParty>(`${urlBase}`, {
+      method: 'POST',
+      body: data
+    })
   }
 
   const update = (id: string, data: Partial<BusinessParty>) => {
-    return $fetch<BusinessParty>(
-      `/api/logistica/master-data/business-parties/${id}`,
-      {
-        method: 'PATCH',
-        body: data
-      }
-    )
+    return $fetch<BusinessParty>(`${urlBase}/${id}`, {
+      method: 'PATCH',
+      body: data
+    })
   }
 
   const remove = (id: string) => {
-    return $fetch<void>(`/api/logistica/master-data/business-parties/${id}`, {
+    return $fetch<void>(`${urlBase}/${id}`, {
       method: 'DELETE'
     })
   }

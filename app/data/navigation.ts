@@ -7,6 +7,7 @@ export const navigationLinks = [
       icon: 'i-lucide-house',
       to: '/'
     },
+
     {
       label: 'Kilometros',
       icon: 'i-lucide-truck',
@@ -38,9 +39,9 @@ export const navigationLinks = [
     {
       label: 'logistica',
       to: '/logistica',
-      icon: 'i-lucide-truck',
-      defaultOpen: false,
-      children: [{ label: 'Demostracion', to: '/logistica/operaciones' }]
+      icon: 'i-lucide-truck'
+      // defaultOpen: false,
+      // children: [{ label: 'Demostracion', to: '/logistica/operaciones' }]
     },
     {
       label: 'Ajustes',

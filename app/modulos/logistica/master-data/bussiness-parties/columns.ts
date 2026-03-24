@@ -1,10 +1,11 @@
 import { h } from 'vue'
 import { UBadge } from '#components'
 import type { TableColumn } from '@nuxt/ui'
-import type { BusinessParty } from '~/modulos/logistica/master-data/bussiness-parties/bussines-parties.types'
+import type { BusinessParty } from '~/modulos/logistica/master-data/bussiness-parties/types/bussines-parties.types'
 
-import { useInlineEdit } from '@/composables/useInlineEdit'
-import { useDateColumn } from '@/composables/useDateColumn'
+import { useInlineEdit } from '~/composables/table/useInlineEdit'
+import type { EditableValue } from '~/composables/table/useInlineEdit'
+import { useDateColumn } from '~/composables/table/useDateColumn'
 import { useSelectColumn } from '@/composables/table/useSelectColumn'
 import { useIdColumn } from '@/composables/table/useIdColumn'
 
@@ -15,8 +16,8 @@ const { editableCell } = useInlineEdit<BusinessParty, EditableField>()
 const createdDate = useDateColumn('es-AR')
 
 export const BusinessPartyColumns = (actions: {
-  onToggleActive?: (row: Row, value: boolean) => void
-  onInlineSave?: (row: Row, field: EditableField, value: EditableValue) => void
+  // onToggleActive?: (row: Row, value: boolean) => void
+  // onInlineSave?: (row: Row, field: EditableField, value: EditableValue) => void
   onEdit?: (row: Row) => void
 }): TableColumn<Row>[] => [
   useSelectColumn<Row>(),
@@ -54,16 +55,6 @@ export const BusinessPartyColumns = (actions: {
         () => cfg.label
       )
     }
-  },
-
-  {
-    accessorKey: 'phone',
-    header: 'Teléfono'
-  },
-
-  {
-    accessorKey: 'email',
-    header: 'Email'
   },
 
   {

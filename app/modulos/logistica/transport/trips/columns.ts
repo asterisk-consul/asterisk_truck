@@ -1,16 +1,18 @@
 import { h } from 'vue'
 import { UBadge, UCheckbox } from '#components'
 import type { TableColumn } from '@nuxt/ui'
-import type { Trip } from '~/modulos/logistica/transport/trips/trips.types'
+import type { Trip } from '~/modulos/logistica/transport/trips/types/trips.types'
 import StatusToggle from '@/components/ui/PopoverTableActive.vue'
 type OptionValue = string | boolean
 
-import { useInlineEdit } from '@/composables/useInlineEdit'
-import { useDateColumn } from '@/composables/useDateColumn'
+import { useInlineEdit } from '~/composables/table/useInlineEdit'
+import type { EditableValue } from '~/composables/table/useInlineEdit'
+import { useDateColumn } from '~/composables/table/useDateColumn'
 import { useSelectColumn } from '@/composables/table/useSelectColumn'
 import { useIdColumn } from '@/composables/table/useIdColumn'
 
 const { editableCell } = useInlineEdit<Trip, EditableField>()
+
 const createdDate = useDateColumn('es-AR')
 
 type TripStatus = 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
@@ -32,8 +34,10 @@ const tripStatusConfig: Record<
   COMPLETED: { label: 'Completado', color: 'success' },
   CANCELLED: { label: 'Cancelado', color: 'error' }
 }
+
 type Row = Trip
-type EditableField = 'reference_number' | 'kilometers'
+type EditableField = 'reference_number' | 'kilometers' | 'week'
+
 export const tripsColumns = (actions: {
   onToggleStatus?: (row: Row, value: TripStatus) => void
   onInlineSave?: (row: Row, field: EditableField, value: EditableValue) => void
@@ -44,8 +48,13 @@ export const tripsColumns = (actions: {
 
   {
     accessorKey: 'reference_number',
-    header: 'Referencia',
+    header: 'Referencia de Viaje',
     cell: ({ row }) => editableCell('reference_number', row.original, actions)
+  },
+  {
+    accessorKey: 'week',
+    header: 'Semana',
+    cell: ({ row }) => editableCell('week', row.original, actions)
   },
   {
     accessorKey: 'status',
@@ -68,6 +77,11 @@ export const tripsColumns = (actions: {
       })
   },
   {
+    id: 'business_party',
+    header: 'Cliente',
+    cell: ({ row }) => row.original.business_party?.name
+  },
+  {
     id: 'vehicle_combination',
     header: 'Combinación',
     cell: ({ row }) => {
@@ -78,11 +92,22 @@ export const tripsColumns = (actions: {
       return vc.unit_number || `VC-${vc.id.slice(0, 8)}`
     }
   },
+  {
+    accessorKey: 'corridos',
+    header: 'Corredor',
+    cell: ({ row }) => {
+      const corridor = row.original.corridors
 
+      return corridor?.name || '—'
+    }
+  },
   {
     accessorKey: 'kilometers',
     header: 'Km',
-    cell: ({ row }) => editableCell('kilometers', row.original, actions)
+    cell: ({ row }) =>
+      row.original.corridors?.total_distance_km
+        ? `${row.original.corridors?.total_distance_km} km`
+        : '—'
   },
   {
     id: 'trip_rates',

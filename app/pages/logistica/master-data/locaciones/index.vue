@@ -3,10 +3,16 @@ definePageMeta({
   layout: 'logistica',
   middleware: ['auth']
 })
-import { useLocationsStore } from '~/modulos/logistica/master-data/locations/locations.store'
+import { useLocationsStore } from '~/modulos/logistica/master-data/locations/store/locations.store'
 import { LocationColumns } from '../../../../modulos/logistica/master-data/locations/columns'
 import { locationFormFields } from '~/modulos/logistica/master-data/locations/locationsFormFields'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
+
+const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
+import type { ButtonProps } from '@nuxt/ui'
+function toggleModuleSidebar() {
+  moduleCollapsed.value = !moduleCollapsed.value
+}
 const store = useLocationsStore()
 
 /* ---------------------------------------
@@ -17,7 +23,7 @@ import type {
   CreateLocationInput,
   UpdateLocationInput,
   Location
-} from '~/modulos/logistica/master-data/locations/locations'
+} from '~/modulos/logistica/master-data/locations/types/locations.types'
 
 type EditableField = 'city' | 'province' | 'country' | 'postalCode'
 
@@ -114,19 +120,39 @@ async function handleSubmit(data: any) {
 
   modalOpen.value = false
 }
+const links: ButtonProps[] = [
+  {
+    label: 'Nueva Locacion',
+    icon: 'i-heroicons-plus',
+    color: 'primary',
+    variant: 'solid',
+    onClick: openCreate
+  }
+]
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-row items-center justify-between">
-      <h3>Locaciones</h3>
-      <UButton icon="i-heroicons-plus" @click="openCreate">
-        Nueva Locacion
-      </UButton>
+  <UPage class="space-y-4">
+    <div class="flex flex-col">
+      <div>
+        <UButton
+          icon="i-lucide-layout-panel-left"
+          variant="ghost"
+          color="neutral"
+          label="Menu"
+          @click="toggleModuleSidebar"
+        />
+      </div>
+      <UPageHeader
+        title="Locaciones"
+        description="Listado de Locaciones"
+        :links="links"
+        class="mb-4 w-full"
+      />
     </div>
 
     <LogisticaTable :loading="loading" :data="items" :columns="columns" />
-  </div>
+  </UPage>
 
   <ModalForm
     v-model:open="modalOpen"

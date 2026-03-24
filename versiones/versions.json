@@ -1,9 +1,38 @@
 [
   {
     "version": "0.0.0",
+    "date": "2026-03-01",
+    "stage": "alpha",
+    "notes": "Inicio",
+    "modules": [{ "name": "transporte", "version": "0.6.0-alpha" }]
+  },
+  {
+    "version": "0.0.1",
     "date": "2026-03-12",
     "stage": "alpha",
-    "notes": "Fix de updates",
-    "modules": [{ "name": "transporte", "version": "0.6.0-alpha" }]
+    "notes": "Fix de lógica de updates",
+    "changes": [
+      "Corrección en update de estados",
+      "Fix en endpoint de vehículos"
+    ],
+    "modules": [
+      {
+        "name": "transporte",
+        "version": "1.0.1-alpha"
+      }
+    ]
+  },
+  {
+    "version": "0.1.2",
+    "date": "2026-03-20",
+    "stage": "alpha",
+    "notes": "Fix de lógica de updates clientes, unidades y viajes",
+    "changes": ["Create.vue y edit.vue en clientes, viajes , corridors"],
+    "modules": [
+      {
+        "name": "transporte",
+        "version": "1.1.5-alpha"
+      }
+    ]
   }
 ]

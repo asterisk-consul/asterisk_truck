@@ -2,6 +2,10 @@ import { h } from 'vue'
 import { UBadge } from '#components'
 import type { TableColumn } from '@nuxt/ui'
 import type { VehicleCombination } from '~/modulos/logistica/transport/vehicles-combinations/vehicles-combinations.types'
+import {
+  useInlineEdit,
+  type EditableValue
+} from '~/composables/table/useInlineEdit'
 type Row = VehicleCombination
 import StatusToggle from '@/components/ui/PopoverTableActive.vue'
 
@@ -11,7 +15,7 @@ type EditableField = 'unit_number'
 
 import { useSelectColumn } from '@/composables/table/useSelectColumn'
 import { useIdColumn } from '@/composables/table/useIdColumn'
-import { useDateColumn } from '@/composables/useDateColumn'
+import { useDateColumn } from '~/composables/table/useDateColumn'
 
 const { editableCell } = useInlineEdit<VehicleCombination, EditableField>()
 const createdDate = useDateColumn('es-AR')

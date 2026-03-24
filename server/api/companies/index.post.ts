@@ -1,4 +1,4 @@
-import { apiProxy } from '../../utils/api-proxy'
+import { apiProxy } from '~~/server/utils/api-proxy'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)

@@ -5,12 +5,13 @@ import type {
   VehicleCombination,
   CreateVehicleCombinationInput,
   UpdateVehicleCombinationInput
-} from '~/modulos/logistica/transport/vehicles-combinations/vehicles-combinations.types'
+} from '~/modulos/logistica/transport/vehicles-combinations/types/vehicles-combinations.types'
 
 export const useVehicleCombinationsStore = defineStore(
   'vehicleCombinations',
   () => {
     const items = ref<VehicleCombination[]>([])
+    const available = ref<VehicleCombination[]>([])
     const current = ref<VehicleCombination | null>(null)
     const loading = ref(false)
     const error = ref<string | null>(null)
@@ -68,6 +69,18 @@ export const useVehicleCombinationsStore = defineStore(
       } catch (err: any) {
         error.value = err?.data?.message || err.message
         throw err
+      } finally {
+        loading.value = false
+      }
+    }
+    const fetchAvailable = async (company_id: string, date: string) => {
+      loading.value = true
+      error.value = null
+
+      try {
+        available.value = await service.getAvailable(company_id, date)
+      } catch (err: any) {
+        error.value = err?.data?.message || err.message
       } finally {
         loading.value = false
       }
@@ -144,6 +157,7 @@ export const useVehicleCombinationsStore = defineStore(
 
     return {
       items,
+      available,
       current,
       loading,
       error,
@@ -155,7 +169,8 @@ export const useVehicleCombinationsStore = defineStore(
       finish,
       activate,
       remove,
-      clearError
+      clearError,
+      fetchAvailable
     }
   }
 )

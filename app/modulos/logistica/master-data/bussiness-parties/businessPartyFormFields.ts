@@ -28,19 +28,5 @@ export const businessPartyFormFields: BaseField[] = [
     type: 'text',
     placeholder: '30-12345678-9'
     // required: true
-  },
-
-  {
-    label: 'Teléfono',
-    name: 'phone',
-    type: 'number',
-    placeholder: '3515551234'
-  },
-
-  {
-    label: 'Email',
-    name: 'email',
-    type: 'text',
-    placeholder: 'cliente@demo.com'
   }
 ]

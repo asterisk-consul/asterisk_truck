@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { navigationLinks } from '~/data/navigation'
 import { useVersion } from '~/composables/useVersion'
+import MainSidebar from '~/components/ui/MainSidebar.vue'
+const { mainCollapsed } = useSidebarState()
+const open = ref(false)
 
 const versions = useVersion()
 const route = useRoute()
 const toast = useToast()
-
-const open = ref(false)
 
 const links = navigationLinks
 
@@ -64,67 +65,16 @@ onMounted(async () => {
 
 <template>
   <UDashboardGroup unit="rem">
-    <UDashboardSidebar
+    <MainSidebar
       id="default"
       v-model:open="open"
-      collapsible
+      v-model:collapsed="mainCollapsed"
       resizable
-      class="bg-elevated/25"
-      :ui="{ footer: 'lg:border-t lg:border-default' }"
-    >
-      <template #header="{ collapsed }">
-        <TeamsMenu :collapsed="collapsed" />
-      </template>
-
-      <template #default="{ collapsed }">
-        <UDashboardSearchButton
-          :collapsed="collapsed"
-          class="bg-transparent ring-default"
-        />
-
-        <UNavigationMenu
-          :collapsed="collapsed"
-          :items="links[0]"
-          orientation="vertical"
-          tooltip
-          popover
-        />
-
-        <UNavigationMenu
-          :collapsed="collapsed"
-          :items="links[1]"
-          orientation="vertical"
-          tooltip
-          class="mt-auto"
-        />
-      </template>
-
-      <template #footer="{ collapsed }">
-        <div class="flex flex-col w-full">
-          <UserMenu :collapsed="collapsed" />
-          <div class="py-3 flex justify-center">
-            <div class="flex items-center text-xs text-muted">
-              <span>v{{ versions.version }}</span>
-
-              <UBadge
-                v-if="versions.stage"
-                size="xs"
-                variant="soft"
-                color="neutral"
-                class="ml-2 capitalize"
-              >
-                {{ versions.stage }}
-              </UBadge>
-            </div>
-          </div>
-        </div>
-      </template>
-    </UDashboardSidebar>
+      with-footer
+    />
 
     <UDashboardSearch :groups="groups" />
-
     <slot />
-
     <NotificationsSlideover />
   </UDashboardGroup>
 </template>

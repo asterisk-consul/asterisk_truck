@@ -16,6 +16,11 @@ export default defineNuxtConfig({
   typescript: {
     typeCheck: false // Desactivar temporalmente durante build
   },
+  vite: {
+    optimizeDeps: {
+      include: ['leaflet']
+    }
+  },
   ssr: true,
   imports: {
     dirs: [

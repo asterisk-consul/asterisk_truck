@@ -4,21 +4,26 @@ definePageMeta({
   middleware: ['auth']
 })
 import { storeToRefs } from 'pinia'
-import { useDocumentTypesStore } from '~/modulos/logistica/documents/delivery-types/document-types.store'
-import { documentTypeFormFields } from '~/modulos/logistica/documents/delivery-types/documentTypeFormFields'
+import { useDocumentTypesStore } from '~/modulos/logistica/documents/documents-types/document-types.store'
+import { documentTypeFormFields } from '~/modulos/logistica/documents/documents-types/documentTypeFormFields'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 
 import type {
   CreateDocumentTypeInput,
   UpdateDocumentTypeInput
-} from '~/modulos/logistica/documents/delivery-types/document-types.types'
+} from '~/modulos/logistica/documents/documents-types/document-types.types'
 
 type EditableField = 'name'
 type EditableValue = string | null | undefined
 
 import ModalForm from '~/components/ModalForm.vue'
-import { transportDocumentTypeColumns } from '../../../modulos/logistica/documents/delivery-types/columns'
+import { transportDocumentTypeColumns } from '../../../modulos/logistica/documents/documents-types/columns'
 
+const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
+import type { ButtonProps } from '@nuxt/ui'
+function toggleModuleSidebar() {
+  moduleCollapsed.value = !moduleCollapsed.value
+}
 /* ---------------------------------------
    MODAL CONTROL
 --------------------------------------- */
@@ -117,18 +122,38 @@ async function handleSubmit(data: any) {
 
   modalOpen.value = false
 }
+const links = ref<ButtonProps[]>([
+  {
+    label: 'Nuevo Documento de Transporte',
+    icon: 'i-heroicons-plus',
+    onClick: openCreate,
+    color: 'primary',
+    variant: 'solid'
+  }
+])
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-row items-center justify-between">
-      <h3>Docuementos de Transporte</h3>
-      <UButton icon="i-heroicons-plus" @click="openCreate">
-        Nuevo Documentos
-      </UButton>
+  <UPage class="space-y-4">
+    <div class="flex flex-col">
+      <div>
+        <UButton
+          icon="i-lucide-layout-panel-left"
+          variant="ghost"
+          color="neutral"
+          label="Menu"
+          @click="toggleModuleSidebar"
+        />
+      </div>
+      <UPageHeader
+        title="Documentos de Transporte"
+        description="Listado de Documentos de Transporte"
+        :links="links"
+        class="mb-4 w-full"
+      />
     </div>
     <LogisticaTable :loading="loading" :data="items" :columns="columns" />
-  </div>
+  </UPage>
   <ModalForm
     v-model:open="modalOpen"
     :fields="documentTypeFormFields"

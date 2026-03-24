@@ -5,7 +5,7 @@ import type {
   BusinessParty,
   CreateBusinessPartyInput,
   UpdateBusinessPartyInput
-} from '~/modulos/logistica/master-data/bussiness-parties/bussines-parties.types'
+} from '~/modulos/logistica/master-data/bussiness-parties/types/bussines-parties.types'
 
 export const useBusinessPartiesStore = defineStore('businessParties', () => {
   const service = useBusinessPartiesService()

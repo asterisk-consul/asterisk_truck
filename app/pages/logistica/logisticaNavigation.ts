@@ -9,6 +9,11 @@ export const links: NavigationMenuItem[][] = [
       defaultOpen: false,
       children: [
         {
+          label: 'Corredores',
+          icon: 'i-lucide-map',
+          to: '/logistica/transport/corridors/'
+        },
+        {
           label: 'Choferes',
           icon: 'i-heroicons-users',
           to: '/logistica/transport/drivers/'
@@ -23,18 +28,13 @@ export const links: NavigationMenuItem[][] = [
     {
       label: 'Depósitos',
       icon: 'i-heroicons-building-storefront',
-      to: '/',
+      to: '/logistica/warehouse/',
       defaultOpen: false,
       children: [
         {
           label: 'Productos',
           icon: 'i-heroicons-cube',
           to: '/logistica/master-data/productos/'
-        },
-        {
-          label: 'Depósitos',
-          icon: 'i-heroicons-building-storefront',
-          to: '/logistica/warehouse/'
         }
       ]
     },
@@ -59,9 +59,27 @@ export const links: NavigationMenuItem[][] = [
     {
       label: 'Clientes',
       icon: 'i-heroicons-building-office-2',
-      to: '/logistica/master-data/business-parties/'
+      to: '/logistica/master-data/business-parties/',
+      children: [
+        {
+          label: 'Contactos',
+          icon: 'i-heroicons-users',
+          to: '/logistica/master-data/contacts/'
+        }
+      ]
     },
-    { label: 'Reportes', icon: 'i-heroicons-chart-bar', to: '/' },
+    {
+      label: 'Reportes',
+      icon: 'i-heroicons-chart-bar',
+      to: '/logistica/master-data/ReporteBipages/',
+      children: [
+        {
+          label: 'Logistica trips BI',
+          icon: 'i-heroicons-chart-bar',
+          to: '/logistica/master-data/ReporteBipages/'
+        }
+      ]
+    },
     {
       label: 'Configuraciones',
       icon: 'i-heroicons-cog-6-tooth',

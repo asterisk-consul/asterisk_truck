@@ -1,13 +1,14 @@
 import type { TableColumn } from '@nuxt/ui'
-import type { Location } from '~/modulos/logistica/master-data/locations/locations'
+import type { Location } from '~/modulos/logistica/master-data/locations/types/locations.types'
 
-import { useInlineEdit } from '@/composables/useInlineEdit'
-import { useDateColumn } from '@/composables/useDateColumn'
+import { useInlineEdit } from '~/composables/table/useInlineEdit'
+import { useDateColumn } from '~/composables/table/useDateColumn'
 import { useSelectColumn } from '@/composables/table/useSelectColumn'
 import { useIdColumn } from '@/composables/table/useIdColumn'
 
 type Row = Location
-type EditableField = 'city' | 'province' | 'country' | 'postalCode'
+type EditableField = 'city' | 'province' | 'country' | 'postalCode' | 'address'
+type EditableValue = string | null | undefined
 
 const { editableCell } = useInlineEdit<Location, EditableField>()
 const createdDate = useDateColumn('es-AR')
@@ -19,6 +20,11 @@ export const LocationColumns = (actions: {
 }): TableColumn<Row>[] => [
   useSelectColumn<Row>(),
   useIdColumn<Row>(actions.onEdit),
+  {
+    accessorKey: 'address',
+    header: 'Dirección',
+    cell: ({ row }) => editableCell('address', row.original, actions)
+  },
 
   {
     accessorKey: 'city',

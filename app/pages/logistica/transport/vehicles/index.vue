@@ -7,13 +7,13 @@ import { storeToRefs } from 'pinia'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 //stores
 import { useVehiclesStore } from '~/modulos/logistica/transport/vehicles/vehicles.store'
-import { useDocumentTypesStore } from '~/modulos/logistica/documents/delivery-types/document-types.store'
+import { useDocumentTypesStore } from '~/modulos/logistica/documents/documents-types/document-types.store'
 //form
 import { vehicleFormFields } from '~/modulos/logistica/transport/vehicles/vehicleFormFields'
 import ModalForm from '~/components/ModalForm.vue'
-import { mapVehicleDocumentsToForm } from '~/mappers/mapVehicleDocumentsToForm'
+import { mapVehicleDocumentsToForm } from '~/modulos/logistica/transport/vehicles-combinations/mappers/mapVehicleDocumentsToForm'
 //composables
-import { useDocuments } from '~/composables/logistica/useDocuments'
+import { useDocuments } from '~/modulos/logistica/documents/documents-types/useDocuments'
 //tabla columns
 import { vehiclesColumns } from '~/modulos/logistica/transport/vehicles/vehicles.columns'
 import type {
@@ -21,6 +21,12 @@ import type {
   CreateVehicleInput,
   UpdateVehicleInput
 } from '~/modulos/logistica/transport/vehicles/vehicles.types'
+
+const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
+import type { ButtonProps } from '@nuxt/ui'
+function toggleModuleSidebar() {
+  moduleCollapsed.value = !moduleCollapsed.value
+}
 
 type EditableField = 'plate'
 
@@ -219,18 +225,38 @@ function mapCreateVehiclePayload(form: any): CreateVehicleInput {
 function mapUpdateVehiclePayload(form: any): UpdateVehicleInput {
   return mapVehicleBase(form, editingRow.value) // ← pasar editingRow
 }
+const links = ref<ButtonProps[]>([
+  {
+    label: 'Nuevo Vehiculo',
+    icon: 'i-heroicons-plus',
+    onClick: openCreate,
+    color: 'primary',
+    variant: 'solid'
+  }
+])
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-row items-center justify-between">
-      <h3>Vehiculos</h3>
-      <UButton icon="i-heroicons-plus" @click="openCreate">
-        Nuevo Vehiculo
-      </UButton>
+  <UPage class="space-y-4">
+    <div class="flex flex-col">
+      <div>
+        <UButton
+          icon="i-lucide-layout-panel-left"
+          variant="ghost"
+          color="neutral"
+          label="Menu"
+          @click="toggleModuleSidebar"
+        />
+      </div>
+      <UPageHeader
+        title="Vehiculos"
+        description="Listado de Vehiculos"
+        :links="links"
+        class="mb-4 w-full"
+      />
     </div>
     <LogisticaTable :loading="loading" :data="items" :columns="columns" />
-  </div>
+  </UPage>
   <ModalForm
     v-model:open="modalOpen"
     :fields="fields"
