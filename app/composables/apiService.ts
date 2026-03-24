@@ -13,15 +13,17 @@ export async function fetchData<T>(endpoint: string) {
   return await $fetch<T>(`${config.public.apiBase}${endpoint}`, { headers })
 }
 
-export async function postData<T, B extends Record<string, any>>(
-  endpoint: string,
-  body: B
-) {
+export async function postData<T>(endpoint: string, body: any) {
   const config = useRuntimeConfig()
 
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {})
+  const headers: Record<string, string> = {}
+
+  if (!(body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json'
+  }
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
   }
 
   let status = 0

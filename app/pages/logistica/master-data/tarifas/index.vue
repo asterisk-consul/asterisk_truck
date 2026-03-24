@@ -78,7 +78,7 @@ const store = useTransferRatesStore()
 const { items } = storeToRefs(store)
 
 onMounted(async () => {
-  const companyId = 'a060f7ff-0281-4df4-b5b3-cbdf940be31e'
+  const companyId = '60e937db-3d8e-4244-9121-def951797e7b'
   await store.fetchAll(companyId)
   loading.value = store.loading
 })
@@ -92,7 +92,7 @@ async function handleSubmit(data: any) {
     const { id, ...payload } = data
     const data2 = {
       ...payload,
-      company_id: 'a060f7ff-0281-4df4-b5b3-cbdf940be31e'
+      company_id: '60e937db-3d8e-4244-9121-def951797e7b'
     }
     await store.create(data2)
   } else {
@@ -106,7 +106,7 @@ async function handleSubmit(data: any) {
     await store.update(editingRow.value.id, payload)
   }
 
-  await store.fetchAll('a060f7ff-0281-4df4-b5b3-cbdf940be31e') // 🔥 FALTA ESTO
+  await store.fetchAll('60e937db-3d8e-4244-9121-def951797e7b') // 🔥 FALTA ESTO
 
   modalOpen.value = false
 }

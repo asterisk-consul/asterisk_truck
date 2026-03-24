@@ -28,7 +28,7 @@ type EditableValue = string | null | undefined
 /* ---------------------------------------
    STATE
 --------------------------------------- */
-const COMPANY_ID = 'a060f7ff-0281-4df4-b5b3-cbdf940be31e'
+const COMPANY_ID = '21f611eb-1f24-4a85-9b82-efc5ba78ef71'
 
 const loading = ref(true)
 const documentStore = useDocumentTypesStore()
@@ -153,7 +153,11 @@ const fields = computed(() =>
 // ========================================
 
 onMounted(async () => {
+<<<<<<< Updated upstream
   await store.fetchAll('a12364b6-c47b-4baa-b4a1-4188b8003433')
+=======
+  await store.fetchAll('21f611eb-1f24-4a85-9b82-efc5ba78ef71')
+>>>>>>> Stashed changes
   await documentStore.fetchAll()
   loading.value = store.loading
 })
