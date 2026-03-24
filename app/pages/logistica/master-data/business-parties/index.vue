@@ -15,22 +15,14 @@ const open = ref(false)
 const loading = ref(true)
 
 onMounted(async () => {
-<<<<<<< Updated upstream
-  await store.fetchAll('c07cff19-1412-4d12-8ee0-089d2ccac729')
-=======
   await store.fetchAll('21f611eb-1f24-4a85-9b82-efc5ba78ef71')
->>>>>>> Stashed changes
   console.log(store.items)
   loading.value = store.loading
 })
 
 const saveLocation = async (data: any) => {
   const payload = {
-<<<<<<< Updated upstream
-    company_id: 'a12364b6-c47b-4baa-b4a1-4188b8003433',
-=======
     company_id: '21f611eb-1f24-4a85-9b82-efc5ba78ef71',
->>>>>>> Stashed changes
     type: data.type,
     name: data.name,
     tax_id: data.tax_id,
