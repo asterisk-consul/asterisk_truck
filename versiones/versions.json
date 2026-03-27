@@ -108,6 +108,10 @@
         "type": "fix"
       },
       {
+        "title": "Refactor de de company_id Harcodeado",
+        "type": "fix"
+      },
+      {
         "title": "Refactor de Create.vue y Edit.vue en clientes, viajes y corredores",
         "type": "changed"
       }
@@ -115,7 +119,7 @@
     "modules": [
       {
         "name": "transporte",
-        "version": "1.1.5-alpha"
+        "version": "1.1.6-alpha"
       }
     ]
   }

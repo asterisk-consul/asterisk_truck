@@ -10,15 +10,23 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isLogged = computed(() => !!user.value)
 
+  const error = ref<string | null>(null)
+
   async function login(email: string, password: string) {
     loading.value = true
+    error.value = null
+
     try {
       const res = await fetchApi<{ user: AuthUser }>('/api/auth/login', {
         method: 'POST',
         body: { email, password },
         credentials: 'include'
       })
+
       user.value = res.user
+    } catch (e: any) {
+      error.value =
+        e?.data?.message || e?.statusMessage || 'Error al iniciar sesión'
     } finally {
       loading.value = false
     }

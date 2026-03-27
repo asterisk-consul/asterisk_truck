@@ -5,6 +5,7 @@ definePageMeta({
 })
 import { useBusinessPartiesStore } from '~/modulos/logistica/master-data/bussiness-parties/bussines-parties.store'
 import { BusinessPartyColumns } from '~/modulos/logistica/master-data/bussiness-parties/columns'
+import { useAuthStore } from '~/modulos/auth/auth.store'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 
 const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
@@ -14,16 +15,20 @@ function toggleModuleSidebar() {
 }
 
 const store = useBusinessPartiesStore()
+const authStore = useAuthStore()
 const router = useRouter()
 const { items } = storeToRefs(store)
 
 const loading = ref(true)
 
 onMounted(async () => {
-  await store.fetchAll('a060f7ff-0281-4df4-b5b3-cbdf940be31e')
+  await authStore.init()
+
+  if (!authStore.user?.companyId) return
+
+  await store.fetchAll(authStore.user.companyId)
   loading.value = store.loading
 })
-
 const openCreate = () => {
   router.push('/logistica/master-data/business-parties/create')
 }

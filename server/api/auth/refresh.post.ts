@@ -64,19 +64,17 @@ export default defineEventHandler(async (event) => {
       refreshToken: api.refreshToken
     }
   } catch (e: any) {
-    console.log('❌ REFRESH ERROR')
-    console.log('Status:', e?.status)
-    console.log('Message:', e?.message)
-    console.log('Data:', e?.data)
+    console.error('REFRESH ERROR:', e?.data || e)
 
     deleteCookie(event, 'api_access', { path: '/' })
     deleteCookie(event, 'api_refresh', { path: '/' })
 
-    console.log('🧹 Cookies deleted')
-
     throw createError({
       statusCode: 401,
-      message: 'Refresh failed'
+      statusMessage: 'Unauthorized',
+      data: {
+        message: 'Sesión expirada'
+      }
     })
   }
 })

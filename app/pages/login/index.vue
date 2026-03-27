@@ -32,7 +32,8 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     await navigateTo('/')
   } catch (err: any) {
     errorMessage.value =
-      err?.data?.message || 'Usuario o contraseña incorrectos'
+      err?.message || err?.data?.message || 'Usuario o contraseña incorrectos'
+
     showError.value = true
   }
 }

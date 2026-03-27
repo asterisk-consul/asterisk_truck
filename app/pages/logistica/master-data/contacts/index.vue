@@ -35,10 +35,6 @@ const loading = ref(true)
    MODAL CONTROL
 --------------------------------------- */
 
-const modalOpen = ref(false)
-const modalMode = ref<'create' | 'edit'>('create')
-const editingRow = ref<any>(null)
-
 function openCreate() {
   router.push('/logistica/master-data/contacts/create')
 }
