@@ -7,7 +7,6 @@ import { useProductsStore } from '~/modulos/logistica/master-data/product/produc
 import { columns } from '../../../../modulos/logistica/master-data/product/columns'
 import { productFormFields } from '~/modulos/logistica/master-data/product/productFormFields'
 import { useProductsMetrics } from '~/modulos/logistica/master-data/product/useProductsMetrics'
-import { useAuthStore } from '~/modulos/auth/auth.store'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 
 const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
@@ -18,18 +17,13 @@ function toggleModuleSidebar() {
 
 const store = useProductsStore()
 
-const authStore = useAuthStore()
 const { items } = storeToRefs(store)
 const metrics = useProductsMetrics(items)
 const open = ref(false)
 const loading = ref(true)
 
 onMounted(async () => {
-  await authStore.init()
-
-  if (!authStore.user?.companyId) return
-
-  await store.fetchAll(authStore.user.companyId)
+  await store.fetchAll('a060f7ff-0281-4df4-b5b3-cbdf940be31e')
   loading.value = store.loading
 })
 const saveLocation = async (data: any) => {

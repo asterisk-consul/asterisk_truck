@@ -8,12 +8,10 @@ import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 
 //stores
 import { useTransferRatesStore } from '~/modulos/logistica/transport/transfer-rates/transfer-rates.store'
-
 //form
 import { transferRatesFormFields } from '~/modulos/logistica/transport/transfer-rates/transfer-rates.form'
 import ModalForm from '~/components/ModalForm.vue'
 import { tarifasColumns } from '../../../../modulos/logistica/transport/transfer-rates/columns'
-import { useAuthStore } from '~/modulos/auth/auth.store'
 
 import type {
   TransferRate,
