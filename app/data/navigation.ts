@@ -26,7 +26,11 @@ export const navigationLinks = [
         },
         {
           label: 'Importador',
-          to: '/data-import/import-compras'
+          to: '/importadores'
+        },
+        {
+          label: 'Productos',
+          to: '/productdash'
         }
       ]
     },

@@ -20,7 +20,6 @@ const { items } = storeToRefs(store)
 const loading = ref(true)
 
 onMounted(async () => {
-<<<<<<< HEAD
   await store.fetchAll('21f611eb-1f24-4a85-9b82-efc5ba78ef71')
   console.log(store.items)
   loading.value = store.loading
@@ -40,14 +39,6 @@ const saveLocation = async (data: any) => {
   await store.create(payload)
   await store.fetchAll('21f611eb-1f24-4a85-9b82-efc5ba78ef71')
   open.value = false
-=======
-  await store.fetchAll('a060f7ff-0281-4df4-b5b3-cbdf940be31e')
-  loading.value = store.loading
-})
-
-const openCreate = () => {
-  router.push('/logistica/master-data/business-parties/create')
->>>>>>> main
 }
 
 const openEdit = (row: any) => {

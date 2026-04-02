@@ -54,15 +54,22 @@ export default defineNuxtConfig({
     '@server/utils': './server/utils'
   },
 
-  routeRules: {
-    '/api/**': {
-      cors: true
-    }
-  },
+ 
 
   compatibilityDate: '2024-07-11',
 
-  nitro: {
-    preset: 'node-server'
+ nitro: {
+    preset: 'node-server',
+    // ✅ CORS va acá
+    routeRules: {
+      '/api/**': {
+        cors: true,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+          'Access-Control-Allow-Headers': 'Authorization,Content-Type'
+        }
+      }
+    }
   }
 })

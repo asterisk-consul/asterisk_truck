@@ -7,60 +7,82 @@ const props = defineProps<{
 }>()
 
 function formatCurrency(value: number): string {
-  return value.toLocaleString('en-US', {
+  return value.toLocaleString('es-AR', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'ARS',
     maximumFractionDigits: 0
   })
 }
 
-const baseStats = [{
-  title: 'Customers',
-  icon: 'i-lucide-users',
-  minValue: 400,
-  maxValue: 1000,
-  minVariation: -15,
-  maxVariation: 25
-}, {
-  title: 'Conversions',
-  icon: 'i-lucide-chart-pie',
-  minValue: 1000,
-  maxValue: 2000,
-  minVariation: -10,
-  maxVariation: 20
-}, {
-  title: 'Revenue',
-  icon: 'i-lucide-circle-dollar-sign',
-  minValue: 200000,
-  maxValue: 500000,
-  minVariation: -20,
-  maxVariation: 30,
-  formatter: formatCurrency
-}, {
-  title: 'Orders',
-  icon: 'i-lucide-shopping-cart',
-  minValue: 100,
-  maxValue: 300,
-  minVariation: -5,
-  maxVariation: 15
-}]
+const DOCUMENT_TYPE_ID = '91a9b49a-88b2-40a7-ba8d-d14ce3b57754'
+const { data: stats } = useAsyncData<Stat[]>(
+  'stats',
+  async () => {
+    const documents = await $fetch('/api/erp/purchases', {
+      query: {
+        document_type_id: DOCUMENT_TYPE_ID
+      }
+    })
 
-const { data: stats } = await useAsyncData<Stat[]>('stats', async () => {
-  return baseStats.map((stat) => {
-    const value = randomInt(stat.minValue, stat.maxValue)
-    const variation = randomInt(stat.minVariation, stat.maxVariation)
+    console.log('DOCUMENTS', documents)
 
-    return {
-      title: stat.title,
-      icon: stat.icon,
-      value: stat.formatter ? stat.formatter(value) : value,
-      variation
+    const now = new Date()
+    const currentMonth = now.getMonth()
+    const currentYear = now.getFullYear()
+
+    let total = 0
+    let subtotal = 0
+    let taxes = 0
+    let count = 0
+
+    for (const doc of documents) {
+      const docDate = new Date(doc.date)
+
+      if (
+        docDate.getMonth() === currentMonth &&
+        docDate.getFullYear() === currentYear
+      ) {
+        total += Number(doc.total)
+        subtotal += Number(doc.subtotal)
+        taxes += Number(doc.total_taxes)
+        count++
+      }
     }
-  })
-}, {
-  watch: [() => props.period, () => props.range],
-  default: () => []
-})
+
+    console.log('TOTAL', total)
+
+    return [
+      {
+        title: 'Compras del mes',
+        icon: 'i-lucide-circle-dollar-sign',
+        value: formatCurrency(total),
+        variation: 0
+      },
+      {
+        title: 'Subtotal compras',
+        icon: 'i-lucide-receipt',
+        value: formatCurrency(subtotal),
+        variation: 0
+      },
+      {
+        title: 'Impuestos compras',
+        icon: 'i-lucide-landmark',
+        value: formatCurrency(taxes),
+        variation: 0
+      },
+      {
+        title: 'Facturas de compra',
+        icon: 'i-lucide-file-text',
+        value: count,
+        variation: 0
+      }
+    ]
+  },
+  {
+    watch: [() => props.period, () => props.range],
+    default: () => [] as Stat[]
+  }
+)
 </script>
 
 <template>
@@ -75,7 +97,8 @@ const { data: stats } = await useAsyncData<Stat[]>('stats', async () => {
       :ui="{
         container: 'gap-y-1.5',
         wrapper: 'items-start',
-        leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25 flex-col',
+        leading:
+          'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25 flex-col',
         title: 'font-normal text-muted text-xs uppercase'
       }"
       class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1"
