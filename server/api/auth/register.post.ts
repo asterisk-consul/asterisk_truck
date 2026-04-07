@@ -1,13 +1,19 @@
 import type { ApiLoginResponse } from '~/modulos/auth/auth.types'
+
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const config = useRuntimeConfig()
-  try {
-    const api = await $fetch<ApiLoginResponse>(`${config.apiBase}/auth/login`, {
-      method: 'POST',
-      body
-    })
 
+  try {
+    const api = await $fetch<ApiLoginResponse>(
+      `${config.apiBase}/auth/register`,
+      {
+        method: 'POST',
+        body
+      }
+    )
+
+    // 🔐 cookies igual que login
     setCookie(event, 'api_access', api.accessToken, {
       httpOnly: true,
       sameSite: 'lax',
@@ -26,9 +32,9 @@ export default defineEventHandler(async (event) => {
   } catch (e: any) {
     throw createError({
       statusCode: e?.status || 500,
-      statusMessage: 'Usuario o contraseña incorrectos',
+      statusMessage: 'Error al registrarse',
       data: {
-        message: e?.data?.message || 'Credenciales inválidas'
+        message: e?.data?.message || 'No se pudo registrar'
       }
     })
   }

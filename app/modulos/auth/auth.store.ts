@@ -35,6 +35,7 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
 
     try {
+      console.log(data)
       const res = await authService.register(data)
       user.value = res.user
     } catch (e: any) {
