@@ -19,7 +19,10 @@ export default defineNuxtConfig({
   },
   vite: {
     optimizeDeps: {
-      include: ['leaflet']
+      include: ['leaflet', 'date-fns', '@unovis/vue', 'zod']
+    },
+    ssr: {
+      noExternal: ['@unovis/vue']
     }
   },
   ssr: true,

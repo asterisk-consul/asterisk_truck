@@ -32,11 +32,10 @@ export const useBusinessPartiesStore = defineStore('businessParties', () => {
   // =========================
   // LOAD ALL
   // =========================
-  const fetchAll = async (companyId: string) => {
+  const fetchAll = async () => {
     try {
       loading.value = true
-      currentCompanyId.value = companyId
-      items.value = await service.findAll(companyId)
+      items.value = await service.findAll()
     } finally {
       loading.value = false
     }
@@ -60,18 +59,14 @@ export const useBusinessPartiesStore = defineStore('businessParties', () => {
   // CREATE
   // =========================
   const create = async (payload: CreateBusinessPartyInput) => {
+    console.log('payload store', payload)
     const created = await service.create(payload)
-
-    // si corresponde a la empresa cargada
-    if (payload.company_id === currentCompanyId.value) {
-      items.value.unshift(created)
-    }
 
     return created
   }
 
   // =========================
-  // UPDATE
+  // UPDATEW
   // =========================
   const update = async (id: string, payload: UpdateBusinessPartyInput) => {
     const updated = await service.update(id, payload)

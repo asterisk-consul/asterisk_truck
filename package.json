@@ -1,5 +1,5 @@
 {
-  "name": "asterisk_truck_nuxt",
+  "name": "frontend",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,11 +13,12 @@
     "start": "nuxt start"
   },
   "dependencies": {
-    "@iconify-json/lucide": "^1.2.98",
-    "@iconify-json/simple-icons": "^1.2.74",
-    "@nuxt/ui": "^4.5.1",
+    "@iconify-json/lucide": "^1.2.101",
+    "@iconify-json/simple-icons": "^1.2.77",
+    "@nuxt/ui": "^4.6.1",
     "@nuxtjs/mdc": "^0.20.2",
     "@pinia/nuxt": "^0.11.3",
+    "@tanstack/vue-table": "^8.21.3",
     "@unovis/ts": "^1.6.4",
     "@unovis/vue": "^1.6.4",
     "@vueuse/nuxt": "^13.9.0",
@@ -27,7 +28,7 @@
     "nuxt": "^4.4.2",
     "papaparse": "^5.5.3",
     "pinia": "^3.0.4",
-    "vue-draggable-plus": "^0.6.1",
+    "vuedraggable": "^4.1.0",
     "xlsx": "https://cdn.sheetjs.com/xlsx-latest/xlsx-latest.tgz",
     "zod": "^3.25.76"
   },

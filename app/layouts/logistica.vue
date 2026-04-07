@@ -4,8 +4,41 @@ import SidebarModules from '~/components/ui/SidebarModules.vue'
 
 const { mainCollapsed } = useSidebarState()
 const moduleCollapsed = ref(false)
+const { items: breadcrumbs } = useBreadcrumbs()
 
 provide('moduleSidebarCollapsed', moduleCollapsed)
+
+const items = [
+  {
+    label: 'Crear Viaje',
+    icon: 'i-lucide-plus',
+    to: '/logistica/viajes/trips/create',
+    kbds: ['meta', 'v'],
+    onSelect() {
+      navigateTo('/logistica/viajes/create')
+    }
+  },
+  {
+    label: 'Crear Orden de Despacho',
+    icon: 'i-lucide-plus',
+    to: '/logistica/transport/dispatch-orders/create',
+    kbds: ['meta', 'd'],
+    onSelect() {
+      navigateTo('/logistica/viajes/dispatch-orders/create')
+    }
+  },
+  {
+    label: 'Crear un Corredor',
+    icon: 'i-lucide-plus',
+    to: '/logistica/viajes/corridors/create',
+    kbds: ['meta', 'e'],
+    onSelect() {
+      navigateTo('/logistica/viajas/corridors/create')
+    }
+  }
+]
+
+defineShortcuts(extractShortcuts(items))
 </script>
 
 <template>
@@ -22,21 +55,36 @@ provide('moduleSidebarCollapsed', moduleCollapsed)
               @click="mainCollapsed = !mainCollapsed"
             />
           </template>
+
+          <template #right>
+            <UDropdownMenu
+              :items="items"
+              :content="{
+                align: 'start',
+                side: 'left',
+                sideOffset: 8
+              }"
+            >
+              <UTooltip text="Crear">
+                <UButton icon="i-lucide-plus" size="md" class="rounded-full" />
+              </UTooltip>
+            </UDropdownMenu>
+          </template>
         </UDashboardNavbar>
       </template>
 
       <!-- BODY -->
       <template #body>
         <div class="flex h-full">
-          <!-- SIDEBAR DE MÓDULO -->
           <SidebarModules
             :links="logistica"
             v-model:collapsed="moduleCollapsed"
           />
 
-          <!-- CONTENIDO -->
-          <main class="flex-1 overflow-hidden">
-            <div class="h-full overflow-y-auto p-6">
+          <main class="flex-1 flex flex-col">
+            <UBreadcrumb :items="breadcrumbs" class="pl-6 pt-6" />
+
+            <div class="flex-1 overflow-y-auto p-6">
               <slot />
             </div>
           </main>
