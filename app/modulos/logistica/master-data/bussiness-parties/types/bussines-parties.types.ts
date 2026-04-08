@@ -55,6 +55,8 @@ export type CreateBusinessPartyInput = {
   name: string
   tax_id?: string
 
+  active?: boolean
+
   locations?: {
     location_id: string
     label?: string
@@ -79,6 +81,8 @@ export interface BusinessPartyForm {
   type: BusinessPartyType
   name: string
   tax_id?: string
+  active?: boolean
+
   locations: {
     location_id: string
     label?: string

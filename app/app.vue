@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const colorMode = useColorMode()
-
+import type { ToasterProps } from '#ui/types'
+const toaster: ToasterProps = { position: 'bottom-center', duration: 3000 }
 const color = computed(() => (colorMode.value === 'dark' ? '#1b1718' : 'white'))
 
 useHead({
@@ -31,7 +32,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <UApp>
+  <UApp :toaster="toaster">
     <NuxtLoadingIndicator />
 
     <NuxtLayout>

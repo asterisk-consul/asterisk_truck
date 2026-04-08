@@ -30,11 +30,11 @@ export const useVehicleCombinationsStore = defineStore(
       }
     }
 
-    const fetchActive = async (company_id: string) => {
+    const fetchActive = async () => {
       loading.value = true
       error.value = null
       try {
-        items.value = await service.getActive(company_id)
+        items.value = await service.getActive()
       } catch (err: any) {
         error.value = err?.data?.message || err.message
       } finally {

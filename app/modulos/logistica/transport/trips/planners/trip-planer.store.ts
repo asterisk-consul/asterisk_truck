@@ -3,6 +3,14 @@ import { ref, computed } from 'vue'
 import { useTripsStore } from '~/modulos/logistica/transport/trips/trips.store'
 import type { PlannerStop, PlannerOrder } from './TripPlanner.types'
 
+export const generateId = (): string => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  })
+}
+
 export const useTripPlannerStore = defineStore('trip-planner', () => {
   const tripId = ref<string | null>(null)
 
@@ -25,7 +33,7 @@ export const useTripPlannerStore = defineStore('trip-planner', () => {
   // =============================
   const addStop = (location_id: string) => {
     stops.value.push({
-      id: crypto.randomUUID(),
+      id: generateId(),
       location_id,
       stop_order: stops.value.length + 1,
       orders: []
@@ -148,7 +156,7 @@ export const useTripPlannerStore = defineStore('trip-planner', () => {
       if (origin) {
         if (!map.has(origin)) {
           map.set(origin, {
-            id: crypto.randomUUID(),
+            id: generateId(),
             location_id: origin,
             stop_order: 0,
             orders: []
@@ -169,7 +177,7 @@ export const useTripPlannerStore = defineStore('trip-planner', () => {
       if (destination) {
         if (!map.has(destination)) {
           map.set(destination, {
-            id: crypto.randomUUID(),
+            id: generateId(),
             location_id: destination,
             stop_order: 0,
             orders: []

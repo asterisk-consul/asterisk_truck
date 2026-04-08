@@ -14,7 +14,6 @@ const emit = defineEmits<{
 
 const form = reactive<BusinessPartyForm>({
   id: undefined,
-
   type: 'client',
   name: '',
   tax_id: '',

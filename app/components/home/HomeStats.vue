@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { Period, Range, Stat } from '~/types'
-
 const props = defineProps<{
   period: Period
   range: Range
@@ -14,17 +12,20 @@ function formatCurrency(value: number): string {
   })
 }
 
-const DOCUMENT_TYPE_ID = '91a9b49a-88b2-40a7-ba8d-d14ce3b57754'
+// const DOCUMENT_TYPE_ID = '91a9b49a-88b2-40a7-ba8d-d14ce3b57754'
 const { data: stats } = useAsyncData<Stat[]>(
   'stats',
   async () => {
-    const documents = await $fetch('/api/erp/purchases', {
-      query: {
-        document_type_id: DOCUMENT_TYPE_ID
-      }
-    })
+    const documents = await $fetch(
+      '/api/erp/purchases'
+      // , {
+      // query: {
+      //   document_type_id: DOCUMENT_TYPE_ID
+      // }
+      // }
+    )
 
-    console.log('DOCUMENTS', documents)
+    // console.log('DOCUMENTS', documents)
 
     const now = new Date()
     const currentMonth = now.getMonth()

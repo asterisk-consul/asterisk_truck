@@ -59,7 +59,6 @@ export const useBusinessPartiesStore = defineStore('businessParties', () => {
   // CREATE
   // =========================
   const create = async (payload: CreateBusinessPartyInput) => {
-    console.log('payload store', payload)
     const created = await service.create(payload)
 
     return created
@@ -101,7 +100,6 @@ export const useBusinessPartiesStore = defineStore('businessParties', () => {
     items,
     current,
     loading,
-    currentCompanyId,
 
     // computed
     activeItems,

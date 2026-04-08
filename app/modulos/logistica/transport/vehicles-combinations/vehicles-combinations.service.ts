@@ -10,12 +10,9 @@ export const useVehicleCombinationsService = () => {
       '/api/logistica/transport/vehicles-combinations'
     )
 
-  const getActive = (company_id: string) =>
+  const getActive = () =>
     $fetch<VehicleCombination[]>(
-      '/api/logistica/transport/vehicles-combinations/active',
-      {
-        query: { company_id }
-      }
+      '/api/logistica/transport/vehicles-combinations/active'
     )
 
   const getById = (id: string) =>

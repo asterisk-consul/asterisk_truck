@@ -34,8 +34,6 @@ type EditableValue = string | null | undefined
 /* ---------------------------------------
    STATE
 --------------------------------------- */
-const COMPANY_ID = 'a060f7ff-0281-4df4-b5b3-cbdf940be31e'
-
 const loading = ref(true)
 const documentStore = useDocumentTypesStore()
 const store = useVehiclesStore()
@@ -159,7 +157,7 @@ const fields = computed(() =>
 // ========================================
 
 onMounted(async () => {
-  await store.fetchAll('a060f7ff-0281-4df4-b5b3-cbdf940be31e')
+  await store.fetchAll()
   await documentStore.fetchAll()
   loading.value = store.loading
 })
@@ -173,11 +171,11 @@ async function handleSubmit(data: any) {
     await store.create(payload)
   } else {
     const payload = mapUpdateVehiclePayload(data) // ya usa editingRow internamente
-    console.log('UPDATE PAYLOAD:', JSON.stringify(payload, null, 2))
+    // console.log('UPDATE PAYLOAD:', JSON.stringify(payload, null, 2))
     await store.update(editingRow.value!.id, payload)
   }
 
-  await store.fetchAll(COMPANY_ID)
+  await store.fetchAll()
   modalOpen.value = false
 }
 
@@ -217,7 +215,6 @@ function mapVehicleBase(form: any, existingRow?: any) {
 
 function mapCreateVehiclePayload(form: any): CreateVehicleInput {
   return {
-    companyId: COMPANY_ID,
     ...mapVehicleBase(form)
   }
 }

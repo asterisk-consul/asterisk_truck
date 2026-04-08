@@ -15,8 +15,6 @@ import { storeToRefs } from 'pinia'
 const router = useRouter()
 const store = useBusinessPartiesStore()
 
-const { currentCompanyId } = storeToRefs(store)
-
 const saving = ref(false)
 
 const handleSubmit = async (form: FormType) => {
@@ -24,15 +22,13 @@ const handleSubmit = async (form: FormType) => {
     saving.value = true
 
     const payload = mapFormToBusinessPartyDto({
-      ...form,
-      company_id: currentCompanyId.value!
+      ...form
     })
 
     await store.create(payload)
 
     await router.push('/logistica/business-parties')
   } catch (error) {
-    console.error(error)
   } finally {
     saving.value = false
   }

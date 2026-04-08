@@ -29,6 +29,10 @@ const dispatchOrdersStore = useDispatchOrdersStore()
 const { dispatchOrders, loading: loadingOrders } =
   storeToRefs(dispatchOrdersStore)
 
+const pendingOrders = computed(() =>
+  dispatchOrders.value.filter((o) => o.status === 'PENDING')
+)
+
 /**
  * HELPERS
  */
@@ -187,7 +191,7 @@ onMounted(async () => {
 
         <div v-else class="space-y-2 max-h-120 overflow-y-auto">
           <div
-            v-for="order in dispatchOrders"
+            v-for="order in pendingOrders"
             :key="order.id"
             class="border rounded p-2 cursor-pointer"
             :class="isOrderSelected(order.id) ? 'bg-primary-900' : ''"

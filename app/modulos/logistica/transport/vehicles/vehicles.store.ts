@@ -25,12 +25,12 @@ export const useVehiclesStore = defineStore('vehicles', () => {
 
   // ================= ACTIONS =================
 
-  const fetchAll = async (companyId: string) => {
+  const fetchAll = async () => {
     loading.value = true
     error.value = null
 
     try {
-      items.value = await service.getAll(companyId)
+      items.value = await service.getAll()
     } catch (err: any) {
       error.value = err?.data?.message || err.message
     } finally {

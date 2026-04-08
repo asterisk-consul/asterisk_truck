@@ -6,10 +6,7 @@ import type {
 
 export const useVehiclesService = () => {
   const baseUrl = '/api/logistica/transport/vehicles'
-  const getAll = (companyId: string) =>
-    $fetch<Vehicle[]>(`${baseUrl}`, {
-      query: { companyId }
-    })
+  const getAll = () => $fetch<Vehicle[]>(`${baseUrl}`)
 
   const getOne = (id: string) => $fetch<Vehicle>(`${baseUrl}/${id}`)
 

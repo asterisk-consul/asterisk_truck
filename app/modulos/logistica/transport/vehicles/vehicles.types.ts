@@ -12,7 +12,6 @@ export interface VehicleDocument {
 
 export interface Vehicle {
   id: string
-  company_id?: string // opcional, para compatibilidad
   plate: string
   type: string
   brand?: string | null
@@ -31,7 +30,6 @@ export interface CreateVehicleDocumentInput {
 }
 
 export interface CreateVehicleInput {
-  companyId: string
   type: string
   plate: string
   brand: string

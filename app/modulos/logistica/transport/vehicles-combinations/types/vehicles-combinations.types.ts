@@ -1,6 +1,5 @@
 export interface VehicleCombination {
   id: string
-  company_id: string
   tractor_id: string
   trailer_id?: string | null
   driver_id?: string | null
@@ -16,7 +15,6 @@ export interface VehicleCombination {
 }
 
 export interface CreateVehicleCombinationInput {
-  company_id: string
   tractor_id: string
   trailer_id?: string
   driver_id?: string

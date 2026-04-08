@@ -7,9 +7,10 @@ export const mapFormToBusinessPartyDto = (
   form: BusinessPartyForm
 ): CreateBusinessPartyInput => {
   return {
+    active: form.active ?? true, // 👈 agregar esto
     type: form.type,
     name: form.name,
-    tax_id: form.tax_id,
+    tax_id: form.tax_id || undefined, // 👈 convierte '-' o '' a undefined
 
     locations: form.locations
       .filter((l) => l.location_id)

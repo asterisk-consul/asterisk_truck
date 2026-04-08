@@ -22,7 +22,7 @@ import { VehicleCombinationColumns } from '~/modulos/logistica/transport/vehicle
 import type {
   VehicleCombination,
   UpdateVehicleCombinationInput
-} from '~/modulos/logistica/transport/vehicles-combinations/vehicles-combinations.types'
+} from '~/modulos/logistica/transport/vehicles-combinations/types/vehicles-combinations.types'
 
 const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
 import type { ButtonProps } from '@nuxt/ui'
@@ -32,8 +32,6 @@ function toggleModuleSidebar() {
 
 type EditableField = 'unit_number'
 type EditableValue = string | null | undefined
-
-const COMPANY_ID = 'a060f7ff-0281-4df4-b5b3-cbdf940be31e'
 
 const toast = useToast()
 const loading = ref(true)
@@ -140,7 +138,7 @@ const columns = VehicleCombinationColumns({
       const msg = err?.response?.data?.message || 'No se pudo cambiar el estado'
       toast.add({ title: 'Error', description: msg, color: 'error' })
     } finally {
-      await store.fetchAll(COMPANY_ID)
+      await store.fetchAll()
     }
   }
 })
@@ -169,10 +167,9 @@ const fields = computed(() =>
 // ========================================
 
 onMounted(async () => {
-  const companyId = 'a060f7ff-0281-4df4-b5b3-cbdf940be31e'
-  await store.fetchAll(companyId)
-  await vehiculoStore.fetchAll(companyId)
-  await choferStore.fetchAll(companyId)
+  await store.fetchAll()
+  await vehiculoStore.fetchAll()
+  await choferStore.fetchAll()
   await authStore.fetchMe()
   loading.value = store.loading
 })
@@ -184,10 +181,8 @@ onMounted(async () => {
 async function handleSubmit(data: any) {
   const { id, ...rest } = data
 
-  // Payload base con company_id
   const payloadBase = {
-    ...rest,
-    company_id: 'a060f7ff-0281-4df4-b5b3-cbdf940be31e'
+    ...rest
   }
 
   try {

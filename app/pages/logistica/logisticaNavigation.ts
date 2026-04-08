@@ -75,7 +75,7 @@ export const links: NavigationMenuItem[][] = [
     {
       label: 'Reportes',
       icon: 'i-heroicons-chart-bar',
-      to: '/reportes/ReporteBipages/'
+      to: '/logistica/reportes/ReporteBipages/'
     },
     {
       label: 'Configuraciones',
