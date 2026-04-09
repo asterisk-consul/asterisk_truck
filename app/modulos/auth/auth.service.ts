@@ -7,48 +7,51 @@ import type {
 } from './auth.types'
 
 export const authService = {
-  login: (email: string, password: string) =>
-    $fetch<ApiLoginResponse>('/api/auth/login', {
-      method: 'POST',
-      body: { email, password },
-      credentials: 'include'
-    }),
+  getFetch() {
+    return useRequestFetch()
+  },
 
-  register: (data: ApiRegisterDto) =>
-    $fetch<ApiLoginResponse>('/api/auth/register', {
+  login(email: string, password: string) {
+    return this.getFetch()<ApiLoginResponse>('/api/auth/login', {
       method: 'POST',
-      body: data,
-      credentials: 'include'
-    }),
-
-  refresh: (refreshToken: string) =>
-    $fetch<ApiLoginResponse>('/api/auth/refresh', {
-      method: 'POST',
-      body: { refreshToken },
-      credentials: 'include'
-    }),
-
-  logout: () =>
-    $fetch('/api/auth/logout', {
-      method: 'POST',
-      credentials: 'include'
-    }),
-
-  logoutAll: () =>
-    $fetch<ApiMessageResponse>('/api/auth/logout-all', {
-      method: 'POST',
-      credentials: 'include'
-    }),
-
-  changePassword: (data: ApiChangePasswordDto) =>
-    $fetch<ApiMessageResponse>('/api/auth/change-password', {
-      method: 'POST',
-      body: data,
-      credentials: 'include'
-    }),
-
-  me: () =>
-    $fetch<AuthUser>('/api/auth/me', {
-      credentials: 'include'
+      body: { email, password }
     })
+  },
+
+  register(data: ApiRegisterDto) {
+    return this.getFetch()<ApiLoginResponse>('/api/auth/register', {
+      method: 'POST',
+      body: data
+    })
+  },
+
+  refresh(refreshToken: string) {
+    return this.getFetch()<ApiLoginResponse>('/api/auth/refresh', {
+      method: 'POST',
+      body: { refreshToken }
+    })
+  },
+
+  logout() {
+    return this.getFetch()('/api/auth/logout', {
+      method: 'POST'
+    })
+  },
+
+  logoutAll() {
+    return this.getFetch()<ApiMessageResponse>('/api/auth/logout-all', {
+      method: 'POST'
+    })
+  },
+
+  changePassword(data: ApiChangePasswordDto) {
+    return this.getFetch()<ApiMessageResponse>('/api/auth/change-password', {
+      method: 'POST',
+      body: data
+    })
+  },
+
+  me() {
+    return this.getFetch()<AuthUser>('/api/auth/me')
+  }
 }

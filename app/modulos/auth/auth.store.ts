@@ -49,17 +49,28 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function fetchMe() {
-    try {
-      user.value = await authService.me()
-    } catch {
-      user.value = null
-    }
+    const me = await authService.me()
+    user.value = me
   }
 
   async function init() {
     if (initialized.value) return
+
+    try {
+      await fetchMe()
+    } catch {
+      try {
+        // 🔥 intentar refresh
+        await $fetch('/api/auth/refresh', { method: 'POST' })
+
+        // 🔥 reintentar
+        await fetchMe()
+      } catch {
+        user.value = null
+      }
+    }
+
     initialized.value = true
-    await fetchMe()
   }
   async function changePassword(data: {
     currentPassword: string

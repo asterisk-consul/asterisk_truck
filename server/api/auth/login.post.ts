@@ -1,4 +1,5 @@
 import type { ApiLoginResponse } from '~/modulos/auth/auth.types'
+import { getCookieOptions } from '~~/server/utils/cookies'
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const config = useRuntimeConfig()
@@ -9,16 +10,12 @@ export default defineEventHandler(async (event) => {
     })
 
     setCookie(event, 'api_access', api.accessToken, {
-      httpOnly: true,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 15
+      ...getCookieOptions(),
+      maxAge: 60 * 60 * 24
     })
 
     setCookie(event, 'api_refresh', api.refreshToken, {
-      httpOnly: true,
-      sameSite: 'lax',
-      path: '/',
+      ...getCookieOptions(),
       maxAge: 60 * 60 * 24 * 7
     })
 

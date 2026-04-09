@@ -1,11 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: [
-    '@nuxt/ui',
-    '@nuxtjs/mdc',
-    '@vueuse/nuxt',
-    ['@pinia/nuxt', { autoImports: ['defineStore', 'storeToRefs'] }] // 👈 así se pasan las opciones
-  ],
+  modules: ['@nuxt/ui', '@nuxtjs/mdc', '@vueuse/nuxt', // 👈 así se pasan las opciones
+  ['@pinia/nuxt', { autoImports: ['defineStore', 'storeToRefs'] }], 'nuxt-auth-utils'],
   devServer: {
     host: '0.0.0.0', // <- debe estar así
     port: 3008

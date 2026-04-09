@@ -1,3 +1,4 @@
+import { getCookieOptions } from '~~/server/utils/cookies'
 export default defineEventHandler(async (event) => {
   console.log('================ REFRESH START ================')
 
@@ -36,20 +37,13 @@ export default defineEventHandler(async (event) => {
     // =========================
 
     console.log('🍪 Setting cookies')
-
     setCookie(event, 'api_access', api.accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 15
+      ...getCookieOptions(),
+      maxAge: 60 * 60 * 24
     })
 
     setCookie(event, 'api_refresh', api.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
-      path: '/',
+      ...getCookieOptions(),
       maxAge: 60 * 60 * 24 * 7
     })
 
