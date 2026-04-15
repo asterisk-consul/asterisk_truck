@@ -678,7 +678,6 @@ onMounted(fetchData)
                 >
                   <td class="td font-mono text-[10px] text-gray-400">
                     {{ p.productCode }}
-                    <
                   </td>
 
                   <td class="td truncate" :title="p.productName">

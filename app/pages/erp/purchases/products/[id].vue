@@ -12,19 +12,22 @@ const route = useRoute()
 const productId = computed(() => route.params.id as string)
 
 // --- Filters ---
-const filters = computed(() => ({
+const filters = reactive({
   startDate: (route.query.startDate as string) || '2026-01-01',
   endDate: (route.query.endDate as string) || '2026-12-31',
   supplierId: Array.isArray(route.query.supplierId)
     ? route.query.supplierId[0]
     : route.query.supplierId
-}))
+})
 
 // --- Fetch ---
 const { data, pending, error, refresh } = await useAsyncData(
-  'product-movements',
+  `product-movements-${productId.value}`,
   async () => {
     if (!productId.value) return null
+
+    console.log('FRONT productId:', productId.value)
+    console.log('FRONT filters:', filters)
 
     try {
       const [detail, movements] = await Promise.all([
@@ -33,7 +36,7 @@ const { data, pending, error, refresh } = await useAsyncData(
 
         // ✅ método correcto + productId incluido
         PurchasesService.getMovements({
-          ...filters.value,
+          ...filters,
           productId: productId.value
         })
       ])
@@ -47,7 +50,7 @@ const { data, pending, error, refresh } = await useAsyncData(
 
       // fallback
       const movements = await PurchasesService.getMovements({
-        ...filters.value,
+        ...filters,
         productId: productId.value
       })
 
