@@ -44,6 +44,7 @@ const filters = reactive({
   choferId: '',
   mes: '',
   cliente: '',
+  numeroViaje: '',
   page: 1,
   limit: 50
 })
@@ -73,76 +74,130 @@ const {
 
 const viajes = computed<ViajeChofer[]>(() => reporteData.value?.data ?? [])
 
-// --- KPIs ---
+// -------------------------
+// FILTRO FRONT (NUM VIAJE)
+// -------------------------
+const viajesFiltrados = computed(() => {
+  const q = filters.numeroViaje.trim().toLowerCase()
+
+  let data = viajes.value
+
+  if (q) {
+    data = data.filter((v) =>
+      String(v.numeroViaje ?? '')
+        .toLowerCase()
+        .includes(q)
+    )
+  }
+
+  return data
+})
+
+// -------------------------
+// KPIs (USAN FILTRO)
+// -------------------------
 const totalTarifas = computed(() =>
-  viajes.value.reduce((sum, v) => sum + parseFloat(v.tarifaTotal), 0)
+  viajesFiltrados.value.reduce(
+    (sum, v) => sum + parseFloat(v.tarifaTotal || '0'),
+    0
+  )
 )
+
 const totalComisiones = computed(() =>
-  viajes.value.reduce((sum, v) => sum + parseFloat(v.comisionChofer), 0)
+  viajesFiltrados.value.reduce(
+    (sum, v) => sum + parseFloat(v.comisionChofer || '0'),
+    0
+  )
 )
-const cantViajes = computed(() => viajes.value.length)
+
+const cantViajes = computed(() => viajesFiltrados.value.length)
+
 const tarifaPromedio = computed(() =>
   cantViajes.value ? totalTarifas.value / cantViajes.value : 0
 )
 
-// --- Agrupado por chofer ---
+// -------------------------
+// AGRUPADOS (USAN FILTRO)
+// -------------------------
 const porChofer = computed(() => {
-  const map: Record<
-    string,
-    { chofer: string; comision: number; viajes: number; tarifa: number }
-  > = {}
-  for (const v of viajes.value) {
+  const map: Record<string, any> = {}
+
+  for (const v of viajesFiltrados.value) {
     if (!map[v.choferId]) {
-      map[v.choferId] = { chofer: v.chofer, comision: 0, viajes: 0, tarifa: 0 }
+      map[v.choferId] = {
+        chofer: v.chofer,
+        comision: 0,
+        viajes: 0,
+        tarifa: 0
+      }
     }
-    map[v.choferId].comision += parseFloat(v.comisionChofer)
-    map[v.choferId].tarifa += parseFloat(v.tarifaTotal)
+
+    map[v.choferId].comision += parseFloat(v.comisionChofer || '0')
+    map[v.choferId].tarifa += parseFloat(v.tarifaTotal || '0')
     map[v.choferId].viajes++
   }
+
   return Object.values(map).sort((a, b) => b.comision - a.comision)
 })
 
-// --- Agrupado por cliente ---
 const porCliente = computed(() => {
-  const map: Record<
-    string,
-    { cliente: string; comision: number; viajes: number }
-  > = {}
-  for (const v of viajes.value) {
+  const map: Record<string, any> = {}
+
+  for (const v of viajesFiltrados.value) {
     const key = v.cliente || 'Sin cliente'
     if (!map[key]) map[key] = { cliente: key, comision: 0, viajes: 0 }
-    map[key].comision += parseFloat(v.comisionChofer)
+
+    map[key].comision += parseFloat(v.comisionChofer || '0')
     map[key].viajes++
   }
+
   return Object.values(map).sort((a, b) => b.viajes - a.viajes)
 })
 
-// --- Agrupado por mes ---
 const porMes = computed(() => {
-  const map: Record<
-    string,
-    { mes: string; comision: number; tarifa: number; viajes: number }
-  > = {}
-  for (const v of viajes.value) {
-    const key = v.mes.slice(0, 7)
-    if (!map[key]) map[key] = { mes: key, comision: 0, tarifa: 0, viajes: 0 }
-    map[key].comision += parseFloat(v.comisionChofer)
-    map[key].tarifa += parseFloat(v.tarifaTotal)
+  const map: Record<string, any> = {}
+
+  for (const v of viajesFiltrados.value) {
+    const key = v.mes?.slice(0, 7)
+    if (!map[key]) {
+      map[key] = { mes: key, comision: 0, tarifa: 0, viajes: 0 }
+    }
+
+    map[key].comision += parseFloat(v.comisionChofer || '0')
+    map[key].tarifa += parseFloat(v.tarifaTotal || '0')
     map[key].viajes++
   }
+
   return Object.values(map).sort((a, b) => a.mes.localeCompare(b.mes))
 })
 
-// --- Rutas frecuentes ---
 const rutasFrecuentes = computed(() => {
   const map: Record<string, number> = {}
-  for (const v of viajes.value) {
+
+  for (const v of viajesFiltrados.value) {
     map[v.origenDestino] = (map[v.origenDestino] || 0) + 1
   }
+
   return Object.entries(map)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 6)
     .map(([ruta, count]) => ({ ruta, count }))
+})
+
+// -------------------------
+// SORTING (igual pero con filtrados)
+// -------------------------
+const sortedViajes = computed(() => {
+  return [...viajesFiltrados.value].sort((a, b) => {
+    const av = a[sortKey.value] ?? ''
+    const bv = b[sortKey.value] ?? ''
+
+    const cmp = String(av).localeCompare(String(bv), undefined, {
+      numeric: true
+    })
+
+    return sortDir.value === 'asc' ? cmp : -cmp
+  })
 })
 
 // --- SVG Bar chart ---
@@ -271,16 +326,6 @@ function toggleSort(key: keyof ViajeChofer) {
     sortDir.value = 'asc'
   }
 }
-const sortedViajes = computed(() => {
-  return [...viajes.value].sort((a, b) => {
-    const av = a[sortKey.value] ?? ''
-    const bv = b[sortKey.value] ?? ''
-    const cmp = String(av).localeCompare(String(bv), undefined, {
-      numeric: true
-    })
-    return sortDir.value === 'asc' ? cmp : -cmp
-  })
-})
 
 // UPageHeader links
 const headerLinks = computed(() => [
@@ -316,6 +361,15 @@ const headerLinks = computed(() => [
         <label class="rch-field">
           <span>Mes</span>
           <input type="month" v-model="filters.mes" class="rch-input" />
+        </label>
+        <label class="rch-field">
+          <span>N° Viaje</span>
+          <input
+            type="text"
+            v-model="filters.numeroViaje"
+            class="rch-input"
+            placeholder="Buscar viaje..."
+          />
         </label>
         <label class="rch-field">
           <span>Cliente</span>
@@ -647,6 +701,9 @@ const headerLinks = computed(() => [
                   }}
                 </span>
               </th>
+              <th @click="toggleSort('numeroViaje')" class="rch-th-sort">
+                N° Viaje
+              </th>
               <th @click="toggleSort('numeroCarga')" class="rch-th-sort">
                 Nº Carga
               </th>
@@ -672,14 +729,25 @@ const headerLinks = computed(() => [
           <tbody>
             <tr v-for="v in sortedViajes" :key="v.id" class="rch-tr">
               <td class="rch-td-date">{{ fmtDate(v.fecha) }}</td>
+
+              <td class="rch-td-mono">{{ v.numeroViaje }}</td>
+
               <td class="rch-td-mono">{{ v.numeroCarga }}</td>
+
               <td class="rch-td-chofer">{{ v.chofer }}</td>
-              <td class="rch-td-mono rch-td-center">{{ v.unidad }}</td>
+
+              <td class="rch-td-center rch-td-mono">{{ v.unidad }}</td>
+
               <td class="rch-td-ruta">{{ v.origenDestino }}</td>
+
               <td>
                 <span class="rch-badge">{{ v.cliente }}</span>
               </td>
-              <td class="rch-td-right">{{ fmt(parseFloat(v.tarifaTotal)) }}</td>
+
+              <td class="rch-td-right">
+                {{ fmt(parseFloat(v.tarifaTotal)) }}
+              </td>
+
               <td class="rch-td-right rch-td-comision-detail">
                 {{ fmt(parseFloat(v.comisionChofer)) }}
               </td>

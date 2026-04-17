@@ -223,5 +223,39 @@
         "version": "2.1.3-alpha"
       }
     ]
+  },
+  {
+    "version": "0.8.0-alpha",
+    "date": "2026-04-17",
+    "stage": "alpha",
+    "notes": "Implementación de módulo de reportes con filtros y visualización en frontend",
+    "changes": [
+      {
+        "type": "feat",
+        "scope": "reportes",
+        "title": "Creación de endpoint de reportes basado en vista de base de datos con filtros dinámicos"
+      },
+      {
+        "type": "feat",
+        "scope": "backend",
+        "title": "Implementación de servicio de consulta para vista de reportes"
+      },
+      {
+        "type": "feat",
+        "scope": "frontend",
+        "title": "Creación de servicio para consumo del endpoint de reportes"
+      },
+      {
+        "type": "feat",
+        "scope": "frontend",
+        "title": "Desarrollo de página de reporte con visualización de datos y filtros"
+      }
+    ],
+    "modules": [
+      {
+        "name": "transporte",
+        "version": "2.2.0-alpha"
+      }
+    ]
   }
 ]
