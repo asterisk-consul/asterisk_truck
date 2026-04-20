@@ -50,6 +50,8 @@ const filters = reactive({
 })
 
 // --- Data ---
+const clean = (v: string) => v?.trim() || undefined
+
 const {
   data: reporteData,
   pending,
@@ -58,20 +60,22 @@ const {
   'reporte-choferes',
   async () => {
     const res = (await getReporteChoferes({
-      fechaDesde: filters.fechaDesde || undefined,
-      fechaHasta: filters.fechaHasta || undefined,
-      choferId: filters.choferId || undefined,
-      mes: filters.mes || undefined,
-      cliente: filters.cliente || undefined,
+      fechaDesde: clean(filters.fechaDesde),
+      fechaHasta: clean(filters.fechaHasta),
+      choferId: clean(filters.choferId),
+      mes: clean(filters.mes),
+      cliente: clean(filters.cliente),
       page: filters.page,
       limit: filters.limit
     })) as ReporteResponse | ViajeChofer[]
+
     if (Array.isArray(res)) return { data: res }
     return res
   },
-  { watch: [filters] }
+  {
+    watch: [() => ({ ...filters })] // 👈 asegura reactividad correcta
+  }
 )
-
 const viajes = computed<ViajeChofer[]>(() => reporteData.value?.data ?? [])
 
 // -------------------------
@@ -158,7 +162,8 @@ const porMes = computed(() => {
   const map: Record<string, any> = {}
 
   for (const v of viajesFiltrados.value) {
-    const key = v.mes?.slice(0, 7)
+    const key = v.mes ? v.mes.slice(0, 7) : 'Sin mes'
+
     if (!map[key]) {
       map[key] = { mes: key, comision: 0, tarifa: 0, viajes: 0 }
     }
@@ -168,7 +173,9 @@ const porMes = computed(() => {
     map[key].viajes++
   }
 
-  return Object.values(map).sort((a, b) => a.mes.localeCompare(b.mes))
+  return Object.values(map).sort((a, b) =>
+    String(a.mes).localeCompare(String(b.mes))
+  )
 })
 
 const rutasFrecuentes = computed(() => {
@@ -337,6 +344,12 @@ const headerLinks = computed(() => [
     disabled: pending.value
   }
 ])
+
+function shortName(nombre?: string | null) {
+  if (!nombre) return '—'
+  const parts = nombre.split(' ')
+  return `${parts[0] || ''} ${parts[1]?.[0] || ''}.`
+}
 </script>
 
 <template>
@@ -436,7 +449,7 @@ const headerLinks = computed(() => [
                 text-anchor="end"
                 class="rch-bar-label"
               >
-                {{ c.chofer.split(' ')[0] }} {{ c.chofer.split(' ')[1]?.[0] }}.
+                {{ shortName(c.chofer) }}
               </text>
               <rect
                 :x="CHART_LEFT"
