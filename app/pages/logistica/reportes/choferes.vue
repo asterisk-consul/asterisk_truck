@@ -4,6 +4,7 @@ definePageMeta({
   middleware: ['auth']
 })
 import { getReporteChoferes } from '~/modulos/reportes/services/choferes.service'
+import type { ButtonProps } from '@nuxt/ui'
 
 // --- Types ---
 interface ViajeChofer {
@@ -326,16 +327,73 @@ function shortName(nombre?: string | null) {
   const parts = nombre.split(' ')
   return `${parts[0] || ''} ${parts[1]?.[0] || ''}.`
 }
+const links = ref<ButtonProps[]>([
+  {
+    label: 'Exportar CSV',
+    icon: 'i-heroicons-arrow-down-tray',
+    onClick: exportCSV,
+    color: 'neutral',
+    variant: 'outline'
+  }
+])
+function exportCSV() {
+  if (!viajes.value.length) return
+
+  const headers = [
+    'Fecha',
+    'N° Viaje',
+    'N° Carga',
+    'Chofer',
+    'Unidad',
+    'Ruta',
+    'Cliente',
+    'Tarifa',
+    'Comisión'
+  ]
+
+  const rows = viajes.value.map((v) => [
+    v.fecha,
+    v.numeroViaje,
+    v.numeroCarga,
+    v.chofer,
+    v.unidad,
+    v.origenDestino,
+    v.cliente,
+    v.tarifaTotal,
+    v.comisionChofer
+  ])
+
+  const csvContent = [headers, ...rows]
+    .map(
+      (row) =>
+        row
+          .map((value) => `"${String(value ?? '').replace(/"/g, '""')}"`)
+          .join(';') // 👈 separador mejor para Excel en Argentina
+    )
+    .join('\n')
+
+  const blob = new Blob([csvContent], {
+    type: 'text/csv;charset=utf-8;'
+  })
+
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.setAttribute('download', 'reporte-choferes.csv')
+
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
 </script>
 
 <template>
   <UPage class="space-y-4">
+    <!-- ✅ HEADER CORREGIDO -->
     <UPageHeader
       title="Comisiones de Choferes"
       description="Reporte de comisiones y viajes por chofer"
-      :links="headerLinks"
+      :links="[...headerLinks, ...links]"
     />
-
     <!-- FILTROS -->
     <section class="rch-filters">
       <div class="rch-filters-grid">
