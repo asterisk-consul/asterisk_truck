@@ -65,6 +65,7 @@ const {
       choferId: clean(filters.choferId),
       mes: clean(filters.mes),
       cliente: clean(filters.cliente),
+      numeroViaje: clean(filters.numeroViaje),
       page: filters.page,
       limit: filters.limit
     })) as ReporteResponse | ViajeChofer[]
@@ -79,42 +80,17 @@ const {
 const viajes = computed<ViajeChofer[]>(() => reporteData.value?.data ?? [])
 
 // -------------------------
-// FILTRO FRONT (NUM VIAJE)
-// -------------------------
-const viajesFiltrados = computed(() => {
-  const q = filters.numeroViaje.trim().toLowerCase()
-
-  let data = viajes.value
-
-  if (q) {
-    data = data.filter((v) =>
-      String(v.numeroViaje ?? '')
-        .toLowerCase()
-        .includes(q)
-    )
-  }
-
-  return data
-})
-
-// -------------------------
 // KPIs (USAN FILTRO)
 // -------------------------
 const totalTarifas = computed(() =>
-  viajesFiltrados.value.reduce(
-    (sum, v) => sum + parseFloat(v.tarifaTotal || '0'),
-    0
-  )
+  viajes.value.reduce((sum, v) => sum + parseFloat(v.tarifaTotal || '0'), 0)
 )
 
 const totalComisiones = computed(() =>
-  viajesFiltrados.value.reduce(
-    (sum, v) => sum + parseFloat(v.comisionChofer || '0'),
-    0
-  )
+  viajes.value.reduce((sum, v) => sum + parseFloat(v.comisionChofer || '0'), 0)
 )
 
-const cantViajes = computed(() => viajesFiltrados.value.length)
+const cantViajes = computed(() => viajes.value.length)
 
 const tarifaPromedio = computed(() =>
   cantViajes.value ? totalTarifas.value / cantViajes.value : 0
@@ -126,7 +102,7 @@ const tarifaPromedio = computed(() =>
 const porChofer = computed(() => {
   const map: Record<string, any> = {}
 
-  for (const v of viajesFiltrados.value) {
+  for (const v of viajes.value) {
     if (!map[v.choferId]) {
       map[v.choferId] = {
         chofer: v.chofer,
@@ -147,7 +123,7 @@ const porChofer = computed(() => {
 const porCliente = computed(() => {
   const map: Record<string, any> = {}
 
-  for (const v of viajesFiltrados.value) {
+  for (const v of viajes.value) {
     const key = v.cliente || 'Sin cliente'
     if (!map[key]) map[key] = { cliente: key, comision: 0, viajes: 0 }
 
@@ -161,7 +137,7 @@ const porCliente = computed(() => {
 const porMes = computed(() => {
   const map: Record<string, any> = {}
 
-  for (const v of viajesFiltrados.value) {
+  for (const v of viajes.value) {
     const key = v.mes ? v.mes.slice(0, 7) : 'Sin mes'
 
     if (!map[key]) {
@@ -181,7 +157,7 @@ const porMes = computed(() => {
 const rutasFrecuentes = computed(() => {
   const map: Record<string, number> = {}
 
-  for (const v of viajesFiltrados.value) {
+  for (const v of viajes.value) {
     map[v.origenDestino] = (map[v.origenDestino] || 0) + 1
   }
 
@@ -195,7 +171,7 @@ const rutasFrecuentes = computed(() => {
 // SORTING (igual pero con filtrados)
 // -------------------------
 const sortedViajes = computed(() => {
-  return [...viajesFiltrados.value].sort((a, b) => {
+  return [...viajes.value].sort((a, b) => {
     const av = a[sortKey.value] ?? ''
     const bv = b[sortKey.value] ?? ''
 
