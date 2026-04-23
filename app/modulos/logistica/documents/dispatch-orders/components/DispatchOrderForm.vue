@@ -202,6 +202,24 @@ type StatusOption = (typeof statusOptions)[number]
 const selectedCorridorData = computed(() =>
   corridors.value.find((c) => c.id === form.corridor_id)
 )
+
+const selectedOriginLocation = computed({
+  get: () =>
+    allLocationItems.value.find((l) => l.value === form.origin_location_id),
+  set: (item) => {
+    form.origin_location_id = item?.value ?? undefined
+  }
+})
+
+const selectedDestinationLocation = computed({
+  get: () =>
+    allLocationItems.value.find(
+      (l) => l.value === form.destination_location_id
+    ),
+  set: (item) => {
+    form.destination_location_id = item?.value ?? undefined
+  }
+})
 const selectedCorridorItem = computed({
   get: () => corridorsItems.value.find((c) => c.value === form.corridor_id),
   set: (item) => {
@@ -388,20 +406,26 @@ watch(
         </UFormField>
 
         <UFormField label="Origen" class="w-full">
-          <USelect
-            class="w-full"
-            v-model="form.origin_location_id"
+          <USelectMenu
+            class="w-full flex-1"
+            v-model="selectedOriginLocation"
             :items="originItems"
             placeholder="Seleccionar origen"
+            option-attribute="label"
+            value-attribute="value"
+            clear
           />
         </UFormField>
 
         <UFormField label="Destino" class="w-full">
-          <USelect
+          <USelectMenu
             class="w-full"
-            v-model="form.destination_location_id"
+            v-model="selectedDestinationLocation"
             :items="destinationItems"
             placeholder="Seleccionar destino"
+            option-attribute="label"
+            value-attribute="value"
+            clear
           />
         </UFormField>
         <div
