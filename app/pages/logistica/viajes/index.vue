@@ -91,7 +91,7 @@ const columns = tripsColumns({
 
 onMounted(async () => {
   await store.fetchAll()
-  console.log(items)
+  // console.log(items)
   loading.value = store.loading
 })
 

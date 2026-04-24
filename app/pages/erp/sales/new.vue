@@ -1,18 +1,16 @@
 <script setup lang="ts">
 definePageMeta({
   layout: 'default',
-  middleware: ['auth'],
-  ssr: false
+  middleware: ['auth']
 })
+
+import { storeToRefs } from 'pinia'
 
 import { DocumentsSalesService } from '~/modulos/erp/sales/sales.service'
 import { useBusinessPartiesStore } from '~/modulos/logistica/master-data/bussiness-parties/bussines-parties.store'
+import { useProductsStore } from '~/modulos/logistica/master-data/product/products.store'
 import { useBusinessParties } from '~/modulos/logistica/master-data/bussiness-parties/composable/useBusinessParties'
-import type {
-  DocumentItem,
-  DocumentItemTax,
-  DocumentTax
-} from '~/modulos/erp/sales/types/sales.types'
+import { useProducts } from '~/modulos/logistica/master-data/product/composable/useProducts'
 
 const router = useRouter()
 const toast = useToast()
@@ -21,26 +19,20 @@ const toast = useToast()
 const salesService = DocumentsSalesService
 
 const store = useBusinessPartiesStore()
-const { loading, items: parties } = storeToRefs(store)
-
-const partyOptions = useBusinessParties(parties)
-console.log(partyOptions)
+const { items: parties } = storeToRefs(store)
+const { items: partyOptions } = useBusinessParties(parties)
 
 // ── Productos ─────────────────────────────────────────────────────
 // ✔ Productos
-const { data: products } = await useAsyncData('products-list', () =>
-  $fetch('/api/master-data/products')
-)
+const productStore = useProductsStore()
+const { items: products } = storeToRefs(productStore)
 
-const productOptions = computed(() =>
-  (products.value ?? []).map((p: any) => ({
-    label: p.name,
-    value: p.id,
-    price: p.price ?? 0,
-    tax: p.tax ?? null
-  }))
-)
-
+const { items: productOptions } = useProducts(products)
+onMounted(async () => {
+  await store.fetchAll()
+  await productStore.fetchAll()
+  console.log(productStore.items)
+})
 // ── Form ──────────────────────────────────────────────────────────
 const form = reactive({
   document_type_id: '84052621-1431-425b-a301-ce6429fafb6a',
@@ -216,10 +208,6 @@ async function submit() {
     saving.value = false
   }
 }
-
-onMounted(() => {
-  await store.fetchAll()
-})
 </script>
 
 <template>
@@ -243,34 +231,31 @@ onMounted(() => {
 
     <template #body>
       <div class="p-4 space-y-5 max-w-4xl mx-auto">
-        <!-- ERROR DEBUG -->
-        <UAlert
-          v-if="partiesError"
-          color="error"
-          title="Error cargando datos"
-        />
-
         <!-- DATOS -->
-        <div class="bg-white rounded-xl border p-5 space-y-4">
+        <div class="border border-primary-300 rounded-xl p-5 space-y-4">
           <span class="text-sm font-semibold">Datos generales</span>
 
           <USelectMenu
             v-model="selectedParty"
-            :options="partyOptions"
+            :items="partyOptions"
             placeholder="Cliente"
             searchable
+            clear
+            class="w-full"
           />
 
           <UInput v-model="form.date" type="date" />
         </div>
 
         <!-- ITEMS -->
-        <div class="bg-white rounded-xl border p-5 space-y-4">
+        <div class="border border-primary-300 rounded-xl p-5 space-y-4">
           <USelectMenu
             v-model="selectedProduct"
-            :options="productOptions"
+            :items="productOptions"
             placeholder="Producto"
             searchable
+            clear
+            class="w-full"
           />
 
           <UButton @click="addItem">Agregar</UButton>

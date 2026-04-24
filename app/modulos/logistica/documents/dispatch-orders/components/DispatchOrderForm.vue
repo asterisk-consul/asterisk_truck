@@ -345,6 +345,7 @@ watch(
             <USelectMenu
               v-model="selectedCustomer"
               :items="items"
+              searchable
               clear
               class="w-full"
             />

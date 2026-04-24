@@ -1,15 +1,14 @@
 <script setup lang="ts">
 definePageMeta({
   layout: 'default',
-  middleware: ['auth'],
-  ssr: false // ✅ evitamos hydration issues
+  middleware: ['auth']
 })
 
 import { DocumentsSalesService } from '~/modulos/erp/sales/sales.service'
 import {
   STATUS_LABELS,
   STATUS_COLORS,
-  type SalesDocument
+  type SaleDocument
 } from '~/modulos/erp/sales/types/sales.types'
 
 const route = useRoute()
@@ -17,34 +16,16 @@ const router = useRouter()
 const toast = useToast()
 
 // ✅ instanciar composable
-const salesService = useSalesService()
+const salesService = DocumentsSalesService
 
 // ── ID seguro ─────────────────────────────────────────────────────
-const docId = computed(() => {
-  const id = route.params.id
-  return typeof id === 'string' ? id : undefined
-})
-// DEBUG
-watch(docId, (v) => {
-  console.log('DOC ID:', v)
-})
+
+const docId = route.params.id as string
+
+console.log(docId)
 
 // ── FETCH SEGURO ──────────────────────────────────────────────────
-const {
-  data: doc,
-  pending,
-  error,
-  refresh
-} = await useAsyncData(
-  () => (docId.value ? `sales-doc-${docId.value}` : null),
-  () => {
-    if (!docId.value) return null
-    return salesService.getById(docId.value)
-  },
-  {
-    watch: [docId]
-  }
-)
+const doc = await salesService.getOne(docId)
 
 // ── Helpers ───────────────────────────────────────────────────────
 function fmt(n: number) {
@@ -180,7 +161,7 @@ async function deleteDoc() {
             v-if="doc?.status === 0"
             icon="i-heroicons-trash"
             size="sm"
-            color="red"
+            color="error"
             variant="ghost"
             :loading="deleting"
             @click="deleteDoc"
