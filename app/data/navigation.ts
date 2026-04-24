@@ -14,6 +14,15 @@ export const navigationLinks = [
       to: '/VKilomentros'
     },
     {
+      label: 'Ventas',
+      icon: 'i-lucide-receipt',
+      defaultOpen: false,
+      children: [
+        { label: 'Facturas', to: '/erp/sales' },
+        { label: 'Nueva factura', to: '/erp/sales/new' }
+      ]
+    },
+    {
       label: 'Compras',
       icon: 'i-lucide-folder-closed',
       defaultOpen: false,
@@ -57,7 +66,8 @@ export const navigationLinks = [
         { label: 'General', to: '/settings', exact: true },
         { label: 'Miembros', to: '/settings/members' },
         { label: 'Notificaciones', to: '/settings/notifications' },
-        { label: 'Seguridad', to: '/settings/security' }
+        { label: 'Seguridad', to: '/settings/security' },
+        { label: 'Impuestos', to: '/settings/taxes' }
       ]
     }
   ],

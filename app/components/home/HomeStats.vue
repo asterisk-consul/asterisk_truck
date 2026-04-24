@@ -16,14 +16,14 @@ function formatCurrency(value: number): string {
 const { data: stats } = useAsyncData<Stat[]>(
   'stats',
   async () => {
-    const documents = await $fetch(
-      '/api/erp/purchases'
-      // , {
-      // query: {
-      //   document_type_id: DOCUMENT_TYPE_ID
-      // }
-      // }
-    )
+    // const documents = await $fetch(
+    //   '/api/erp/purchases'
+    //   // , {
+    //   // query: {
+    //   //   document_type_id: DOCUMENT_TYPE_ID
+    //   // }
+    //   // }
+    // )
 
     // console.log('DOCUMENTS', documents)
 

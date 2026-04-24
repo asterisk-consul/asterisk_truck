@@ -5,10 +5,7 @@ import type {
 } from '~/modulos/logistica/master-data/product/product.types'
 
 export const useProductsService = () => {
-  const findAll = (company_id: string) =>
-    $fetch<Product[]>('/api/logistica/master-data/products', {
-      query: { company_id }
-    })
+  const findAll = () => $fetch<Product[]>('/api/logistica/master-data/products')
 
   const findOne = (id: string) =>
     $fetch<Product>(`/api/logistica/master-data/products/${id}`)

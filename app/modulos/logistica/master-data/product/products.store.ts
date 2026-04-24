@@ -13,16 +13,14 @@ export const useProductsStore = defineStore('products', () => {
   const items = ref<Product[]>([])
   const current = ref<Product | null>(null)
   const loading = ref(false)
-  const currentCompanyId = ref<string | null>(null)
 
   // =========================
   // LOAD ALL
   // =========================
-  const fetchAll = async (companyId: string) => {
+  const fetchAll = async () => {
     try {
       loading.value = true
-      currentCompanyId.value = companyId
-      items.value = await service.findAll(companyId)
+      items.value = await service.findAll()
     } finally {
       loading.value = false
     }
@@ -47,11 +45,6 @@ export const useProductsStore = defineStore('products', () => {
   // =========================
   const create = async (payload: CreateProductInput) => {
     const created = await service.create(payload)
-
-    if (payload.company_id === currentCompanyId.value) {
-      items.value.unshift(created)
-    }
-
     return created
   }
 
@@ -90,7 +83,6 @@ export const useProductsStore = defineStore('products', () => {
     items,
     current,
     loading,
-    currentCompanyId,
     fetchAll,
     fetchOne,
     create,

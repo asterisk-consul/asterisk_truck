@@ -4,6 +4,7 @@ definePageMeta({
   middleware: ['auth']
 })
 import { getReporteChoferes } from '~/modulos/reportes/services/choferes.service'
+import type { ButtonProps } from '@nuxt/ui'
 
 // --- Types ---
 interface ViajeChofer {
@@ -65,6 +66,7 @@ const {
       choferId: clean(filters.choferId),
       mes: clean(filters.mes),
       cliente: clean(filters.cliente),
+      numeroViaje: clean(filters.numeroViaje),
       page: filters.page,
       limit: filters.limit
     })) as ReporteResponse | ViajeChofer[]
@@ -79,42 +81,17 @@ const {
 const viajes = computed<ViajeChofer[]>(() => reporteData.value?.data ?? [])
 
 // -------------------------
-// FILTRO FRONT (NUM VIAJE)
-// -------------------------
-const viajesFiltrados = computed(() => {
-  const q = filters.numeroViaje.trim().toLowerCase()
-
-  let data = viajes.value
-
-  if (q) {
-    data = data.filter((v) =>
-      String(v.numeroViaje ?? '')
-        .toLowerCase()
-        .includes(q)
-    )
-  }
-
-  return data
-})
-
-// -------------------------
 // KPIs (USAN FILTRO)
 // -------------------------
 const totalTarifas = computed(() =>
-  viajesFiltrados.value.reduce(
-    (sum, v) => sum + parseFloat(v.tarifaTotal || '0'),
-    0
-  )
+  viajes.value.reduce((sum, v) => sum + parseFloat(v.tarifaTotal || '0'), 0)
 )
 
 const totalComisiones = computed(() =>
-  viajesFiltrados.value.reduce(
-    (sum, v) => sum + parseFloat(v.comisionChofer || '0'),
-    0
-  )
+  viajes.value.reduce((sum, v) => sum + parseFloat(v.comisionChofer || '0'), 0)
 )
 
-const cantViajes = computed(() => viajesFiltrados.value.length)
+const cantViajes = computed(() => viajes.value.length)
 
 const tarifaPromedio = computed(() =>
   cantViajes.value ? totalTarifas.value / cantViajes.value : 0
@@ -126,7 +103,7 @@ const tarifaPromedio = computed(() =>
 const porChofer = computed(() => {
   const map: Record<string, any> = {}
 
-  for (const v of viajesFiltrados.value) {
+  for (const v of viajes.value) {
     if (!map[v.choferId]) {
       map[v.choferId] = {
         chofer: v.chofer,
@@ -147,7 +124,7 @@ const porChofer = computed(() => {
 const porCliente = computed(() => {
   const map: Record<string, any> = {}
 
-  for (const v of viajesFiltrados.value) {
+  for (const v of viajes.value) {
     const key = v.cliente || 'Sin cliente'
     if (!map[key]) map[key] = { cliente: key, comision: 0, viajes: 0 }
 
@@ -161,7 +138,7 @@ const porCliente = computed(() => {
 const porMes = computed(() => {
   const map: Record<string, any> = {}
 
-  for (const v of viajesFiltrados.value) {
+  for (const v of viajes.value) {
     const key = v.mes ? v.mes.slice(0, 7) : 'Sin mes'
 
     if (!map[key]) {
@@ -181,7 +158,7 @@ const porMes = computed(() => {
 const rutasFrecuentes = computed(() => {
   const map: Record<string, number> = {}
 
-  for (const v of viajesFiltrados.value) {
+  for (const v of viajes.value) {
     map[v.origenDestino] = (map[v.origenDestino] || 0) + 1
   }
 
@@ -195,7 +172,7 @@ const rutasFrecuentes = computed(() => {
 // SORTING (igual pero con filtrados)
 // -------------------------
 const sortedViajes = computed(() => {
-  return [...viajesFiltrados.value].sort((a, b) => {
+  return [...viajes.value].sort((a, b) => {
     const av = a[sortKey.value] ?? ''
     const bv = b[sortKey.value] ?? ''
 
@@ -350,16 +327,73 @@ function shortName(nombre?: string | null) {
   const parts = nombre.split(' ')
   return `${parts[0] || ''} ${parts[1]?.[0] || ''}.`
 }
+const links = ref<ButtonProps[]>([
+  {
+    label: 'Exportar CSV',
+    icon: 'i-heroicons-arrow-down-tray',
+    onClick: exportCSV,
+    color: 'neutral',
+    variant: 'outline'
+  }
+])
+function exportCSV() {
+  if (!viajes.value.length) return
+
+  const headers = [
+    'Fecha',
+    'N° Viaje',
+    'N° Carga',
+    'Chofer',
+    'Unidad',
+    'Ruta',
+    'Cliente',
+    'Tarifa',
+    'Comisión'
+  ]
+
+  const rows = viajes.value.map((v) => [
+    v.fecha,
+    v.numeroViaje,
+    v.numeroCarga,
+    v.chofer,
+    v.unidad,
+    v.origenDestino,
+    v.cliente,
+    v.tarifaTotal,
+    v.comisionChofer
+  ])
+
+  const csvContent = [headers, ...rows]
+    .map(
+      (row) =>
+        row
+          .map((value) => `"${String(value ?? '').replace(/"/g, '""')}"`)
+          .join(';') // 👈 separador mejor para Excel en Argentina
+    )
+    .join('\n')
+
+  const blob = new Blob([csvContent], {
+    type: 'text/csv;charset=utf-8;'
+  })
+
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.setAttribute('download', 'reporte-choferes.csv')
+
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
 </script>
 
 <template>
   <UPage class="space-y-4">
+    <!-- ✅ HEADER CORREGIDO -->
     <UPageHeader
       title="Comisiones de Choferes"
       description="Reporte de comisiones y viajes por chofer"
-      :links="headerLinks"
+      :links="[...headerLinks, ...links]"
     />
-
     <!-- FILTROS -->
     <section class="rch-filters">
       <div class="rch-filters-grid">
