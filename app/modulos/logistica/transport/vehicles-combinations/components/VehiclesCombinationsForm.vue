@@ -3,7 +3,8 @@ import type {
   VehicleCombination,
   UpdateVehicleCombinationInput
 } from '~/modulos/logistica/transport/vehicles-combinations/types/vehicles-combinations.types'
-
+import { parseDate, today, getLocalTimeZone } from '@internationalized/date'
+import type { CalendarDate } from '@internationalized/date'
 import {
   mapVehicleCombinationToForm,
   mapVehicleCombinationFormToDto,
@@ -13,10 +14,15 @@ import {
 import type { SelectMenuItem } from '~/modulos/logistica/transport/corridors/composables/useCorridors'
 
 import { useVehiclesStore } from '~/modulos/logistica/transport/vehicles/store/vehicles.store'
+import { useChoferesStore } from '~/modulos/logistica/transport/drivers/choferes.store'
+import { useVehicleCombinationsStore } from '~/modulos/logistica/transport/vehicles-combinations/vehicle-combinations.store'
 
 // composables
 import { useVehicles } from '~/modulos/logistica/transport/vehicles/composable/useVehicles'
 import { useDriverMetrics } from '~/modulos/logistica/transport/drivers/useDriverMetrics'
+
+const inputDateFrom = useTemplateRef('inputDateFrom')
+const inputDateUntil = useTemplateRef('inputDateUntil')
 
 const props = defineProps<{
   vehicleCombination?: VehicleCombination
@@ -32,12 +38,20 @@ const isEdit = computed(() => !!props.vehicleCombination)
  * STORE
  */
 const store = useVehiclesStore()
+const choferStore = useChoferesStore()
 const { items: vehicles } = storeToRefs(store)
+const { drivers } = storeToRefs(choferStore)
+const combinationsStore = useVehicleCombinationsStore()
+const { items: combinations } = storeToRefs(combinationsStore)
+
 /**
  * COMPOSABLES
  */
-const { tractorOptions, trailerOptions } = useVehicles(vehicles)
-const { items: driverItems } = useDriverMetrics()
+const {
+  availableTractorOptions: tractorOptions,
+  availableTrailerOptions: trailerOptions
+} = useVehicles(vehicles, combinations)
+const { items: driverItems } = useDriverMetrics(drivers)
 
 /**
  * FORM
@@ -48,7 +62,7 @@ const form = reactive<VehicleCombinationForm>({
   tractor_id: '',
   trailer_id: '',
   driver_id: '',
-  valid_from: '',
+  valid_from: today(getLocalTimeZone()).toString(),
   valid_until: ''
 })
 
@@ -64,6 +78,22 @@ watch(
   { immediate: true }
 )
 
+const validFromDate = computed({
+  get: () => {
+    if (form.valid_from) return parseDate(form.valid_from)
+    return today(getLocalTimeZone()) // 👈 default a hoy si está vacío
+  },
+  set: (val: CalendarDate | null | undefined) => {
+    form.valid_from = val ? val.toString() : ''
+  }
+})
+
+const validUntilDate = computed({
+  get: () => (form.valid_until ? parseDate(form.valid_until) : undefined),
+  set: (val: CalendarDate | null | undefined) => {
+    form.valid_until = val ? val.toString() : ''
+  }
+})
 /**
  * Submit
  */
@@ -137,12 +167,48 @@ const submit = () => {
 
       <!-- Válido desde -->
       <UFormField label="Válido desde">
-        <UInput type="date" v-model="form.valid_from" class="w-full" />
+        <UInputDate ref="inputDateFrom" v-model="validFromDate" class="w-full">
+          <template #trailing>
+            <UPopover :reference="inputDateFrom?.inputsRef[3]?.$el">
+              <UButton
+                color="neutral"
+                variant="link"
+                size="sm"
+                icon="i-lucide-calendar"
+                aria-label="Seleccionar fecha"
+                class="px-0"
+              />
+              <template #content>
+                <UCalendar v-model="validFromDate" class="p-2" />
+              </template>
+            </UPopover>
+          </template>
+        </UInputDate>
       </UFormField>
 
       <!-- Válido hasta -->
       <UFormField label="Válido hasta">
-        <UInput type="date" v-model="form.valid_until" class="w-full" />
+        <UInputDate
+          ref="inputDateUntil"
+          v-model="validUntilDate"
+          class="w-full"
+        >
+          <template #trailing>
+            <UPopover :reference="inputDateUntil?.inputsRef[3]?.$el">
+              <UButton
+                color="neutral"
+                variant="link"
+                size="sm"
+                icon="i-lucide-calendar"
+                aria-label="Seleccionar fecha"
+                class="px-0"
+              />
+              <template #content>
+                <UCalendar v-model="validUntilDate" class="p-2" />
+              </template>
+            </UPopover>
+          </template>
+        </UInputDate>
       </UFormField>
     </UCard>
 

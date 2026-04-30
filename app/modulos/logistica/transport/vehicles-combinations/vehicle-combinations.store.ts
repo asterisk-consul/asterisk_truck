@@ -150,7 +150,55 @@ export const useVehicleCombinationsStore = defineStore(
         loading.value = false
       }
     }
+    const reassign = async (
+      unitNumber: string,
+      newCombinationPayload: CreateVehicleCombinationInput
+    ) => {
+      loading.value = true
+      error.value = null
 
+      try {
+        const activeCombo = items.value.find(
+          (combo) => !combo.valid_until && combo.unit_number === unitNumber
+        )
+
+        if (activeCombo) {
+          await finish(activeCombo.id)
+        }
+
+        const created = await create(newCombinationPayload)
+        return created
+      } catch (err: any) {
+        error.value = err?.data?.message || err.message
+        throw err
+      } finally {
+        loading.value = false
+      }
+    }
+
+    // const buildRemainingPayload = (
+    //   combo: VehicleCombination,
+    //   removedElementId: string
+    // ): CreateVehicleCombinationInput | null => {
+    //   const remaining: Partial<CreateVehicleCombinationInput> = {
+    //     tractor_id:
+    //       combo.tractor_id !== removedElementId ? combo.tractor_id : undefined,
+    //     trailer_id:
+    //       combo.trailer_id !== removedElementId
+    //         ? (combo.trailer_id ?? undefined)
+    //         : undefined,
+    //     driver_id:
+    //       combo.driver_id !== removedElementId
+    //         ? (combo.driver_id ?? undefined)
+    //         : undefined
+    //     // copiá acá los demás campos requeridos por CreateVehicleCombinationInput
+    //   }
+
+    //   // Regla mínima de viabilidad — ajustá según tu negocio
+    //   const isViable = !!remaining.tractor_id && !!remaining.driver_id
+
+    //   return isViable ? (remaining as CreateVehicleCombinationInput) : null
+    // }
     const clearError = () => {
       error.value = null
     }
@@ -170,7 +218,8 @@ export const useVehicleCombinationsStore = defineStore(
       activate,
       remove,
       clearError,
-      fetchAvailable
+      fetchAvailable,
+      reassign
     }
   }
 )

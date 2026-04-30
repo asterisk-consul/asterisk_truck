@@ -7,6 +7,7 @@ import type {
 import { useBusinessPartiesStore } from '~/modulos/logistica/master-data/bussiness-parties/bussines-parties.store'
 
 import BusinessPartyFormComponent from '~/modulos/logistica/master-data/bussiness-parties/components/BusinessPartyForm.vue'
+import { mapFormToBusinessPartyDto } from '~/modulos/logistica/master-data/bussiness-parties/mapper/mapFormToBusines'
 import { computed } from 'vue'
 import { mapBusinessPartyToForm } from '~/modulos/logistica/master-data/bussiness-parties/mapper/mapFormToBusines'
 
@@ -29,6 +30,8 @@ const formValue = computed(() => {
 
 const submit = async (form: BusinessPartyForm) => {
   let result: BusinessParty
+
+  form = mapFormToBusinessPartyDto(form)
 
   if (props.businessParty?.id) {
     result = await store.update(props.businessParty.id, form)

@@ -5,6 +5,7 @@ definePageMeta({
 })
 import { storeToRefs } from 'pinia'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
+
 //stores
 import { useVehiclesStore } from '~/modulos/logistica/transport/vehicles/store/vehicles.store'
 import { useVehicleCombinationsStore } from '~/modulos/logistica/transport/vehicles-combinations/vehicle-combinations.store'
@@ -46,6 +47,7 @@ const { drivers } = storeToRefs(choferStore)
 
 const { tractorOptions, trailerOptions } = useVehicles(vehicles)
 const { items: driverItems } = useDriverMetrics(drivers)
+const router = useRouter()
 
 /* ---------------------------------------
    MODAL CONTROL
@@ -56,9 +58,7 @@ const modalMode = ref<'create' | 'edit'>('create')
 const editingRow = ref<any>(null)
 
 function openCreate() {
-  modalMode.value = 'create'
-  editingRow.value = null
-  modalOpen.value = true
+  router.push('/logistica/vehicles-combinations/create')
 }
 
 function openEdit(row: VehicleCombination) {
@@ -263,11 +263,4 @@ const links = ref<ButtonProps[]>([
     </div>
     <LogisticaTable :loading="loading" :data="items" :columns="columns" />
   </UPage>
-  <ModalForm
-    v-model:open="modalOpen"
-    :fields="fields"
-    :title="modalMode === 'create' ? 'Nueva Unidad' : 'Editar Unidad'"
-    :initial-values="editingRow"
-    @submit="handleSubmit"
-  />
 </template>
