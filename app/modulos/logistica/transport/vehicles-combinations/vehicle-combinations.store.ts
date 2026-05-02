@@ -158,14 +158,50 @@ export const useVehicleCombinationsStore = defineStore(
       error.value = null
 
       try {
-        const activeCombo = items.value.find(
-          (combo) => !combo.valid_until && combo.unit_number === unitNumber
-        )
+        // Los elementos del nuevo payload que vamos a reasignar
+        const { tractor_id, trailer_id, driver_id } = newCombinationPayload
 
-        if (activeCombo) {
-          await finish(activeCombo.id)
+        // 1. Buscar TODAS las combinaciones activas que contengan
+        //    cualquiera de los elementos del nuevo payload
+        const affectedCombos = items.value.filter((combo) => {
+          if (combo.valid_until) return false // ya está dada de baja, ignorar
+
+          return (
+            (tractor_id && combo.tractor_id === tractor_id) ||
+            (trailer_id && combo.trailer_id === trailer_id) ||
+            (driver_id && combo.driver_id === driver_id)
+          )
+        })
+
+        for (const combo of affectedCombos) {
+          // 2. Dar de baja la combinación afectada
+          await finish(combo.id)
+
+          // 3. Reconstruirla sin el/los elementos que se reasignan
+          const remainingTractor =
+            combo.tractor_id !== tractor_id ? combo.tractor_id : undefined
+          const remainingTrailer =
+            combo.trailer_id !== trailer_id
+              ? (combo.trailer_id ?? undefined)
+              : undefined
+          const remainingDriver =
+            combo.driver_id !== driver_id
+              ? (combo.driver_id ?? undefined)
+              : undefined
+
+          // Solo reconstruir si sigue siendo viable (tiene al menos tractor + conductor)
+          const isViable = !!remainingTractor && !!remainingDriver
+          if (isViable) {
+            await create({
+              ...combo, // copiá los campos base (valid_from, unit_number, etc.)
+              tractor_id: remainingTractor,
+              trailer_id: remainingTrailer,
+              driver_id: remainingDriver
+            } as CreateVehicleCombinationInput)
+          }
         }
 
+        // 4. Crear la nueva combinación destino
         const created = await create(newCombinationPayload)
         return created
       } catch (err: any) {

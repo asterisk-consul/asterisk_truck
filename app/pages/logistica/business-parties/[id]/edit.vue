@@ -20,7 +20,7 @@ const route = useRoute()
 const router = useRouter()
 
 const store = useBusinessPartiesStore()
-const { current, loading } = storeToRefs(store)
+const { loading } = storeToRefs(store)
 
 const id = route.params.id as string
 

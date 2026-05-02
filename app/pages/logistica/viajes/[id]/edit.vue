@@ -24,10 +24,12 @@ const trip = computed(() => store.current)
 onMounted(async () => {
   try {
     await store.fetchOne(id)
+    console.log('Trip', store.current)
   } finally {
     loading.value = false
     // En edit el trip ya existe, mostramos el planner directamente
     tripSaved.value = true
+    console.log(tripSaved.value)
   }
 })
 

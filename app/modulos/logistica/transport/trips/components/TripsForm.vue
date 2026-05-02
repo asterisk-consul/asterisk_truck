@@ -204,44 +204,6 @@ const isLockedByDate = computed(() => !form.departure_time)
         />
       </UFormField>
 
-      <!-- Origen -->
-      <!-- <UFormField label="Origen">
-        <USelectMenu
-          :model-value="
-            locationsItems.find((l) => l.value === form.origin_location_id)
-          "
-          :items="locationsItems"
-          option-attribute="label"
-          value-attribute="value"
-          class="w-full"
-          :disabled="isLockedByCorridor"
-          @update:model-value="
-            (item: SelectMenuItem | null) =>
-              (form.origin_location_id = item?.value)
-          "
-          clear
-        />
-      </UFormField> -->
-
-      <!-- Destino -->
-      <!-- <UFormField label="Destino">
-        <USelectMenu
-          :model-value="
-            locationsItems.find((l) => l.value === form.destination_location_id)
-          "
-          :items="locationsItems"
-          option-attribute="label"
-          value-attribute="value"
-          class="w-full"
-          :disabled="isLockedByCorridor"
-          @update:model-value="
-            (item: SelectMenuItem | null) =>
-              (form.destination_location_id = item?.value)
-          "
-          clear
-        />
-      </UFormField> -->
-
       <!-- Fechas -->
       <UFormField label="Salida">
         <UInput
@@ -298,18 +260,6 @@ const isLockedByDate = computed(() => !form.departure_time)
           value-attribute="value"
         />
       </UFormField>
-
-      <!-- Km -->
-      <!-- <UFormField label="Kilómetros">
-        <UInput
-          type="number"
-          :model-value="form.kilometers ?? undefined"
-          @update:model-value="
-            (val: number | undefined) => (form.kilometers = val ?? null)
-          "
-          class="w-full"
-        />
-      </UFormField> -->
     </UCard>
 
     <!-- Actions -->

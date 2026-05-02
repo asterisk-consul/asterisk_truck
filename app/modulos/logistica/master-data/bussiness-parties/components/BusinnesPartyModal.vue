@@ -31,12 +31,12 @@ const formValue = computed(() => {
 const submit = async (form: BusinessPartyForm) => {
   let result: BusinessParty
 
-  form = mapFormToBusinessPartyDto(form)
+  const payload = mapFormToBusinessPartyDto(form)
 
   if (props.businessParty?.id) {
-    result = await store.update(props.businessParty.id, form)
+    result = await store.update(props.businessParty.id, payload)
   } else {
-    result = await store.create(form)
+    result = await store.create(payload)
   }
 
   open.value = false
