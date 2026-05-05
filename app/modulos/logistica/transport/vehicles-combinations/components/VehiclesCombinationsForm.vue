@@ -3,55 +3,71 @@ import type {
   VehicleCombination,
   UpdateVehicleCombinationInput
 } from '~/modulos/logistica/transport/vehicles-combinations/types/vehicles-combinations.types'
+
 import { parseDate, today, getLocalTimeZone } from '@internationalized/date'
 import type { CalendarDate } from '@internationalized/date'
+
 import {
   mapVehicleCombinationToForm,
   mapVehicleCombinationFormToDto,
   type VehicleCombinationForm
 } from '~/modulos/logistica/transport/vehicles-combinations/mappers/vehicle-combinations.mapper'
 
-import type { SelectMenuItem } from '~/modulos/logistica/transport/corridors/composables/useCorridors'
-
 import { useVehiclesStore } from '~/modulos/logistica/transport/vehicles/store/vehicles.store'
 import { useChoferesStore } from '~/modulos/logistica/transport/drivers/choferes.store'
 import { useVehicleCombinationsStore } from '~/modulos/logistica/transport/vehicles-combinations/vehicle-combinations.store'
 
-// composables
 import { useVehicles } from '~/modulos/logistica/transport/vehicles/composable/useVehicles'
 import { useDriverMetrics } from '~/modulos/logistica/transport/drivers/useDriverMetrics'
-
-const inputDateFrom = useTemplateRef('inputDateFrom')
-const inputDateUntil = useTemplateRef('inputDateUntil')
 
 const props = defineProps<{
   vehicleCombination?: VehicleCombination
 }>()
 
 const emit = defineEmits<{
-  submit: [data: UpdateVehicleCombinationInput]
+  submit: [form: VehicleCombinationForm]
   cancel: []
 }>()
 
 const isEdit = computed(() => !!props.vehicleCombination)
+
 /**
- * STORE
+ * STORES
  */
 const store = useVehiclesStore()
 const choferStore = useChoferesStore()
+const combinationsStore = useVehicleCombinationsStore()
+
 const { items: vehicles } = storeToRefs(store)
 const { drivers } = storeToRefs(choferStore)
-const combinationsStore = useVehicleCombinationsStore()
 const { items: combinations } = storeToRefs(combinationsStore)
 
 /**
  * COMPOSABLES
  */
 const {
-  availableTractorOptions: tractorOptions,
-  availableTrailerOptions: trailerOptions
-} = useVehicles(vehicles, combinations)
+  tractorOptions,
+  trailerOptions,
+  availableTractorOptions,
+  availableTrailerOptions
+} = useVehicles(
+  vehicles,
+  combinations,
+  computed(() => props.vehicleCombination?.id)
+)
+
 const { items: driverItems } = useDriverMetrics(drivers)
+
+/**
+ * OPTIONS SEGÚN MODO
+ */
+const tractorOptionsFinal = computed(() =>
+  isEdit.value ? tractorOptions.value : availableTractorOptions.value
+)
+
+const trailerOptionsFinal = computed(() =>
+  isEdit.value ? trailerOptions.value : availableTrailerOptions.value
+)
 
 /**
  * FORM
@@ -67,22 +83,65 @@ const form = reactive<VehicleCombinationForm>({
 })
 
 /**
- * Hidratación en modo edición
+ * HIDRATACIÓN
  */
 watch(
-  () => props.vehicleCombination,
-  (vehicleCombination) => {
+  [
+    () => props.vehicleCombination,
+    tractorOptionsFinal,
+    trailerOptionsFinal,
+    driverItems
+  ],
+  ([vehicleCombination]) => {
+    console.log('watch fired', {
+      vc: !!vehicleCombination,
+      tractors: tractorOptionsFinal.value.length,
+      trailers: trailerOptionsFinal.value.length,
+      drivers: driverItems.value.length
+    })
+
     if (!vehicleCombination) return
+    if (!tractorOptionsFinal.value.length) return
+    if (!trailerOptionsFinal.value.length) return
+    if (!driverItems.value.length) return
+
     Object.assign(form, mapVehicleCombinationToForm(vehicleCombination))
+    console.log('form hydrated', { ...form })
   },
   { immediate: true }
 )
+/**
+ * SELECT MODELS
+ */
+const selectedTractor = computed({
+  get: () =>
+    tractorOptionsFinal.value.find((t) => t.value === form.tractor_id) ?? null,
+  set: (item) => {
+    form.tractor_id = item?.value ?? ''
+  }
+})
 
+const selectedTrailer = computed({
+  get: () =>
+    trailerOptionsFinal.value.find((t) => t.value === form.trailer_id) ?? null,
+  set: (item) => {
+    form.trailer_id = item?.value ?? ''
+  }
+})
+
+const selectedDriver = computed({
+  get: () => driverItems.value.find((d) => d.value === form.driver_id) ?? null,
+  set: (item) => {
+    form.driver_id = item?.value ?? ''
+  }
+})
+
+/**
+ * FECHAS
+ */
 const validFromDate = computed({
-  get: () => {
-    if (form.valid_from) return parseDate(form.valid_from)
-    return today(getLocalTimeZone()) // 👈 default a hoy si está vacío
-  },
+  get: () =>
+    form.valid_from ? parseDate(form.valid_from) : today(getLocalTimeZone()),
   set: (val: CalendarDate | null | undefined) => {
     form.valid_from = val ? val.toString() : ''
   }
@@ -94,125 +153,68 @@ const validUntilDate = computed({
     form.valid_until = val ? val.toString() : ''
   }
 })
+
 /**
- * Submit
+ * SUBMIT
  */
 const submit = () => {
-  emit('submit', mapVehicleCombinationFormToDto(form))
+  emit('submit', form)
 }
 </script>
-
 <template>
   <UForm @submit="submit" class="space-y-6">
     <UCard :ui="{ body: 'grid grid-cols-2 gap-4' }">
-      <!-- N° Unidad -->
       <UFormField label="N° Unidad">
-        <UInput
-          v-model="form.unit_number"
-          placeholder="INT-001"
-          class="w-full"
-        />
+        <UInput v-model="form.unit_number" class="w-full" />
       </UFormField>
 
       <!-- Tractor -->
       <UFormField label="Tractor">
         <USelectMenu
-          :model-value="tractorOptions.find((t) => t.value === form.tractor_id)"
-          :items="tractorOptions"
-          placeholder="Seleccionar tractor"
+          v-model="selectedTractor"
+          :items="tractorOptionsFinal"
           option-attribute="label"
           value-attribute="value"
           class="w-full"
           clear
-          @update:model-value="
-            (item: SelectMenuItem | null) =>
-              (form.tractor_id = item?.value ?? '')
-          "
         />
       </UFormField>
 
       <!-- Trailer -->
       <UFormField label="Trailer">
         <USelectMenu
-          :model-value="trailerOptions.find((t) => t.value === form.trailer_id)"
-          :items="trailerOptions"
-          placeholder="Seleccionar trailer"
+          v-model="selectedTrailer"
+          :items="trailerOptionsFinal"
           option-attribute="label"
           value-attribute="value"
           class="w-full"
           clear
-          @update:model-value="
-            (item: SelectMenuItem | null) =>
-              (form.trailer_id = item?.value ?? '')
-          "
         />
       </UFormField>
 
       <!-- Chofer -->
       <UFormField label="Chofer">
         <USelectMenu
-          :model-value="driverItems.find((d) => d.value === form.driver_id)"
+          v-model="selectedDriver"
           :items="driverItems"
-          placeholder="Seleccionar chofer"
           option-attribute="label"
           value-attribute="value"
           class="w-full"
           clear
-          @update:model-value="
-            (item: SelectMenuItem | null) =>
-              (form.driver_id = item?.value ?? '')
-          "
         />
       </UFormField>
 
-      <!-- Válido desde -->
+      <!-- Fecha desde -->
       <UFormField label="Válido desde">
-        <UInputDate ref="inputDateFrom" v-model="validFromDate" class="w-full">
-          <template #trailing>
-            <UPopover :reference="inputDateFrom?.inputsRef[3]?.$el">
-              <UButton
-                color="neutral"
-                variant="link"
-                size="sm"
-                icon="i-lucide-calendar"
-                aria-label="Seleccionar fecha"
-                class="px-0"
-              />
-              <template #content>
-                <UCalendar v-model="validFromDate" class="p-2" />
-              </template>
-            </UPopover>
-          </template>
-        </UInputDate>
+        <UInputDate v-model="validFromDate" class="w-full" />
       </UFormField>
 
-      <!-- Válido hasta -->
+      <!-- Fecha hasta -->
       <UFormField label="Válido hasta">
-        <UInputDate
-          ref="inputDateUntil"
-          v-model="validUntilDate"
-          class="w-full"
-        >
-          <template #trailing>
-            <UPopover :reference="inputDateUntil?.inputsRef[3]?.$el">
-              <UButton
-                color="neutral"
-                variant="link"
-                size="sm"
-                icon="i-lucide-calendar"
-                aria-label="Seleccionar fecha"
-                class="px-0"
-              />
-              <template #content>
-                <UCalendar v-model="validUntilDate" class="p-2" />
-              </template>
-            </UPopover>
-          </template>
-        </UInputDate>
+        <UInputDate v-model="validUntilDate" class="w-full" />
       </UFormField>
     </UCard>
 
-    <!-- Actions -->
     <div class="flex justify-end gap-2">
       <UButton variant="ghost" @click="emit('cancel')">Cancelar</UButton>
       <UButton type="submit">

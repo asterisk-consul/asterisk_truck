@@ -6,7 +6,7 @@ definePageMeta({
 import { useRouter } from 'vue-router'
 
 import VehicleCombinationForm from '~/modulos/logistica/transport/vehicles-combinations/components/VehiclesCombinationsForm.vue'
-
+import { mapVehicleCombinationFormToCreateDto } from '~/modulos/logistica/transport/vehicles-combinations/mappers/vehicle-combinations.mapper'
 import { useVehicleCombinationsStore } from '~/modulos/logistica/transport/vehicles-combinations/vehicle-combinations.store'
 
 const store = useVehicleCombinationsStore()
@@ -19,21 +19,28 @@ const saving = ref(false)
 const handleSubmit = async (form: any) => {
   try {
     saving.value = true
-    console.log(form)
 
-    await store.create(form)
+    const payload = mapVehicleCombinationFormToCreateDto(form)
+
+    await store.create(payload)
     toast.add({
       title: 'Guardado',
-      description: `La Unidad ${form.unit_number}, se guardo correctamente`,
+      description: `La Unidad ${form.unit_number} se guardó correctamente`,
       color: 'success'
     })
 
     await router.push('/logistica/vehicles-combinations')
-  } catch (error) {
+  } catch (error: any) {
+    toast.add({
+      title: 'Error',
+      description: error?.data?.message || error?.message || 'Error al guardar',
+      color: 'error'
+    })
   } finally {
     saving.value = false
   }
 }
+
 const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
 function toggleModuleSidebar() {
   moduleCollapsed.value = !moduleCollapsed.value
@@ -57,6 +64,6 @@ function toggleModuleSidebar() {
         class="mb-4 w-full"
       />
     </div>
-    <VehicleCombinationForm @submit="handleSubmit" />
+    <VehicleCombinationForm @submit="handleSubmit" @cancel="router.back()" />
   </UPage>
 </template>

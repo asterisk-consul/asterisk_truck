@@ -62,13 +62,7 @@ function openCreate() {
 }
 
 function openEdit(row: VehicleCombination) {
-  modalMode.value = 'edit'
-
-  editingRow.value = {
-    ...row
-  }
-
-  modalOpen.value = true
+  router.push(`/logistica/vehicles-combinations/${row.id}/edit`)
 }
 /* ---------------------------------------
    TABLE COLUMNS
@@ -115,10 +109,10 @@ const columns = VehicleCombinationColumns({
       })
     }
   },
-  async onToggleActive(row: VehicleCombination, value: boolean) {
+  async onToggleActive(row: VehicleCombination, validUntil: string | null) {
+    const isActive = validUntil === null // null = activo, string = histórico
     try {
-      if (value) {
-        // Reactivar
+      if (isActive) {
         await store.activate(row.id)
         toast.add({
           title: 'Reactivado',
@@ -126,7 +120,6 @@ const columns = VehicleCombinationColumns({
           color: 'success'
         })
       } else {
-        // Finalizar
         await store.finish(row.id)
         toast.add({
           title: 'Finalizado',
@@ -165,12 +158,14 @@ const fields = computed(() =>
 // ========================================
 // HOOKS
 // ========================================
+console.log(store.items)
 
 onMounted(async () => {
   await store.fetchAll()
   await vehiculoStore.fetchAll()
   await choferStore.fetchAll()
   await authStore.fetchMe()
+  console.log('ITEMS RAW:', store.items)
   loading.value = store.loading
 })
 

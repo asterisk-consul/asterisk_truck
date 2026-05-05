@@ -5,7 +5,7 @@ import type {
 } from '~/modulos/logistica/transport/trips/types/trips.types'
 
 import type { Corridor } from '~/modulos/logistica/transport/corridors/types/corridors.types'
-
+import VehicleCombinationModal from '~/modulos/logistica/transport/vehicles-combinations/components/VehiclesComnbinationsModal.vue'
 import {
   mapTripToForm,
   mapFormToDto,
@@ -13,8 +13,7 @@ import {
   type TripForm
 } from '~/modulos/logistica/transport/trips/mappers/trips.mapper'
 
-import type { SelectMenuItem } from '~/modulos/logistica/transport/corridors/composables/useCorridors'
-
+import type { VehicleCombination } from '~/modulos/logistica/transport/vehicles-combinations/types/vehicles-combinations.types'
 //stores
 import { useVehicleCombinationsStore } from '~/modulos/logistica/transport/vehicles-combinations/vehicle-combinations.store'
 
@@ -31,6 +30,9 @@ const emit = defineEmits<{
 }>()
 
 const isEdit = computed(() => !!props.trip)
+const isSaving = ref(false)
+const showVehicleCombinationModal = ref(false)
+const selectedVehicleCombinationId = ref<string | undefined>()
 
 /**
  * STORES
@@ -61,6 +63,7 @@ const vehicleCombinationsSource = computed(() => {
   const current = vehicleCombinations.value.find((vc) => vc.id === assignedId)
   return current ? [...base, current] : base
 })
+// console.log(vehicleCombinationsSource)
 
 const { items: vehicleCombinationsItems } = useVehiclesCombinations(
   vehicleCombinationsSource
@@ -75,6 +78,26 @@ const selectedCorridor = ref<Corridor | undefined>(undefined)
 watch(showCorridorModal, (open) => {
   if (!open) selectedCorridor.value = undefined
 })
+
+const openEditVehicleCombination = () => {
+  if (!form.vehicle_combination_id) return
+  selectedVehicleCombinationId.value = form.vehicle_combination_id
+  showVehicleCombinationModal.value = true
+}
+
+const onVehicleCombinationSaved = async (updated: VehicleCombination) => {
+  // refrescar data
+  await vehicleCombinationsStore.fetchAll()
+
+  if (form.departure_time) {
+    await vehicleCombinationsStore.fetchAvailable(form.departure_time)
+  }
+
+  // re-seleccionar automáticamente
+  form.vehicle_combination_id = updated.id
+
+  showVehicleCombinationModal.value = false
+}
 
 /**
  * FORM
@@ -140,24 +163,35 @@ watch(
 
     await vehicleCombinationsStore.fetchAvailable(date)
 
-    // Si es la primera vez que se dispara (hidratación del form en edit),
-    // no limpiar el vehículo
+    if (isSaving.value) return
+
     if (isHydrating.value) {
       isHydrating.value = false
       return
     }
 
-    // Solo limpiar si el usuario cambió la fecha (había una fecha anterior)
-    if (prevDate && prevDate !== date) {
-      const stillAvailable = available.value.some(
-        (vc) => vc.id === form.vehicle_combination_id
-      )
-      if (!stillAvailable) {
-        form.vehicle_combination_id = null
-      }
+    if (prevDate === date) return
+
+    const stillAvailable = available.value.some(
+      (vc) => vc.id === form.vehicle_combination_id
+    )
+
+    if (!stillAvailable && !isEdit.value) {
+      form.vehicle_combination_id = null
     }
   }
 )
+
+const selectedVehicleCombination = computed({
+  get: () =>
+    vehicleCombinationsItems.value.find(
+      (v) => v.value === form.vehicle_combination_id
+    ) ?? null,
+
+  set: (item) => {
+    form.vehicle_combination_id = item?.value ?? null
+  }
+})
 
 watch(
   () => props.trip,
@@ -170,14 +204,16 @@ watch(
   },
   { immediate: true }
 )
-
 /**
  * Submit
  */
-const submit = () => {
-  emit('submit', mapFormToDto(form))
-}
+const submit = async () => {
+  isSaving.value = true
 
+  await emit('submit', mapFormToDto(form))
+
+  isSaving.value = false
+}
 /**
  * Fetch
  */
@@ -225,30 +261,33 @@ const isLockedByDate = computed(() => !form.departure_time)
 
       <!-- Vehiculo -->
       <UFormField label="Unidad">
-        <USelectMenu
-          :model-value="
-            vehicleCombinationsItems.find(
-              (v) => v.value === form.vehicle_combination_id
-            )
-          "
-          :items="vehicleCombinationsItems"
-          :placeholder="
-            !form.departure_time
-              ? 'Seleccioná una fecha de salida primero'
-              : !vehicleCombinationsItems.length
-                ? 'No hay unidades disponibles para esta fecha'
-                : 'Seleccionar unidad'
-          "
-          option-attribute="label"
-          value-attribute="value"
-          class="w-full"
-          :disabled="isLockedByDate"
-          clear
-          @update:model-value="
-            (item: SelectMenuItem | null) =>
-              (form.vehicle_combination_id = item?.value)
-          "
-        />
+        <div class="flex gap-2 items-center">
+          <USelectMenu
+            v-model="selectedVehicleCombination"
+            :items="vehicleCombinationsItems"
+            :placeholder="
+              !form.departure_time
+                ? 'Seleccioná una fecha de salida primero'
+                : !vehicleCombinationsItems.length
+                  ? 'No hay unidades disponibles para esta fecha'
+                  : 'Seleccionar unidad'
+            "
+            option-attribute="label"
+            value-attribute="value"
+            class="w-full"
+            :disabled="isLockedByDate"
+            clear
+          />
+
+          <!-- Botón editar -->
+          <UButton
+            icon="i-lucide-pencil"
+            color="neutral"
+            variant="ghost"
+            :disabled="!form.vehicle_combination_id"
+            @click="openEditVehicleCombination"
+          />
+        </div>
       </UFormField>
 
       <UFormField label="Estado">
@@ -270,4 +309,9 @@ const isLockedByDate = computed(() => !form.departure_time)
       </UButton>
     </div>
   </UForm>
+  <VehicleCombinationModal
+    v-model:open="showVehicleCombinationModal"
+    :vehicleCombinationId="selectedVehicleCombinationId"
+    @success="onVehicleCombinationSaved"
+  />
 </template>

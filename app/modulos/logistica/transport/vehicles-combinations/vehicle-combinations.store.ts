@@ -151,21 +151,22 @@ export const useVehicleCombinationsStore = defineStore(
       }
     }
     const reassign = async (
-      unitNumber: string,
       newCombinationPayload: CreateVehicleCombinationInput
     ) => {
       loading.value = true
       error.value = null
 
       try {
-        // Los elementos del nuevo payload que vamos a reasignar
         const { tractor_id, trailer_id, driver_id } = newCombinationPayload
 
-        // 1. Buscar TODAS las combinaciones activas que contengan
-        //    cualquiera de los elementos del nuevo payload
-        const affectedCombos = items.value.filter((combo) => {
-          if (combo.valid_until) return false // ya está dada de baja, ignorar
+        console.log('🚀 REASSIGN - payload:', {
+          tractor_id,
+          trailer_id,
+          driver_id
+        })
 
+        const affectedCombos = items.value.filter((combo) => {
+          if (combo.valid_until) return false
           return (
             (tractor_id && combo.tractor_id === tractor_id) ||
             (trailer_id && combo.trailer_id === trailer_id) ||
@@ -173,38 +174,118 @@ export const useVehicleCombinationsStore = defineStore(
           )
         })
 
+        console.log(
+          '⚠️ affectedCombos:',
+          affectedCombos.map((c) => ({
+            id: c.id,
+            unit: c.unit_number,
+            tractor: c.tractor_id,
+            trailer: c.trailer_id,
+            driver: c.driver_id
+          }))
+        )
+
+        // PASO 1 — Clasificar: update vs cerrar+reconstruir
+        const toUpdate: typeof affectedCombos = []
+        const toClose: typeof affectedCombos = []
+
         for (const combo of affectedCombos) {
-          // 2. Dar de baja la combinación afectada
-          await finish(combo.id)
+          const conflictsTrailer = trailer_id && combo.trailer_id === trailer_id
+          const conflictsDriver = driver_id && combo.driver_id === driver_id
 
-          // 3. Reconstruirla sin el/los elementos que se reasignan
-          const remainingTractor =
-            combo.tractor_id !== tractor_id ? combo.tractor_id : undefined
-          const remainingTrailer =
-            combo.trailer_id !== trailer_id
-              ? (combo.trailer_id ?? undefined)
-              : undefined
-          const remainingDriver =
-            combo.driver_id !== driver_id
-              ? (combo.driver_id ?? undefined)
-              : undefined
-
-          // Solo reconstruir si sigue siendo viable (tiene al menos tractor + conductor)
-          const isViable = !!remainingTractor && !!remainingDriver
-          if (isViable) {
-            await create({
-              ...combo, // copiá los campos base (valid_from, unit_number, etc.)
-              tractor_id: remainingTractor,
-              trailer_id: remainingTrailer,
-              driver_id: remainingDriver
-            } as CreateVehicleCombinationInput)
+          if (!conflictsTrailer && !conflictsDriver) {
+            toUpdate.push(combo)
+          } else {
+            toClose.push(combo)
           }
         }
 
-        // 4. Crear la nueva combinación destino
+        console.log(
+          '🔄 toUpdate:',
+          toUpdate.map((c) => c.unit_number)
+        )
+        console.log(
+          '🔴 toClose:',
+          toClose.map((c) => c.unit_number)
+        )
+
+        // PASO 2 — Calcular reconstrucciones ANTES de cerrar nada
+        const takenTractors = new Set(tractor_id ? [tractor_id] : [])
+        const takenTrailers = new Set(trailer_id ? [trailer_id] : [])
+        const takenDrivers = new Set(driver_id ? [driver_id] : [])
+
+        const reconstructions: CreateVehicleCombinationInput[] = []
+
+        for (const combo of toClose) {
+          const remainingTractor =
+            combo.tractor_id && !takenTractors.has(combo.tractor_id)
+              ? combo.tractor_id
+              : undefined
+          const remainingTrailer =
+            combo.trailer_id && !takenTrailers.has(combo.trailer_id)
+              ? combo.trailer_id
+              : undefined
+          const remainingDriver =
+            combo.driver_id && !takenDrivers.has(combo.driver_id)
+              ? combo.driver_id
+              : undefined
+
+          const isViable = !!remainingTractor
+
+          console.log('🔧 Remaining para combo', combo.unit_number, {
+            remainingTractor,
+            remainingTrailer,
+            remainingDriver,
+            isViable
+          })
+
+          if (isViable) {
+            reconstructions.push({
+              unit_number: combo.unit_number ?? undefined,
+              tractor_id: remainingTractor,
+              trailer_id: remainingTrailer ?? undefined,
+              driver_id: remainingDriver ?? undefined,
+              valid_from: newCombinationPayload.valid_from,
+              valid_until: undefined
+            })
+          }
+        }
+
+        // PASO 3 — Actualizar las que no tienen conflicto real
+        for (const combo of toUpdate) {
+          console.log('🔄 Actualizando combo (sin cerrar):', combo.unit_number)
+          await update(combo.id, {
+            unit_number: combo.unit_number ?? undefined,
+            valid_from: combo.valid_from,
+            valid_until: combo.valid_until ?? undefined,
+            tractor_id: combo.tractor_id,
+            trailer_id: combo.trailer_id ?? undefined,
+            driver_id: combo.driver_id ?? undefined
+          })
+        }
+
+        // PASO 4 — Cerrar las que tienen conflicto
+        for (const combo of toClose) {
+          console.log('🔴 Cerrando combo:', {
+            id: combo.id,
+            unit: combo.unit_number
+          })
+          await finish(combo.id)
+        }
+
+        // PASO 5 — Reconstruir las viables (ya sin conflictos activos)
+        for (const newCombo of reconstructions) {
+          console.log('🟢 Creando combo reconstruida:', newCombo)
+          await create(newCombo)
+        }
+
+        // PASO 6 — Crear la nueva combo destino
+        console.log('🆕 Creando nueva combinación destino')
         const created = await create(newCombinationPayload)
         return created
       } catch (err: any) {
+        console.error('❌ Error completo:', err)
+        console.error('❌ Response data:', err?.response?.data || err?.data)
         error.value = err?.data?.message || err.message
         throw err
       } finally {

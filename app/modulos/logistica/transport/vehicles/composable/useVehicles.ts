@@ -20,7 +20,7 @@ export function useVehicles(
     if (!combinations) return new Set<string>()
     return new Set(
       combinations.value
-        .filter((c) => c.id !== currentCombinationId?.value)
+        .filter((c) => c.id !== currentCombinationId?.value && !c.valid_until) // 👈 solo activas
         .map((c) => c.tractor_id)
     )
   })
@@ -29,7 +29,7 @@ export function useVehicles(
     if (!combinations) return new Set<string>()
     return new Set(
       combinations.value
-        .filter((c) => c.id !== currentCombinationId?.value)
+        .filter((c) => c.id !== currentCombinationId?.value && !c.valid_until) // 👈 solo activas
         .map((c) => c.trailer_id)
     )
   })

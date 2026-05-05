@@ -9,6 +9,7 @@ import type { CreateTripInput } from '~/modulos/logistica/transport/trips/types/
 import TripsForm from '~/modulos/logistica/transport/trips/components/TripsForm.vue'
 import TripOrderPlanner from '~/modulos/logistica/transport/trips/planners/TripOrderPlanner.vue'
 
+const toast = useToast()
 const route = useRoute()
 const router = useRouter()
 const store = useTripsStore()
@@ -24,17 +25,20 @@ const trip = computed(() => store.current)
 onMounted(async () => {
   try {
     await store.fetchOne(id)
-    console.log('Trip', store.current)
   } finally {
     loading.value = false
     // En edit el trip ya existe, mostramos el planner directamente
     tripSaved.value = true
-    console.log(tripSaved.value)
   }
 })
 
 const submit = async (dto: CreateTripInput) => {
   await store.update(id, dto)
+  toast.add({
+    title: 'Guardado',
+    description: 'Viaje guardado',
+    color: 'success'
+  })
   tripSaved.value = true
 }
 

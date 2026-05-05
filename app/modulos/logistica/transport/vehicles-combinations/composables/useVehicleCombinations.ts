@@ -11,10 +11,19 @@ export function useVehiclesCombinations(
   vehicleCombinations: Ref<VehicleCombination[]>
 ) {
   const items = computed<SelectMenuItem[]>(() =>
-    vehicleCombinations.value.map((vc) => ({
-      label: vc.unit_number ?? `VC-${vc.id.slice(0, 8)}`,
-      value: vc.id
-    }))
+    vehicleCombinations.value.map((vc) => {
+      const parts = [
+        vc.unit_number,
+        vc.tractor?.plate,
+        vc.trailer?.plate,
+        vc.drivers?.first_name + ' ' + vc.drivers?.last_name
+      ].filter(Boolean)
+
+      return {
+        label: parts.length > 0 ? parts.join(' - ') : `VC-${vc.id.slice(0, 8)}`,
+        value: vc.id
+      }
+    })
   )
 
   return { items }
