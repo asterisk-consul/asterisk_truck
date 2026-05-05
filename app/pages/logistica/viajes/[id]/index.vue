@@ -137,9 +137,40 @@ const links = ref<ButtonProps[]>([
             <span class="text-xs text-gray-400 uppercase tracking-wide">
               Unidad
             </span>
-            <span class="font-medium">
-              {{ trip.vehicle_combination?.unit_number ?? '—' }}
-            </span>
+            <div v-if="trip.vehicle_combination" class="flex flex-col gap-1.5">
+              <div class="flex items-center gap-2">
+                <span
+                  v-if="trip.vehicle_combination.unit_number"
+                  class="font-bold text-base"
+                >
+                  #{{ trip.vehicle_combination.unit_number }}
+                </span>
+                <UBadge
+                  v-if="trip.vehicle_combination.tractor?.plate"
+                  color="info"
+                  variant="subtle"
+                  class="tracking-wider font-mono"
+                >
+                  {{ trip.vehicle_combination.tractor.plate }}
+                </UBadge>
+                <UBadge
+                  v-if="trip.vehicle_combination.trailer?.plate"
+                  color="warning"
+                  variant="subtle"
+                  class="tracking-wider font-mono"
+                >
+                  {{ trip.vehicle_combination.trailer.plate }}
+                </UBadge>
+              </div>
+              <span
+                v-if="trip.vehicle_combination.drivers"
+                class="text-sm text-muted leading-none"
+              >
+                {{ trip.vehicle_combination.drivers.first_name }}
+                {{ trip.vehicle_combination.drivers.last_name }}
+              </span>
+            </div>
+            <span v-else class="font-medium">—</span>
           </div>
 
           <div class="flex flex-col gap-0.5">

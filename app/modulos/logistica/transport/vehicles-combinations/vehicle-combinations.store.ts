@@ -159,11 +159,11 @@ export const useVehicleCombinationsStore = defineStore(
       try {
         const { tractor_id, trailer_id, driver_id } = newCombinationPayload
 
-        console.log('🚀 REASSIGN - payload:', {
-          tractor_id,
-          trailer_id,
-          driver_id
-        })
+        // console.log('🚀 REASSIGN - payload:', {
+        //   tractor_id,
+        //   trailer_id,
+        //   driver_id
+        // })
 
         // Combo destino = la que tiene el mismo tractor (actualizar, no recrear)
         const destinationCombo = items.value.find(
@@ -182,17 +182,17 @@ export const useVehicleCombinationsStore = defineStore(
           )
         })
 
-        console.log('🎯 destinationCombo:', destinationCombo?.unit_number)
-        console.log(
-          '⚠️ affectedCombos:',
-          affectedCombos.map((c) => ({
-            id: c.id,
-            unit: c.unit_number,
-            tractor: c.tractor_id,
-            trailer: c.trailer_id,
-            driver: c.driver_id
-          }))
-        )
+        // console.log('🎯 destinationCombo:', destinationCombo?.unit_number)
+        // console.log(
+        //   '⚠️ affectedCombos:',
+        //   affectedCombos.map((c) => ({
+        //     id: c.id,
+        //     unit: c.unit_number,
+        //     tractor: c.tractor_id,
+        //     trailer: c.trailer_id,
+        //     driver: c.driver_id
+        //   }))
+        // )
 
         // PASO 1 — Clasificar: update vs cerrar+reconstruir
         const toUpdate: typeof affectedCombos = []
@@ -209,14 +209,14 @@ export const useVehicleCombinationsStore = defineStore(
           }
         }
 
-        console.log(
-          '🔄 toUpdate:',
-          toUpdate.map((c) => c.unit_number)
-        )
-        console.log(
-          '🔴 toClose:',
-          toClose.map((c) => c.unit_number)
-        )
+        // console.log(
+        //   '🔄 toUpdate:',
+        //   toUpdate.map((c) => c.unit_number)
+        // )
+        // console.log(
+        //   '🔴 toClose:',
+        //   toClose.map((c) => c.unit_number)
+        // )
 
         // PASO 2 — Calcular reconstrucciones ANTES de cerrar nada
         const takenTractors = new Set(tractor_id ? [tractor_id] : [])
@@ -245,13 +245,13 @@ export const useVehicleCombinationsStore = defineStore(
             (!!combo.trailer_id && combo.trailer_id !== trailer_id) ||
             (!!combo.driver_id && combo.driver_id !== driver_id)
 
-          console.log('🔧 Remaining para combo', combo.unit_number, {
-            remainingTractor,
-            remainingTrailer,
-            remainingDriver,
-            isViable,
-            hasAnythingWorthKeeping
-          })
+          // console.log('🔧 Remaining para combo', combo.unit_number, {
+          //   remainingTractor,
+          //   remainingTrailer,
+          //   remainingDriver,
+          //   isViable,
+          //   hasAnythingWorthKeeping
+          // })
 
           if (isViable && hasAnythingWorthKeeping) {
             reconstructions.push({
@@ -267,7 +267,7 @@ export const useVehicleCombinationsStore = defineStore(
 
         // PASO 3 — Actualizar las que no tienen conflicto real
         for (const combo of toUpdate) {
-          console.log('🔄 Actualizando combo (sin cerrar):', combo.unit_number)
+          // console.log('🔄 Actualizando combo (sin cerrar):', combo.unit_number)
           await update(combo.id, {
             unit_number: combo.unit_number ?? undefined,
             valid_from: combo.valid_from,
@@ -280,25 +280,25 @@ export const useVehicleCombinationsStore = defineStore(
 
         // PASO 4 — Cerrar las que tienen conflicto
         for (const combo of toClose) {
-          console.log('🔴 Cerrando combo:', {
-            id: combo.id,
-            unit: combo.unit_number
-          })
+          // console.log('🔴 Cerrando combo:', {
+          //   id: combo.id,
+          //   unit: combo.unit_number
+          // })
           await finish(combo.id)
         }
 
         // PASO 5 — Reconstruir las viables (ya sin conflictos activos)
         for (const newCombo of reconstructions) {
-          console.log('🟢 Creando combo reconstruida:', newCombo)
+          // console.log('🟢 Creando combo reconstruida:', newCombo)
           await create(newCombo)
         }
 
         // PASO 6 — Actualizar o crear la combo destino
         if (destinationCombo) {
-          console.log(
-            '🔄 Actualizando combo destino:',
-            destinationCombo.unit_number
-          )
+          // console.log(
+          //   '🔄 Actualizando combo destino:',
+          //   destinationCombo.unit_number
+          // )
           const updated = await update(destinationCombo.id, {
             unit_number: destinationCombo.unit_number ?? undefined,
             valid_from: destinationCombo.valid_from,
@@ -309,12 +309,12 @@ export const useVehicleCombinationsStore = defineStore(
           })
           return updated
         } else {
-          console.log('🆕 Creando nueva combinación destino')
+          // console.log('🆕 Creando nueva combinación destino')
           return await create(newCombinationPayload)
         }
       } catch (err: any) {
-        console.error('❌ Error completo:', err)
-        console.error('❌ Response data:', err?.response?.data || err?.data)
+        // console.error('❌ Error completo:', err)
+        // console.error('❌ Response data:', err?.response?.data || err?.data)
         error.value = err?.data?.message || err.message
         throw err
       } finally {

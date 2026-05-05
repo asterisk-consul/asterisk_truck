@@ -129,10 +129,66 @@ export const tripsColumns = (actions: {
         cell: ({ row }) => {
           const vc = row.original.vehicle_combination
           if (!vc) return '—'
-          return vc.unit_number || `VC-${vc.id.slice(0, 8)}`
+
+          const unit = vc.unit_number
+          const tractor = vc.tractor?.plate
+          const trailer = vc.trailer?.plate
+          const driver = vc.drivers
+            ? `${vc.drivers.first_name} ${vc.drivers.last_name}`
+            : null
+
+          if (!unit && !tractor && !trailer && !driver) {
+            return `VC-${vc.id.slice(0, 8)}`
+          }
+
+          const plates = [
+            tractor &&
+              h(
+                UBadge,
+                {
+                  color: 'info',
+                  variant: 'subtle',
+                  class: 'text-[10px] px-1 py-0 tracking-wider font-mono'
+                },
+                () => tractor
+              ),
+            trailer &&
+              h(
+                UBadge,
+                {
+                  color: 'warning',
+                  variant: 'subtle',
+                  class: 'text-[10px] px-1 py-0 tracking-wider font-mono'
+                },
+                () => trailer
+              )
+          ].filter(Boolean)
+
+          return h(
+            'div',
+            { class: 'flex flex-col gap-1' },
+            [
+              // Fila superior: número + patentes
+              h('div', { class: 'flex items-center gap-1.5' }, [
+                unit &&
+                  h(
+                    'span',
+                    { class: 'text-xs font-bold text-foreground' },
+                    `#${unit}`
+                  ),
+                ...plates
+              ]),
+              // Fila inferior: chofer más discreto
+              driver &&
+                h(
+                  'span',
+                  { class: 'text-[11px] text-muted leading-none pl-0.5' },
+                  driver
+                )
+            ].filter(Boolean)
+          )
         }
       },
-
       // {
       //   key: 'kilometers',
       //   label: 'Km',
