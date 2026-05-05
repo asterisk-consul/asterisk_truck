@@ -10,6 +10,7 @@ import type { CreateTripInput } from '~/modulos/logistica/transport/trips/types/
 import TripsForm from '~/modulos/logistica/transport/trips/components/TripsForm.vue'
 import TripOrderPlanner from '~/modulos/logistica/transport/trips/planners/TripOrderPlanner.vue'
 
+const toast = useToast()
 const router = useRouter()
 const store = useTripsStore()
 
@@ -32,6 +33,11 @@ const submit = async (dto: CreateTripInput) => {
  * Paso 2: órdenes asignadas → navegar
  */
 const handleOrdersSaved = () => {
+  toast.add({
+    title: 'Guardado',
+    description: 'Viaje guardado',
+    color: 'success'
+  })
   router.push('/logistica/viajes/')
 }
 </script>

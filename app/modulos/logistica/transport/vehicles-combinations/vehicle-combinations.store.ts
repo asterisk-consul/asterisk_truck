@@ -165,15 +165,24 @@ export const useVehicleCombinationsStore = defineStore(
           driver_id
         })
 
+        // Combo destino = la que tiene el mismo tractor (actualizar, no recrear)
+        const destinationCombo = items.value.find(
+          (combo) =>
+            !combo.valid_until && tractor_id && combo.tractor_id === tractor_id
+        )
+
+        // Afectadas = solo las que tienen trailer o driver en conflicto
+        // (excluimos la destino para no procesarla dos veces)
         const affectedCombos = items.value.filter((combo) => {
           if (combo.valid_until) return false
+          if (combo.tractor_id === tractor_id) return false
           return (
-            (tractor_id && combo.tractor_id === tractor_id) ||
             (trailer_id && combo.trailer_id === trailer_id) ||
             (driver_id && combo.driver_id === driver_id)
           )
         })
 
+        console.log('🎯 destinationCombo:', destinationCombo?.unit_number)
         console.log(
           '⚠️ affectedCombos:',
           affectedCombos.map((c) => ({
@@ -232,14 +241,19 @@ export const useVehicleCombinationsStore = defineStore(
 
           const isViable = !!remainingTractor
 
+          const hasAnythingWorthKeeping =
+            (!!combo.trailer_id && combo.trailer_id !== trailer_id) ||
+            (!!combo.driver_id && combo.driver_id !== driver_id)
+
           console.log('🔧 Remaining para combo', combo.unit_number, {
             remainingTractor,
             remainingTrailer,
             remainingDriver,
-            isViable
+            isViable,
+            hasAnythingWorthKeeping
           })
 
-          if (isViable) {
+          if (isViable && hasAnythingWorthKeeping) {
             reconstructions.push({
               unit_number: combo.unit_number ?? undefined,
               tractor_id: remainingTractor,
@@ -279,10 +293,25 @@ export const useVehicleCombinationsStore = defineStore(
           await create(newCombo)
         }
 
-        // PASO 6 — Crear la nueva combo destino
-        console.log('🆕 Creando nueva combinación destino')
-        const created = await create(newCombinationPayload)
-        return created
+        // PASO 6 — Actualizar o crear la combo destino
+        if (destinationCombo) {
+          console.log(
+            '🔄 Actualizando combo destino:',
+            destinationCombo.unit_number
+          )
+          const updated = await update(destinationCombo.id, {
+            unit_number: destinationCombo.unit_number ?? undefined,
+            valid_from: destinationCombo.valid_from,
+            valid_until: undefined,
+            tractor_id,
+            trailer_id: trailer_id ?? undefined,
+            driver_id: driver_id ?? undefined
+          })
+          return updated
+        } else {
+          console.log('🆕 Creando nueva combinación destino')
+          return await create(newCombinationPayload)
+        }
       } catch (err: any) {
         console.error('❌ Error completo:', err)
         console.error('❌ Response data:', err?.response?.data || err?.data)

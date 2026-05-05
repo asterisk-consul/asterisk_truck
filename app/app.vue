@@ -2,7 +2,7 @@
 import { es } from '@nuxt/ui/locale'
 const colorMode = useColorMode()
 import type { ToasterProps } from '#ui/types'
-const toaster: ToasterProps = { position: 'bottom-center', duration: 3000 }
+const toaster: ToasterProps = { position: 'top-center', duration: 3000 }
 const color = computed(() => (colorMode.value === 'dark' ? '#1b1718' : 'white'))
 
 const locale = extendLocale(es, { code: 'es-AR' })

@@ -33,12 +33,22 @@ onMounted(async () => {
 })
 
 const submit = async (dto: CreateTripInput) => {
-  await store.update(id, dto)
-  toast.add({
-    title: 'Guardado',
-    description: 'Viaje guardado',
-    color: 'success'
-  })
+  try {
+    await store.update(id, dto)
+    toast.add({
+      title: 'Guardado',
+      description: 'Viaje guardado',
+      color: 'success'
+    })
+  } catch (error) {
+    if (error instanceof Error) {
+      toast.add({
+        title: 'Error',
+        description: error.message,
+        color: 'error'
+      })
+    }
+  }
   tripSaved.value = true
 }
 
