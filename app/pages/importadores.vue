@@ -13,6 +13,14 @@ const importers = [
     handler: FileService.importCompras // 👈
   },
   {
+    key: 'Ventas',
+    title: 'Importar Ventas',
+    description: 'Importar facturas de compra desde archivo Excel o CSV',
+    icon: 'i-lucide-file-plus',
+    heading: 'Importar Facturas de ventas',
+    handler: FileService.importVentas // 👈
+  },
+  {
     key: 'nc',
     title: 'Importar Notas de Crédito',
     description: 'Importar notas de crédito de proveedores',
