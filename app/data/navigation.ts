@@ -19,7 +19,11 @@ export const navigationLinks = [
       defaultOpen: false,
       children: [
         { label: 'Facturas', to: '/erp/sales' },
-        { label: 'Nueva factura', to: '/erp/sales/new' }
+        { label: 'Nueva factura', to: '/erp/sales/new' },
+        {
+          label: 'Resumen de productos vendidos',
+          to: '/erp/sales/sales-reports/salesProducts'
+        }
       ]
     },
 
