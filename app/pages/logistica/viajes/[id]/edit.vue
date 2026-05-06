@@ -9,6 +9,7 @@ import type { CreateTripInput } from '~/modulos/logistica/transport/trips/types/
 import TripsForm from '~/modulos/logistica/transport/trips/components/TripsForm.vue'
 import TripOrderPlanner from '~/modulos/logistica/transport/trips/planners/TripOrderPlanner.vue'
 
+const toast = useToast()
 const route = useRoute()
 const router = useRouter()
 const store = useTripsStore()
@@ -32,7 +33,22 @@ onMounted(async () => {
 })
 
 const submit = async (dto: CreateTripInput) => {
-  await store.update(id, dto)
+  try {
+    await store.update(id, dto)
+    toast.add({
+      title: 'Guardado',
+      description: 'Viaje guardado',
+      color: 'success'
+    })
+  } catch (error) {
+    if (error instanceof Error) {
+      toast.add({
+        title: 'Error',
+        description: error.message,
+        color: 'error'
+      })
+    }
+  }
   tripSaved.value = true
 }
 

@@ -45,7 +45,7 @@ function openCreate() {
 }
 
 function openEdit(row: any) {
-  console.log(row.id)
+  // console.log(row.id)
   router.push(`/logistica/viajes/${row.id}`)
 }
 

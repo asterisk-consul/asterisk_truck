@@ -4,7 +4,7 @@ import type { TableColumn } from '@nuxt/ui'
 import type {
   Vehicle,
   VehicleDocument
-} from '~/modulos/logistica/transport/vehicles/vehicles.types'
+} from '~/modulos/logistica/transport/vehicles/types/vehicles.types'
 import StatusToggle from '@/components/ui/PopoverTableActive.vue'
 import {
   useInlineEdit,

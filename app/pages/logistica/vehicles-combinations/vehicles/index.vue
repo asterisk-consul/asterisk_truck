@@ -6,7 +6,7 @@ definePageMeta({
 import { storeToRefs } from 'pinia'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 //stores
-import { useVehiclesStore } from '~/modulos/logistica/transport/vehicles/vehicles.store'
+import { useVehiclesStore } from '~/modulos/logistica/transport/vehicles/store/vehicles.store'
 import { useDocumentTypesStore } from '~/modulos/logistica/documents/documents-types/document-types.store'
 //form
 import { vehicleFormFields } from '~/modulos/logistica/transport/vehicles/vehicleFormFields'
@@ -20,7 +20,7 @@ import type {
   Vehicle,
   CreateVehicleInput,
   UpdateVehicleInput
-} from '~/modulos/logistica/transport/vehicles/vehicles.types'
+} from '~/modulos/logistica/transport/vehicles/types/vehicles.types'
 
 const moduleCollapsed = inject('moduleSidebarCollapsed') as Ref<boolean>
 import type { ButtonProps } from '@nuxt/ui'

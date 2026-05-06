@@ -111,7 +111,7 @@ export function createTableBuilder<
 
       if (col.header) {
         header = col.header
-      } else if (col.sortable && accessorKey) {
+      } else if (col.sortable && (accessorKey || col.id)) {
         header = ({ column }: any) => {
           const isSorted = column.getIsSorted()
 
@@ -160,12 +160,15 @@ export function createTableBuilder<
       }
 
       // enum toggle
+      // enum toggle
       if (col.enum?.toggle) {
         const Comp = col.enum.toggle.component
 
         cell = ({ row }) =>
           h(Comp, {
-            modelValue: row.original[accessorKey as keyof T],
+            modelValue: col.accessorFn
+              ? col.accessorFn(row.original)
+              : row.original[accessorKey as keyof T],
             title: col.enum!.toggle?.title,
             options: col.enum!.options,
             'onUpdate:modelValue': (value: unknown) =>

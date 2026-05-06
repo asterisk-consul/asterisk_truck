@@ -2,7 +2,7 @@ export interface VehicleCombination {
   id: string
   tractor_id: string
   trailer_id?: string | null
-  driver_id?: string | null
+  driver_id?: string | undefined
   unit_number?: string | null
   valid_from: string
   valid_until?: string | null

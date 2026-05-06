@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
-import { useVehiclesService } from '~/modulos/logistica/transport/vehicles/vehicles.service'
+import { useVehiclesService } from '~/modulos/logistica/transport/vehicles/service/vehicles.service'
 import type {
   Vehicle,
   CreateVehicleInput,
   UpdateVehicleInput
-} from '~/modulos/logistica/transport/vehicles/vehicles.types'
+} from '~/modulos/logistica/transport/vehicles/types/vehicles.types'
 
 export const useVehiclesStore = defineStore('vehicles', () => {
   // ================= STATE =================

@@ -5,8 +5,9 @@ definePageMeta({
 })
 import { storeToRefs } from 'pinia'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
+
 //stores
-import { useVehiclesStore } from '~/modulos/logistica/transport/vehicles/vehicles.store'
+import { useVehiclesStore } from '~/modulos/logistica/transport/vehicles/store/vehicles.store'
 import { useVehicleCombinationsStore } from '~/modulos/logistica/transport/vehicles-combinations/vehicle-combinations.store'
 import { useChoferesStore } from '~/modulos/logistica/transport/drivers/choferes.store'
 import { useAuthStore } from '~/modulos/auth/auth.store'
@@ -16,7 +17,7 @@ import ModalForm from '~/components/ModalForm.vue'
 //composables
 
 import { useDriverMetrics } from '~/modulos/logistica/transport/drivers/useDriverMetrics'
-import { useVehicles } from '~/modulos/logistica/transport/vehicles/useVehicles'
+import { useVehicles } from '~/modulos/logistica/transport/vehicles/composable/useVehicles'
 //tabla columns
 import { VehicleCombinationColumns } from '~/modulos/logistica/transport/vehicles-combinations/columns'
 import type {
@@ -46,6 +47,7 @@ const { drivers } = storeToRefs(choferStore)
 
 const { tractorOptions, trailerOptions } = useVehicles(vehicles)
 const { items: driverItems } = useDriverMetrics(drivers)
+const router = useRouter()
 
 /* ---------------------------------------
    MODAL CONTROL
@@ -56,19 +58,11 @@ const modalMode = ref<'create' | 'edit'>('create')
 const editingRow = ref<any>(null)
 
 function openCreate() {
-  modalMode.value = 'create'
-  editingRow.value = null
-  modalOpen.value = true
+  router.push('/logistica/vehicles-combinations/create')
 }
 
 function openEdit(row: VehicleCombination) {
-  modalMode.value = 'edit'
-
-  editingRow.value = {
-    ...row
-  }
-
-  modalOpen.value = true
+  router.push(`/logistica/vehicles-combinations/${row.id}/edit`)
 }
 /* ---------------------------------------
    TABLE COLUMNS
@@ -115,10 +109,10 @@ const columns = VehicleCombinationColumns({
       })
     }
   },
-  async onToggleActive(row: VehicleCombination, value: boolean) {
+  async onToggleActive(row: VehicleCombination, validUntil: string | null) {
+    const isActive = validUntil === null // null = activo, string = histórico
     try {
-      if (value) {
-        // Reactivar
+      if (isActive) {
         await store.activate(row.id)
         toast.add({
           title: 'Reactivado',
@@ -126,7 +120,6 @@ const columns = VehicleCombinationColumns({
           color: 'success'
         })
       } else {
-        // Finalizar
         await store.finish(row.id)
         toast.add({
           title: 'Finalizado',
@@ -165,12 +158,14 @@ const fields = computed(() =>
 // ========================================
 // HOOKS
 // ========================================
+console.log(store.items)
 
 onMounted(async () => {
   await store.fetchAll()
   await vehiculoStore.fetchAll()
   await choferStore.fetchAll()
   await authStore.fetchMe()
+  console.log('ITEMS RAW:', store.items)
   loading.value = store.loading
 })
 
@@ -263,11 +258,4 @@ const links = ref<ButtonProps[]>([
     </div>
     <LogisticaTable :loading="loading" :data="items" :columns="columns" />
   </UPage>
-  <ModalForm
-    v-model:open="modalOpen"
-    :fields="fields"
-    :title="modalMode === 'create' ? 'Nueva Unidad' : 'Editar Unidad'"
-    :initial-values="editingRow"
-    @submit="handleSubmit"
-  />
 </template>

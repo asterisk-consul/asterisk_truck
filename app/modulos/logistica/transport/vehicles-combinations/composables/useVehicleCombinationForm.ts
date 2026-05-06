@@ -10,13 +10,13 @@ export function useVehicleCombinationForm(
   editingRow: Ref<VehicleCombination | null>
 ) {
   const form = reactive<VehicleCombinationForm>({
-    id: null,
+    id: '',
     unit_number: '',
-    tractor_id: null,
-    trailer_id: null,
-    driver_id: null,
-    valid_from: null,
-    valid_until: null
+    tractor_id: '',
+    trailer_id: '',
+    driver_id: '',
+    valid_from: '',
+    valid_until: ''
   })
 
   watch(

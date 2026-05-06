@@ -1,4 +1,6 @@
 import type { Location } from '~/modulos/logistica/master-data/locations/types/locations.types'
+import type { VehicleCombination } from '~/modulos/logistica/transport/vehicles-combinations/types/vehicles-combinations.types'
+
 export interface TripStopOrder {
   dispatch_order_id: string
   order_number?: string | null
@@ -44,11 +46,6 @@ export interface Trip {
   // 🔹 agregar campos de relación con ubicación
   locations_trips_origin_location_idTolocations?: Location
   locations_trips_destination_location_idTolocations?: Location
-}
-
-export interface VehicleCombination {
-  id: string
-  unit_number?: string | null
 }
 
 export interface CreateTripInput {

@@ -8,12 +8,17 @@ import { useIdColumn } from '@/composables/table/useIdColumn'
 
 type Row = VehicleCombination
 
+export type EditableField = 'unit_number'
+
 export const VehicleCombinationColumns = (actions: {
-  onInlineSave?: (row: Row, field: 'unit_number', value: any) => void
-  onToggleActive?: (row: Row, value: boolean) => void
+  onInlineSave?: (row: Row, field: EditableField, value: any) => void
+  onToggleActive?: (row: Row, validUntil: string | null) => void
   onEdit?: (row: Row) => void
 }): TableColumn<Row>[] => {
-  const build = createTableBuilder<Row>({ locale: 'es-AR' })
+  const build = createTableBuilder<Row, EditableField>({
+    locale: 'es-AR',
+    onInlineSave: actions.onInlineSave
+  })
 
   return [
     useSelectColumn<Row>(),
@@ -29,23 +34,23 @@ export const VehicleCombinationColumns = (actions: {
       },
 
       {
-        key: 'status',
+        id: 'status',
         label: 'Estado',
         sortable: true,
+        accessorFn: (row) => (row.valid_until === null ? null : 'historic'),
 
         enum: {
           options: [
-            { label: 'Activo', value: true, color: 'success' },
-            { label: 'Histórico', value: false, color: 'neutral' }
+            { label: 'Activo', value: null, color: 'success' },
+            { label: 'Histórico', value: 'historic', color: 'neutral' }
           ],
           toggle: {
             component: StatusToggle,
             title: 'Cambiar estado',
-            onChange: (row) => {
-              const isActive =
-                !row.valid_until || new Date(row.valid_until) >= new Date()
-
-              actions.onToggleActive?.(row, !isActive)
+            onChange: (row, value) => {
+              const newValidUntil =
+                value === null ? null : new Date().toISOString()
+              actions.onToggleActive?.(row, newValidUntil)
             }
           }
         }

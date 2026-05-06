@@ -133,6 +133,33 @@ export const useTripsStore = defineStore('trips', () => {
       loading.value = false
     }
   }
+  const removeOrderFromTrip = async (tripId: string, orderId: string) => {
+    try {
+      loading.value = true
+
+      await service.removeOrder(tripId, orderId)
+
+      // 🔥 refrescar el trip para mantener consistencia
+      const updated = await service.getById(tripId)
+
+      const index = items.value.findIndex((t) => t.id === tripId)
+      if (index !== -1) {
+        items.value[index] = updated
+      }
+
+      // si tenés currentTrip seleccionado
+      if (current.value?.id === tripId) {
+        current.value = updated
+      }
+
+      return updated
+    } catch (error) {
+      console.error('Error removing order from trip:', error)
+      throw error
+    } finally {
+      loading.value = false
+    }
+  }
   const clearError = () => {
     error.value = null
   }
@@ -149,6 +176,7 @@ export const useTripsStore = defineStore('trips', () => {
     remove,
     clearError,
     assignOrders,
-    updateStatus
+    updateStatus,
+    removeOrderFromTrip
   }
 })

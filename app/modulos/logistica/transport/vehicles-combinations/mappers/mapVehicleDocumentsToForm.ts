@@ -1,5 +1,5 @@
 import { parseDate, CalendarDate } from '@internationalized/date'
-import type { Vehicle } from '~/modulos/logistica/transport/vehicles/vehicles.types'
+import type { Vehicle } from '~/modulos/logistica/transport/vehicles/types/vehicles.types'
 
 function toCalendarDate(value?: string | null): CalendarDate | null {
   if (!value) return null

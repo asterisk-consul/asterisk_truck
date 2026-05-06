@@ -92,6 +92,11 @@ export const useTripPlannerStore = defineStore('trip-planner', () => {
     if (!stop) return
 
     stop.orders = stop.orders.filter((o) => o.dispatch_order_id !== orderId)
+
+    // 🔥 eliminar stop vacío en frontend
+    if (stop.orders.length === 0) {
+      removeStop(stopId)
+    }
   }
 
   // =============================
@@ -132,6 +137,9 @@ export const useTripPlannerStore = defineStore('trip-planner', () => {
     if (!tripId.value) return
 
     await tripsStore.assignOrders(tripId.value, buildPayload.value)
+
+    // 🔥 volver a traer estado real
+    await tripsStore.fetchOne(tripId.value)
 
     clear()
   }
@@ -207,6 +215,23 @@ export const useTripPlannerStore = defineStore('trip-planner', () => {
 
     reorderStops()
   }
+  const removeOrderFromTrip = async (orderId: string) => {
+    if (!tripId.value) return
+
+    const tripsStore = useTripsStore()
+
+    await tripsStore.removeOrderFromTrip(tripId.value, orderId)
+
+    // 🔥 opcional pero recomendado: reflejar en UI sin refetch
+    stops.value.forEach((stop) => {
+      stop.orders = stop.orders.filter((o) => o.dispatch_order_id !== orderId)
+    })
+
+    // limpiar stops vacíos
+    stops.value = stops.value.filter((s) => s.orders.length > 0)
+
+    reorderStops()
+  }
   return {
     // state
     tripId,
@@ -228,6 +253,7 @@ export const useTripPlannerStore = defineStore('trip-planner', () => {
     toggleOrder,
     selectedOrders,
     buildStopsFromOrders,
+    removeOrderFromTrip,
     // computed
     buildPayload
   }

@@ -2,7 +2,7 @@ import type {
   Vehicle,
   CreateVehicleInput,
   UpdateVehicleInput
-} from '~/modulos/logistica/transport/vehicles/vehicles.types'
+} from '~/modulos/logistica/transport/vehicles/types/vehicles.types'
 
 export const useVehiclesService = () => {
   const baseUrl = '/api/logistica/transport/vehicles'

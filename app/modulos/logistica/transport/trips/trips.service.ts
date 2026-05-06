@@ -29,6 +29,14 @@ export const useTripsService = () => {
     })
   }
 
+  const removeOrder = async (tripId: string, orderId: string) => {
+    // Añade un log aqui para ver la URL final exacta
+    const url = `${base}/${tripId}/orders/${orderId}`
+    return await $fetch<Trip>(url, {
+      method: 'DELETE'
+    })
+  }
+
   const assignOrders = (tripId: string, body: AssignOrdersDto) =>
     $fetch<Trip>(`${base}/${tripId}/assign-orders`, {
       method: 'POST',
@@ -43,6 +51,7 @@ export const useTripsService = () => {
     update,
     remove,
     updateStatus,
-    assignOrders
+    assignOrders,
+    removeOrder
   }
 }
