@@ -4,7 +4,7 @@ definePageMeta({
   middleware: ['auth']
 })
 
-import { DocumentsPurchasesService } from '~/modulos/erp/purchases/purchases.service'
+import { PurchasesService } from '~/modulos/erp/purchases/purchases.service'
 import {
   STATUS_LABELS,
   STATUS_COLORS
@@ -22,11 +22,9 @@ const {
   pending,
   error,
   refresh
-} = await useAsyncData(
-  'documents-sales',
-  () => DocumentsPurchasesService.getAll({ status: statusFilter.value }),
-  { server: false }
-)
+} = await useAsyncData('documents-sales', () => PurchasesService.getSummary(), {
+  server: false
+})
 
 watch(statusFilter, () => refresh())
 

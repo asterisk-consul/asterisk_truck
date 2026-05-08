@@ -4,7 +4,7 @@ definePageMeta({
   middleware: ['auth']
 })
 
-import { DocumentsSalesService } from '~/modulos/erp/sales/sales.service'
+import { DocumentsSalesService } from '~/modulos/erp/sales/services/sales.service'
 import {
   STATUS_LABELS,
   STATUS_COLORS,
@@ -22,7 +22,7 @@ const salesService = DocumentsSalesService
 const docId = computed(() => route.params.id as string)
 
 // ── STATE ─────────────────────────────────────────────────────────
-const doc = ref<SaleDocument | null>(null)
+const doc = ref<Document | null>(null)
 const pending = ref(false)
 const error = ref<any>(null)
 

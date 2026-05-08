@@ -6,7 +6,7 @@ definePageMeta({
 
 import { storeToRefs } from 'pinia'
 
-import { DocumentsSalesService } from '~/modulos/erp/sales/sales.service'
+import { DocumentsSalesService } from '~/modulos/erp/sales/services/sales.service'
 import { useBusinessPartiesStore } from '~/modulos/logistica/master-data/bussiness-parties/bussines-parties.store'
 import { useProductsStore } from '~/modulos/logistica/master-data/product/products.store'
 import { useBusinessParties } from '~/modulos/logistica/master-data/bussiness-parties/composable/useBusinessParties'
