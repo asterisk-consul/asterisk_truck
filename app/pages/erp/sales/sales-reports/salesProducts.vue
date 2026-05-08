@@ -5,7 +5,7 @@ definePageMeta({
 })
 
 import { Chart, registerables } from 'chart.js'
-import { SalesService } from '~/modulos/erp/sales/salesReports.sarvice'
+import { SalesService } from '~/modulos/erp/sales/salesReports.service'
 import type {
   SummaryFilters,
   SalesSummaryResponse
@@ -81,7 +81,7 @@ function goToProduct(p: any) {
   }
 
   navigateTo({
-    path: `/erp/sales-reports/products/${id}`,
+    path: `/erp/sales/sales-reports/products/${id}`,
     query: {
       startDate: filters.value.startDate,
       endDate: filters.value.endDate,
@@ -119,7 +119,11 @@ const metrics = computed(() => {
     },
     {
       label: 'Total',
-      value: fmt(d.globalTotal + d.globalTaxes + d.globalExempt),
+      value: fmt(
+        d.grandTotal ??
+          d.globalSalesTotal ??
+          d.globalTotal + d.globalTaxes + d.globalExempt
+      ),
       sub: `${taxRate}% sobre compras`
     },
     {
@@ -311,8 +315,8 @@ function exportCSV() {
     p.invoiceCount,
     p.creditNoteCount,
     p.avgPurchaseValue,
-    fmtDate(p.firstPurchaseDate),
-    fmtDate(p.lastPurchaseDate)
+    fmtDate(p.firstSalesDate),
+    fmtDate(p.lastSalesDate)
   ])
   const csv = [headers, ...rows]
     .map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(','))
@@ -626,31 +630,28 @@ onMounted(fetchData)
                   <th
                     class="th"
                     style="width: 90px"
-                    @click="setSort('firstPurchaseDate')"
+                    @click="setSort('firstSalesDate')"
                   >
                     1ra compra
                     <span
                       :class="[
                         'sort',
-                        sortCol === 'firstPurchaseDate' && 'active'
+                        sortCol === 'firstSalesDate' && 'active'
                       ]"
                     >
-                      {{ sortIcon('firstPurchaseDate') }}
+                      {{ sortIcon('firstSalesDate') }}
                     </span>
                   </th>
                   <th
                     class="th"
                     style="width: 90px"
-                    @click="setSort('lastPurchaseDate')"
+                    @click="setSort('lastSalesDate')"
                   >
                     Últ. compra
                     <span
-                      :class="[
-                        'sort',
-                        sortCol === 'lastPurchaseDate' && 'active'
-                      ]"
+                      :class="['sort', sortCol === 'lastSalesDate' && 'active']"
                     >
-                      {{ sortIcon('lastPurchaseDate') }}
+                      {{ sortIcon('lastSalesDate') }}
                     </span>
                   </th>
                   <th class="th" style="width: 100px">Participación</th>
@@ -712,10 +713,10 @@ onMounted(fetchData)
                     {{ fmt(p.avgPurchaseValue) }}
                   </td>
                   <td class="td text-gray-400">
-                    {{ fmtDate(p.firstPurchaseDate) }}
+                    {{ fmtDate(p.firstSalesDate) }}
                   </td>
                   <td class="td text-gray-400">
-                    {{ fmtDate(p.lastPurchaseDate) }}
+                    {{ fmtDate(p.lastSalesDate) }}
                   </td>
                   <td class="td">
                     <div class="flex items-center gap-1">

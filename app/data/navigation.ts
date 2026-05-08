@@ -48,7 +48,7 @@ export const navigationLinks = [
           to: '/importadores'
         },
         {
-          label: 'Productos',
+          label: 'Resumen de productos comprados',
           to: '/productdash'
         }
       ]
