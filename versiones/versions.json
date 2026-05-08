@@ -257,5 +257,44 @@
         "version": "2.2.0-alpha"
       }
     ]
+  },
+  {
+    "version": "0.8.1-alpha",
+    "date": "2026-04-27",
+    "stage": "alpha",
+    "notes": "Mejoras en reportes, visualización y pequeños fixes en módulos clave",
+    "changes": [
+      {
+        "type": "feat",
+        "scope": "reportes",
+        "title": "Incorporación de facturas de venta en la visualización de reportes"
+      },
+      {
+        "type": "feat",
+        "scope": "reportes",
+        "title": "Creación de reporte de choferes"
+      },
+      {
+        "type": "feat",
+        "scope": "reportes",
+        "title": "Exportación de reportes a CSV"
+      },
+      {
+        "type": "fix",
+        "scope": "trips",
+        "title": "Pequeñas correcciones en gestión de viajes"
+      },
+      {
+        "type": "fix",
+        "scope": "dispatch",
+        "title": "Correcciones menores en dispatch orders"
+      }
+    ],
+    "modules": [
+      {
+        "name": "transporte",
+        "version": "2.2.1-alpha"
+      }
+    ]
   }
 ]
