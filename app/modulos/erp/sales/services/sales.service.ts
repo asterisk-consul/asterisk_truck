@@ -1,39 +1,39 @@
-import type { SaleDocument } from './types/sales.types'
+import type { Document } from '~/modulos/erp/facturas/types/factura.types'
 
 export const DocumentsSalesService = {
   async getAll(params?: {
     documentTypeId?: string
     status?: number
-  }): Promise<SaleDocument[]> {
+  }): Promise<Document[]> {
     return $fetch('/api/erp/documents/sales', {
       query: params
     })
   },
 
-  async getOne(id: string): Promise<SaleDocument> {
+  async getOne(id: string): Promise<Document> {
     return $fetch(`/api/erp/documents/sales/${id}`)
   },
 
-  async create(dto: any): Promise<SaleDocument> {
+  async create(dto: any): Promise<Document> {
     return $fetch('/api/erp/documents/sales', {
       method: 'POST' as any,
       body: dto
     })
   },
 
-  async update(id: string, dto: any): Promise<SaleDocument> {
+  async update(id: string, dto: any): Promise<Document> {
     return $fetch(`/api/erp/documents/sales/${id}`, {
       method: 'PATCH' as any,
       body: dto
     })
   },
-  async confirm(id: string): Promise<SaleDocument> {
+  async confirm(id: string): Promise<Document> {
     return $fetch(`/api/erp/documents/sales/${id}/confirm`, {
       method: 'PATCH' as any
     })
   },
 
-  async cancel(id: string): Promise<SaleDocument> {
+  async cancel(id: string): Promise<Document> {
     return $fetch(`/api/erp/documents/sales/${id}/cancel`, {
       method: 'PATCH' as any
     })

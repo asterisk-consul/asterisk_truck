@@ -12,11 +12,11 @@ import type {
 import { storeToRefs } from 'pinia'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 
-import { useDocumentTypesStore } from '~/modulos/logistica/documents/documents-types/document-types.store'
+import { useDocumentTypesStore } from '~/modulos/logistica/documents/transport-documents-types/document-types.store'
 import { useChoferesStore } from '~/modulos/logistica/transport/drivers/choferes.store'
 //composable
 import { mapDriverDocumentsToForm } from '~/modulos/logistica/transport/drivers/mappers/mapDriverDocumentsToForm'
-import { useDocuments } from '~/modulos/logistica/documents/documents-types/useDocuments'
+import { useDocuments } from '~/modulos/logistica/documents/transport-documents-types/useDocuments'
 import { useDriverMetrics } from '~/modulos/logistica/transport/drivers/useDriverMetrics'
 import type { Driver } from '~/modulos/logistica/transport/drivers/drivers.types'
 //form

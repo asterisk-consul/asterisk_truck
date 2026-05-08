@@ -3,8 +3,12 @@ definePageMeta({
   layout: 'default',
   middleware: ['auth']
 })
-
-import { TaxesService, type Tax } from '~/modulos/erp/taxes/taxes.service'
+import type {
+  CreateTaxDto,
+  UpdateTaxDto,
+  Tax
+} from '~/modulos/erp/taxes/types/taxes.types'
+import { TaxesService } from '~/modulos/erp/taxes/services/taxes.service'
 
 const TAX_TYPES = ['IVA', 'IIBB', 'Percepción', 'Retención', 'Otro']
 const CALC_LEVELS = ['LINE', 'TOTAL', 'HEADER']

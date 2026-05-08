@@ -3,8 +3,7 @@ definePageMeta({
   layout: 'default',
   middleware: ['auth']
 })
-
-import { DocumentsSalesService } from '~/modulos/erp/sales/sales.service'
+import { useDocumentsSalesStore } from '~/modulos/erp/sales/stores/sales.store'
 import {
   STATUS_LABELS,
   STATUS_COLORS
@@ -17,16 +16,24 @@ const generating = ref(false)
 const generateResult = ref<{ total_trips: number; results: any[] } | null>(null)
 
 // ─── Fetch ────────────────────────────────────────────────────────────────────
-const {
-  data: documents,
-  pending,
-  error,
-  refresh
-} = await useAsyncData(
-  'documents-sales',
-  () => DocumentsSalesService.getAll({ status: statusFilter.value }),
-  { server: false }
-)
+const documentsSalesStore = useDocumentsSalesStore()
+
+const documents = computed(() => documentsSalesStore.items)
+console.log(documents)
+
+const pending = computed(() => documentsSalesStore.loading)
+
+const error = computed(() => documentsSalesStore.error)
+
+const refresh = () =>
+  documentsSalesStore.fetchAll({ status: statusFilter.value })
+
+onMounted(async () => {
+  await documentsSalesStore.fetchAll({
+    status: statusFilter.value,
+    documentTypeId: '0453babd-adda-499f-9c8b-25bc7a52a762'
+  })
+})
 
 watch(statusFilter, () => refresh())
 
