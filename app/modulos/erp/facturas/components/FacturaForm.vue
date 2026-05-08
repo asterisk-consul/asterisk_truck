@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, computed, onMounted } from 'vue'
+import { reactive, ref, computed, onMounted, watch } from 'vue'
 
 import type { BusinessParty } from '~/modulos/logistica/master-data/bussiness-parties/types/bussines-parties.types'
 
@@ -27,7 +27,6 @@ import type { Document, FacturaItem, FacturaTax } from '../types/factura.types'
 
 interface Props {
   loading?: boolean
-
   initialValues?: Partial<Document>
 }
 
@@ -52,68 +51,68 @@ const { items: documentTypeOptions } = useDocumentsTypes(documentsTypes)
 onMounted(async () => {
   await Promise.all([
     partiesStore.fetchAll(),
-
     productsStore.fetchAll(),
-
     documentsTypesStore.fetchAll()
   ])
 })
 
 const form = reactive({
   document_type_id: '',
-
   party_id: '',
-
   date: '',
-
   descrip: '',
-
   ref: ''
 })
 
 const items = ref<FacturaItem[]>([])
+
 watch(
   () => props.initialValues,
   (value) => {
-    if (!value) {
-      return
-    }
-
-    console.log('DOCUMENT EDIT')
-    console.log(value)
+    if (!value) return
 
     form.document_type_id = value.document_type_id ?? ''
-
     form.party_id = value.party_id ?? ''
-
     form.date = value.date
       ? new Date(value.date).toISOString().split('T')[0]
       : ''
-
     form.descrip = value.descrip ?? ''
-
     form.ref = value.ref ?? ''
 
+    // Taxes de nivel DOCUMENT (se aplican a todos los items)
+    const documentTaxes = (value.document_taxes ?? []).map((tax: any) => ({
+      tax_id: tax.tax_id,
+      name: tax.taxes?.name ?? '',
+      code: tax.taxes?.code ?? '',
+      tax_rate: Number(tax.tax_rate ?? 0),
+      tax_amount: 0, // se recalcula por item abajo
+      calculation_level:
+        tax.taxes?.calculation_level?.toLowerCase() ?? 'document',
+      is_included_in_price: false
+    }))
+
     items.value = (value.document_items ?? []).map((item: any) => {
-      const taxes =
-        item.document_item_taxes?.map((tax: any) => ({
-          tax_id: tax.tax_id,
+      const subtotal = Number(item.quantity ?? 0) * Number(item.unit_price ?? 0)
 
-          name: tax.taxes?.name ?? '',
+      // Taxes de nivel LINE (vienen del item)
+      const lineTaxes = (item.document_item_taxes ?? []).map((tax: any) => ({
+        tax_id: tax.tax_id,
+        name: tax.taxes?.name ?? '',
+        code: tax.taxes?.code ?? '',
+        tax_rate: Number(tax.tax_rate ?? 0),
+        tax_amount: Number(tax.tax_amount ?? 0),
+        calculation_level:
+          tax.taxes?.calculation_level?.toLowerCase() ?? 'line',
+        is_included_in_price: false
+      }))
 
-          code: tax.taxes?.code ?? '',
+      // Taxes de nivel DOCUMENT: recalcular tax_amount en base al subtotal del item
+      const docTaxesForItem = documentTaxes.map((tax: any) => ({
+        ...tax,
+        tax_amount: Number(((subtotal * tax.tax_rate) / 100).toFixed(2))
+      }))
 
-          tax_rate: Number(tax.tax_rate ?? 0),
-
-          tax_amount: Number(tax.tax_amount ?? 0),
-
-          calculation_level:
-            tax.taxes?.calculation_level?.toLowerCase() ?? 'line',
-
-          is_included_in_price: false
-        })) ?? []
-
-      const subtotal = Number(item.price ?? 0)
+      const taxes = [...lineTaxes, ...docTaxesForItem]
 
       const totalTaxes = taxes.reduce(
         (acc: number, tax: any) => acc + Number(tax.tax_amount || 0),
@@ -122,28 +121,17 @@ watch(
 
       return {
         product_id: item.product_id,
-
         product_name:
           item.products?.name || item.products?.description || 'Producto',
-
         quantity: Number(item.quantity ?? 0),
-
         unit_price: Number(item.unit_price ?? 0),
-
         price: subtotal,
-
         subtotal,
-
         taxes,
-
         total_taxes: totalTaxes,
-
         total: subtotal + totalTaxes
       }
     })
-
-    console.log('ITEMS LOADED')
-    console.log(items.value)
   },
   {
     immediate: true,
@@ -153,7 +141,6 @@ watch(
 
 const selectedCustomer = computed({
   get: () => partyOptions.value.find((i) => i.value === form.party_id),
-
   set: (option) => {
     form.party_id = option?.value ?? ''
   }
@@ -162,7 +149,6 @@ const selectedCustomer = computed({
 const selectedDocumentType = computed({
   get: () =>
     documentTypeOptions.value.find((i) => i.value === form.document_type_id),
-
   set: (option) => {
     form.document_type_id = option?.value ?? ''
   }
@@ -173,146 +159,65 @@ const currentDocumentType = computed(() =>
 )
 
 function addItem(prod: any) {
-  // console.log('PRODUCT FULL')
-  // console.log(prod)
-
-  // console.log('CURRENT DOC')
-  // console.log(currentDocumentType.value)
-
-  // ─────────────────────────────────────
-  // Precio
-  // ─────────────────────────────────────
   const unitPrice = Number(prod.price ?? prod.data?.price ?? 0)
-
   const quantity = 1
-
   const subtotal = quantity * unitPrice
 
-  // ─────────────────────────────────────
-  // Taxes producto
-  // ─────────────────────────────────────
-  const productTaxes =
-    prod.taxes?.map((t: any) => ({
+  // Taxes del producto (nivel LINE)
+  const productTaxes = (prod.taxes ?? []).map((t: any) => {
+    const rate = Number(t.taxes?.rate ?? 0)
+    const taxAmount = Number(((subtotal * rate) / 100).toFixed(2))
+    return {
       tax_id: t.tax_id,
-
-      name: t.taxes?.name,
-
-      code: t.taxes?.code,
-
-      tax_rate: Number(t.taxes?.rate ?? 0),
-
-      tax_amount: 0,
-
+      name: t.taxes?.name ?? '',
+      code: t.taxes?.code ?? '',
+      tax_rate: rate,
+      tax_amount: taxAmount,
       calculation_level: String(
         t.taxes?.calculation_level ?? 'LINE'
       ).toLowerCase(),
-
       is_included_in_price: Boolean(t.is_included_in_price)
-    })) ?? []
-
-  // ─────────────────────────────────────
-  // Taxes documento
-  // ─────────────────────────────────────
-  const documentTaxes =
-    value.document_taxes?.map((tax: any) => ({
-      tax_id: tax.tax_id,
-
-      name: tax.taxes?.name ?? '',
-
-      code: tax.taxes?.code ?? '',
-
-      tax_rate: Number(tax.tax_rate ?? 0),
-
-      tax_amount: Number(tax.tax_amount ?? 0),
-
-      calculation_level:
-        tax.taxes?.calculation_level?.toLowerCase() ?? 'document',
-
-      is_included_in_price: false
-    })) ?? []
-
-  items.value = (value.document_items ?? []).map((item: any) => {
-    const lineTaxes =
-      item.document_item_taxes?.map((tax: any) => ({
-        tax_id: tax.tax_id,
-
-        name: tax.taxes?.name ?? '',
-
-        code: tax.taxes?.code ?? '',
-
-        tax_rate: Number(tax.tax_rate ?? 0),
-
-        tax_amount: Number(tax.tax_amount ?? 0),
-
-        calculation_level:
-          tax.taxes?.calculation_level?.toLowerCase() ?? 'line',
-
-        is_included_in_price: false
-      })) ?? []
-
-    // agregar taxes documento
-    const taxes = [...lineTaxes, ...documentTaxes]
-
-    const subtotal = Number(item.price ?? 0)
-
-    const totalTaxes = taxes.reduce(
-      (acc: number, tax: any) => acc + Number(tax.tax_amount || 0),
-      0
-    )
-
-    return {
-      product_id: item.product_id,
-
-      product_name:
-        item.products?.name || item.products?.description || 'Producto',
-
-      quantity: Number(item.quantity ?? 0),
-
-      unit_price: Number(item.unit_price ?? 0),
-
-      price: subtotal,
-
-      subtotal,
-
-      taxes,
-
-      total_taxes: totalTaxes,
-
-      total: subtotal + totalTaxes
     }
   })
 
-  // ─────────────────────────────────────
-  // Totales
-  // ─────────────────────────────────────
+  // Taxes del tipo de documento (nivel DOCUMENT)
+  // Nota: verificá que fetchAll() traiga la relación document_type_taxes(*, taxes(*))
+  const docTaxes = (currentDocumentType.value?.document_type_taxes ?? []).map(
+    (t: any) => {
+      const rate = Number(t.taxes?.rate ?? 0)
+      const taxAmount = Number(((subtotal * rate) / 100).toFixed(2))
+      return {
+        tax_id: t.tax_id,
+        name: t.taxes?.name ?? '',
+        code: t.taxes?.code ?? '',
+        tax_rate: rate,
+        tax_amount: taxAmount,
+        calculation_level: String(
+          t.taxes?.calculation_level ?? 'DOCUMENT'
+        ).toLowerCase(),
+        is_included_in_price: false
+      }
+    }
+  )
+
+  const taxes = [...productTaxes, ...docTaxes]
+
   const totalTaxes = taxes.reduce(
     (acc, tax) => acc + Number(tax.tax_amount || 0),
-
     0
   )
 
   const total = subtotal + totalTaxes
 
-  // ─────────────────────────────────────
-  // Push item
-  // ─────────────────────────────────────
   items.value.push({
     product_id: prod.value ?? prod.id ?? '',
-
     product_name: prod.label ?? prod.name ?? 'Producto',
-
     quantity,
-
     unit_price: unitPrice,
-
     price: subtotal,
-
     subtotal,
-
     taxes,
-
     total_taxes: totalTaxes,
-
     total
   })
 }
@@ -322,21 +227,13 @@ function removeItem(index: number) {
 }
 
 const subtotal = computed(() =>
-  items.value.reduce(
-    (acc, item) => acc + Number(item.subtotal || 0),
-
-    0
-  )
+  items.value.reduce((acc, item) => acc + Number(item.subtotal || 0), 0)
 )
 
 const allTaxes = computed(() => items.value.flatMap((i) => i.taxes ?? []))
 
 const totalTaxes = computed(() =>
-  allTaxes.value.reduce(
-    (acc, tax) => acc + Number(tax.tax_amount || 0),
-
-    0
-  )
+  allTaxes.value.reduce((acc, tax) => acc + Number(tax.tax_amount || 0), 0)
 )
 
 const total = computed(
@@ -346,51 +243,36 @@ const total = computed(
 function submit() {
   emit('submit', {
     document_type_id: form.document_type_id,
-
     party_id: form.party_id,
-
     date: form.date,
-
     descrip: form.descrip,
-
     ref: form.ref,
-
     items: items.value.map((i) => ({
       product_id: i.product_id,
-
       quantity: Number(i.quantity),
-
       unit_price: Number(i.unit_price),
-
       taxes: i.taxes.map((t) => ({
         tax_id: t.tax_id,
-
         tax_rate: Number(t.tax_rate || 0),
-
         tax_amount: Number(t.tax_amount || 0)
       }))
     }))
   })
 }
+
 const onEditBussinessParty = () => {
-  if (!selectedCustomer.value?.value) {
-    return
-  }
+  if (!selectedCustomer.value?.value) return
 
   const customer = parties.value.find(
     (c) => c.id === selectedCustomer.value?.value
   )
 
-  if (!customer) {
-    return
-  }
+  if (!customer) return
 
   selectedBusinessParty.value = customer
-
   showBusinessPartiesModal.value = true
 }
 
-console.log('props', props.initialValues)
 defineExpose({ submit })
 </script>
 

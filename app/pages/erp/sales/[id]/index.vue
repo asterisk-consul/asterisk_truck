@@ -21,15 +21,11 @@ const { mainCollapsed } = useSidebarState()
 const loading = ref(true)
 
 const factura = computed(() => documentsSalesStore.current)
+console.log(factura)
 
 onMounted(async () => {
   try {
     await documentsSalesStore.fetchOne(route.params.id as string)
-    toast.add({
-      title: 'Factura cargada',
-      description: 'Factura cargada con exito',
-      color: 'success'
-    })
   } finally {
     loading.value = false
   }
