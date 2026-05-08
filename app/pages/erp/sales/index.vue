@@ -19,7 +19,7 @@ const generateResult = ref<{ total_trips: number; results: any[] } | null>(null)
 const documentsSalesStore = useDocumentsSalesStore()
 
 const documents = computed(() => documentsSalesStore.items)
-console.log(documents)
+// console.log(documents)
 
 const pending = computed(() => documentsSalesStore.loading)
 
@@ -30,8 +30,7 @@ const refresh = () =>
 
 onMounted(async () => {
   await documentsSalesStore.fetchAll({
-    status: statusFilter.value,
-    documentTypeId: '0453babd-adda-499f-9c8b-25bc7a52a762'
+    status: statusFilter.value
   })
 })
 
@@ -70,7 +69,7 @@ function fmtDate(d?: string) {
 async function generateFromTrips() {
   generating.value = true
   try {
-    generateResult.value = await DocumentsSalesService.generateFromAllTrips()
+    generateResult.value = await documentsSalesStore.generateFromAllTrips()
     await refresh()
   } catch (e) {
     console.error(e)

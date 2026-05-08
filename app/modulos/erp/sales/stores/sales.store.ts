@@ -248,7 +248,7 @@ export const useDocumentsSalesStore = defineStore(
       try {
         return await DocumentsSalesService.generateFromAllTrips()
       } catch (err: any) {
-        console.error(err)
+        // console.error(err)
 
         error.value =
           err?.data?.message || err?.message || 'Error generating documents'
