@@ -138,14 +138,14 @@ console.log(columns)
       </div>
 
       <!-- 🔥 Tabs controlados -->
-      <UTabs
+      <!-- <UTabs
         v-model="activeTab"
         :items="itemsTabs"
         color="neutral"
         variant="link"
         :content="false"
         class="w-full"
-      />
+      /> -->
 
       <!-- 🔥 Header dinámico -->
       <UPageHeader

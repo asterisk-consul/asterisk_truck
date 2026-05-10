@@ -266,7 +266,7 @@ function confirmDelete(): void {
         td: 'border-b border-default'
       }"
       :class="[
-        'max-h-[50vh] overflow-y-auto',
+        'max-h-[75vh] overflow-y-auto',
         selectedCount > 0 ? 'rounded-b-lg rounded-t-none' : 'rounded-lg'
       ]"
     />
