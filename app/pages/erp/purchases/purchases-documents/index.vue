@@ -3,12 +3,13 @@ definePageMeta({
   layout: 'default',
   middleware: ['auth']
 })
-import { useDocumentsSalesStore } from '~/modulos/erp/sales/stores/sales.store'
+
+import { PurchasesService } from '~/modulos/erp/purchases/purchases.service'
 import {
   STATUS_LABELS,
   STATUS_COLORS
-} from '~/modulos/erp/sales/types/sales.types'
-import type { SaleDocument } from '~/modulos/erp/sales/types/sales.types'
+} from '~/modulos/erp/purchases/types/purchases-documents'
+import type { PurchasesDocument } from '~/modulos/erp/purchases/types/purchases-documents'
 
 // ─── Filtros ──────────────────────────────────────────────────────────────────
 const statusFilter = ref<number | undefined>(undefined)
@@ -16,22 +17,13 @@ const generating = ref(false)
 const generateResult = ref<{ total_trips: number; results: any[] } | null>(null)
 
 // ─── Fetch ────────────────────────────────────────────────────────────────────
-const documentsSalesStore = useDocumentsSalesStore()
-
-const documents = computed(() => documentsSalesStore.items)
-// console.log(documents)
-
-const pending = computed(() => documentsSalesStore.loading)
-
-const error = computed(() => documentsSalesStore.error)
-
-const refresh = () =>
-  documentsSalesStore.fetchAll({ status: statusFilter.value })
-
-onMounted(async () => {
-  await documentsSalesStore.fetchAll({
-    status: statusFilter.value
-  })
+const {
+  data: documents,
+  pending,
+  error,
+  refresh
+} = await useAsyncData('documents-sales', () => PurchasesService.getSummary(), {
+  server: false
 })
 
 watch(statusFilter, () => refresh())
@@ -69,7 +61,8 @@ function fmtDate(d?: string) {
 async function generateFromTrips() {
   generating.value = true
   try {
-    generateResult.value = await documentsSalesStore.generateFromAllTrips()
+    generateResult.value =
+      await DocumentsPurchasesService.generateFromAllTrips()
     await refresh()
   } catch (e) {
     console.error(e)

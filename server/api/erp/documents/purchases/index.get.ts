@@ -1,5 +1,5 @@
 import { apiProxy } from '~~/server/utils/api-proxy'
-
 export default defineEventHandler(async (event) => {
-  return apiProxy(event, `/taxes`)
+  const query = getQuery(event)
+  return apiProxy(event, `/documents/purchases-documents`, { query })
 })

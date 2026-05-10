@@ -11,6 +11,9 @@ export const FileService = {
   async importCompras(file: File) {
     return await postData('/data-import/compras', buildForm(file))
   },
+  async importVentas(file: File) {
+    return await postData('/data-import/ventas', buildForm(file))
+  },
   async importNotaCredito(file: File) {
     return await postData('/data-import/nota-credito', buildForm(file))
   },

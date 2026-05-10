@@ -7,13 +7,13 @@ import { storeToRefs } from 'pinia'
 import LogisticaTable from '~/components/Tablas/LogisticaTable.vue'
 //stores
 import { useVehiclesStore } from '~/modulos/logistica/transport/vehicles/store/vehicles.store'
-import { useDocumentTypesStore } from '~/modulos/logistica/documents/documents-types/document-types.store'
+import { useDocumentTypesStore } from '~/modulos/logistica/documents/transport-documents-types/document-types.store'
 //form
 import { vehicleFormFields } from '~/modulos/logistica/transport/vehicles/vehicleFormFields'
 import ModalForm from '~/components/ModalForm.vue'
 import { mapVehicleDocumentsToForm } from '~/modulos/logistica/transport/vehicles-combinations/mappers/mapVehicleDocumentsToForm'
 //composables
-import { useDocuments } from '~/modulos/logistica/documents/documents-types/useDocuments'
+import { useDocuments } from '~/modulos/logistica/documents/transport-documents-types/useDocuments'
 //tabla columns
 import { vehiclesColumns } from '~/modulos/logistica/transport/vehicles/vehicles.columns'
 import type {
