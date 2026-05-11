@@ -121,7 +121,6 @@ const links = ref<ButtonProps[]>([
     variant: 'solid'
   }
 ])
-console.log(columns)
 </script>
 
 <template>

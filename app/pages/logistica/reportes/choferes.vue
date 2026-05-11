@@ -9,6 +9,7 @@ import type { ButtonProps } from '@nuxt/ui'
 // --- Types ---
 interface ViajeChofer {
   id: string
+  tripId: string
   choferId: string
   nombre: string
   apellido: string
@@ -776,8 +777,14 @@ function exportCSV() {
           <tbody>
             <tr v-for="v in sortedViajes" :key="v.id" class="rch-tr">
               <td class="rch-td-date">{{ fmtDate(v.fecha) }}</td>
-
-              <td class="rch-td-mono">{{ v.numeroViaje }}</td>
+              <UTooltip text="Ir al viaje">
+                <td
+                  class="rch-td-mono cursor-pointer hover:opacity-75 transition-opacity"
+                  @click="$router.push(`/logistica/viajes/${v.tripId}`)"
+                >
+                  {{ v.numeroViaje }}
+                </td>
+              </UTooltip>
 
               <td class="rch-td-mono">{{ v.numeroCarga }}</td>
 

@@ -296,5 +296,64 @@
         "version": "2.2.1-alpha"
       }
     ]
+  },
+  {
+    "version": "0.8.2-alpha",
+    "date": "2026-04-27",
+    "stage": "alpha",
+    "notes": "Mejoras en reportes, viajes y gestión de unidades con soporte de historial",
+    "changes": [
+      {
+        "type": "feat",
+        "scope": "reportes",
+        "title": "Reporte de choferes corregido y con detalles de unidades incluidos"
+      },
+      {
+        "type": "feat",
+        "scope": "viajes",
+        "title": "Tabla de viajes muestra detalles de unidades al listar y al editar"
+      },
+      {
+        "type": "feat",
+        "scope": "viajes",
+        "title": "Clic en una orden desde el viaje navega directamente a la orden correspondiente"
+      },
+      {
+        "type": "feat",
+        "scope": "reportes",
+        "title": "Desde el reporte se puede navegar directamente al viaje asociado"
+      },
+      {
+        "type": "feat",
+        "scope": "facturación",
+        "title": "Desde la factura se puede navegar directamente al viaje vinculado"
+      },
+      {
+        "type": "feat",
+        "scope": "unidades",
+        "title": "Las unidades ahora soportan historial: al editar se cierra la versión actual y se crea una nueva"
+      },
+      {
+        "type": "feat",
+        "scope": "tablas",
+        "title": "Las tablas del sistema cuentan con múltiples filtros simultáneos"
+      },
+      {
+        "type": "fix",
+        "scope": "trips",
+        "title": "Pequeñas correcciones en gestión de viajes"
+      },
+      {
+        "type": "fix",
+        "scope": "dispatch",
+        "title": "Correcciones menores en dispatch orders"
+      }
+    ],
+    "modules": [
+      {
+        "name": "transporte",
+        "version": "2.2.2-alpha"
+      }
+    ]
   }
 ]

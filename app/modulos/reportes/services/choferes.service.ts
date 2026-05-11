@@ -4,6 +4,7 @@ export const getReporteChoferes = (params?: {
   choferId?: string
   mes?: string
   cliente?: string
+  numeroViaje?: string
   corredor?: string
   page?: number
   limit?: number

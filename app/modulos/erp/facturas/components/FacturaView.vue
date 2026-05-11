@@ -147,7 +147,14 @@ const statusInfo = computed(
         </div>
         <div v-if="document.ref">
           <div class="text-sm text-gray-500">Referencia</div>
-          <div class="font-medium">{{ document.ref }}</div>
+          <UTooltip text="Ver detalles del viaje">
+            <div
+              class="font-medium cursor-pointer text-blue-600 hover:underline"
+              @click="$router.push(`/logistica/viajes/${document.ref}`)"
+            >
+              {{ document.ref }}
+            </div>
+          </UTooltip>
         </div>
       </div>
     </UCard>

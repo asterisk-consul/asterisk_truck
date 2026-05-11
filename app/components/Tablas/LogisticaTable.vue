@@ -85,10 +85,10 @@ const isDateRangeFilter = computed(
 function applyTextFilter(value: string, column: string) {
   const api = table.value?.tableApi
   if (!api) return
-  console.log('SET FILTER', {
-    column,
-    value
-  })
+  // console.log('SET FILTER', {
+  //   column,
+  //   value
+  // })
   if (column === '__global__') {
     filterableColumns.value.forEach((c) => {
       api.getColumn(c.value)?.setFilterValue(undefined)

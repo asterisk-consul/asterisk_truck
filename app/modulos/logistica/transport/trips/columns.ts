@@ -1,5 +1,5 @@
 import type { TableColumn } from '@nuxt/ui'
-import { UBadge } from '#components'
+import { UBadge, UTooltip } from '#components'
 import type { Trip } from '~/modulos/logistica/transport/trips/types/trips.types'
 import StatusToggle from '@/components/ui/PopoverTableActive.vue'
 
@@ -101,6 +101,7 @@ export const tripsColumns = (actions: {
         label: 'Órdenes / Clientes',
         cell: ({ row }) => {
           const ordersList = row.original.unique_orders ?? []
+          const router = useRouter()
 
           if (!ordersList.length) return '—'
 
@@ -108,16 +109,22 @@ export const tripsColumns = (actions: {
             'div',
             { class: 'flex flex-wrap gap-1' },
             ordersList.map((o) =>
-              h(
-                UBadge,
-                {
-                  variant: 'subtle',
-
-                  class: 'text-xs'
-                },
-                () => {
-                  return `${o.order_number} (${o.customer_name}) `
-                }
+              h(UTooltip, { text: 'Ver orden de despacho' }, () =>
+                h(
+                  UBadge,
+                  {
+                    variant: 'subtle',
+                    class:
+                      'text-xs cursor-pointer hover:opacity-75 transition-opacity',
+                    onClick: (e: MouseEvent) => {
+                      e.stopPropagation()
+                      router.push(
+                        `/logistica/viajes/dispatch-orders/${o.dispatch_order_id}/edit`
+                      )
+                    }
+                  },
+                  () => `${o.order_number} (${o.customer_name})`
+                )
               )
             )
           )
