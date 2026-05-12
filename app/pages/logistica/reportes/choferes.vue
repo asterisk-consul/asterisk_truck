@@ -786,7 +786,18 @@ function exportCSV() {
                 </td>
               </UTooltip>
 
-              <td class="rch-td-mono">{{ v.numeroCarga }}</td>
+              <UTooltip text="Ir al viaje">
+                <td
+                  class="rch-td-mono cursor-pointer hover:opacity-75 transition-opacity"
+                  @click="
+                    $router.push(
+                      `/logistica/viajes/dispatch-orders/${v.despachoId}/edit`
+                    )
+                  "
+                >
+                  {{ v.numeroCarga }}
+                </td>
+              </UTooltip>
 
               <td class="rch-td-chofer">{{ v.chofer }}</td>
 
