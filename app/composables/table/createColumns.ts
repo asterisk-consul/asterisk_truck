@@ -1,5 +1,7 @@
 import { h } from 'vue'
+
 import { UButton, UBadge } from '#components'
+
 import type { TableColumn } from '@nuxt/ui'
 
 import { useInlineEdit } from '@/composables/table/useInlineEdit'
@@ -8,6 +10,7 @@ import { useDateColumn } from '@/composables/table/useDateColumn'
 /* ========================
    Badge Colors
 ======================== */
+
 export type BadgeColor =
   | 'error'
   | 'primary'
@@ -34,6 +37,7 @@ function isBadgeColor(v: any): v is BadgeColor {
 /* ========================
    Tipos
 ======================== */
+
 type EnumOption<T = any> = {
   label: string
   value: T
@@ -42,48 +46,65 @@ type EnumOption<T = any> = {
 
 type BuilderConfig<T, K extends keyof T = keyof T> = {
   locale?: string
+
   onInlineSave?: (row: T, field: K, value: any) => void | Promise<void>
 }
 
 type ColumnConfig<T, K extends keyof T = keyof T> = {
   key?: keyof T | string
+
   id?: string
+
   accessorFn?: (row: T) => any
 
   label: string
+
   sortable?: boolean
 
   editable?: boolean
+
   editField?: K
 
   date?: boolean
 
   enum?: {
     options: EnumOption[]
+
     toggle?: {
       component: any
+
       onChange?: (row: T, value: any) => void
+
       title?: string
     }
   }
 
   badge?: {
-    resolve: (row: T) => { label: string; color?: BadgeColor }
+    resolve: (row: T) => {
+      label: string
+      color?: BadgeColor
+    }
   }
 
   multiBadge?: {
-    resolve: (row: T) => { label: string; color?: BadgeColor }[]
+    resolve: (row: T) => {
+      label: string
+      color?: BadgeColor
+    }[]
   }
 
   component?: {
     is: any
+
     props?: (row: T) => Record<string, any>
   }
 
   cell?: TableColumn<T>['cell']
+
   header?: TableColumn<T>['header']
 
   meta?: Record<string, any>
+
   filterFn?: TableColumn<T>['filterFn']
 
   column?: Partial<TableColumn<T>>
@@ -92,21 +113,25 @@ type ColumnConfig<T, K extends keyof T = keyof T> = {
 /* ========================
    Builder
 ======================== */
+
 export function createTableBuilder<
   T extends { id: string },
   K extends keyof T = keyof T
 >(config?: BuilderConfig<T, K>) {
   const { editableCell } = useInlineEdit<T, any>()
+
   const dateCol = useDateColumn(config?.locale || 'es-AR')
 
   return function build(cols: ColumnConfig<T, K>[]): TableColumn<T>[] {
     return cols.map((col) => {
       const accessorKey = col.key as string | undefined
+
       const accessorFn = col.accessorFn
 
       /* ========================
          HEADER
-      ======================== */
+      ========================= */
+
       let header: TableColumn<T>['header']
 
       if (col.header) {
@@ -117,14 +142,19 @@ export function createTableBuilder<
 
           return h(UButton, {
             color: 'neutral',
+
             variant: 'ghost',
+
             label: col.label,
+
             icon: isSorted
               ? isSorted === 'asc'
                 ? 'i-lucide-arrow-up-narrow-wide'
                 : 'i-lucide-arrow-down-wide-narrow'
               : 'i-lucide-arrow-up-down',
+
             class: '-mx-2.5',
+
             onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
           })
         }
@@ -134,10 +164,12 @@ export function createTableBuilder<
 
       /* ========================
          CELL
-      ======================== */
+      ========================= */
+
       let cell = col.cell
 
       // editable
+
       if (!cell && col.editable && col.editField) {
         cell = ({ row }) =>
           editableCell(col.editField as any, row.original, {
@@ -146,21 +178,25 @@ export function createTableBuilder<
       }
 
       // date
+
       if (!cell && col.date && accessorKey) {
         cell = ({ row }) => dateCol.format(row.getValue<string>(accessorKey))
       }
 
       // enum display
+
       if (!cell && col.enum && accessorKey) {
         cell = ({ row }) => {
           const value = row.original[accessorKey as keyof T]
+
           const opt = col.enum!.options.find((o) => o.value === value)
+
           return opt?.label ?? '—'
         }
       }
 
       // enum toggle
-      // enum toggle
+
       if (col.enum?.toggle) {
         const Comp = col.enum.toggle.component
 
@@ -169,14 +205,18 @@ export function createTableBuilder<
             modelValue: col.accessorFn
               ? col.accessorFn(row.original)
               : row.original[accessorKey as keyof T],
+
             title: col.enum!.toggle?.title,
+
             options: col.enum!.options,
+
             'onUpdate:modelValue': (value: unknown) =>
               col.enum!.toggle?.onChange?.(row.original, value)
           })
       }
 
       // badge
+
       if (!cell && col.badge) {
         cell = ({ row }) => {
           const { label, color } = col.badge!.resolve(row.original)
@@ -185,6 +225,7 @@ export function createTableBuilder<
             UBadge,
             {
               variant: 'subtle',
+
               color: isBadgeColor(color) ? color : 'neutral'
             },
             () => label
@@ -193,20 +234,26 @@ export function createTableBuilder<
       }
 
       // multi badge
+
       if (!cell && col.multiBadge) {
         cell = ({ row }) => {
           const badges = col.multiBadge!.resolve(row.original)
 
-          if (!badges?.length) return '—'
+          if (!badges?.length) {
+            return '—'
+          }
 
           return h(
             'div',
-            { class: 'flex gap-1 flex-wrap' },
+            {
+              class: 'flex gap-1 flex-wrap'
+            },
             badges.map((b) =>
               h(
                 UBadge,
                 {
                   variant: 'subtle',
+
                   color: isBadgeColor(b.color) ? b.color : 'neutral'
                 },
                 () => b.label
@@ -217,45 +264,192 @@ export function createTableBuilder<
       }
 
       // custom component
+
       if (col.component) {
         const Comp = col.component.is
+
         cell = ({ row }) => h(Comp, col.component?.props?.(row.original) || {})
       }
 
       /* ========================
-         META / FILTER
-      ======================== */
+         FILTER META
+      ========================= */
+
+      const inferredFilter = (() => {
+        // DATE
+
+        if (col.date) {
+          return {
+            type: 'date-range',
+
+            operators: ['between']
+          }
+        }
+
+        // ENUM
+
+        if (col.enum) {
+          return {
+            type: 'select',
+
+            operators: ['equals'],
+
+            options: col.enum.options.map((o) => ({
+              label: o.label,
+
+              value: o.value
+            }))
+          }
+        }
+
+        // NUMBER
+
+        if (
+          typeof accessorKey === 'string' &&
+          accessorKey.toLowerCase().includes('id')
+        ) {
+          return {
+            type: 'number',
+
+            operators: ['equals', 'gt', 'lt']
+          }
+        }
+
+        // DEFAULT TEXT
+
+        return {
+          type: 'text',
+
+          operators: ['contains', 'equals', 'startsWith']
+        }
+      })()
+
+      /* ========================
+         META
+      ========================= */
 
       const meta = {
         label: col.label,
-        ...(col.date ? dateCol.meta : {}),
+
+        filter: {
+          ...inferredFilter,
+
+          ...(col.meta?.filter || {})
+        },
+
         ...(col.meta || {})
       }
 
-      // ✅ DEFAULT FILTER STRING (CLAVE)
+      /* ========================
+         DEFAULT FILTER
+      ========================= */
+
       const defaultStringFilter: TableColumn<T>['filterFn'] = (
         row,
         columnId,
         value
       ) => {
         const v = row.getValue(columnId)
-        if (v == null) return false
 
-        return String(v).toLowerCase().includes(String(value).toLowerCase())
+        if (v == null) {
+          return false
+        }
+
+        return String(v)
+          .toLowerCase()
+          .includes(String(value || '').toLowerCase())
       }
 
-      const filterFn = col.date
-        ? dateCol.filterFn
-        : (col.filterFn ?? defaultStringFilter)
+      /* ========================
+         ADVANCED FILTER
+      ========================= */
+
+      const advancedFilter: TableColumn<T>['filterFn'] = (
+        row,
+        columnId,
+        filter
+      ) => {
+        const value = row.getValue(columnId)
+
+        console.log('FILTER RUN =>', {
+          columnId,
+          rowValue: value,
+          filter
+        })
+
+        if (!filter) {
+          return true
+        }
+
+        switch (filter.operator) {
+          case 'contains':
+            return String(value || '')
+              .toLowerCase()
+              .includes(String(filter.value || '').toLowerCase())
+
+          case 'equals':
+            return String(value || '') === String(filter.value || '')
+
+          case 'startsWith':
+            return String(value || '')
+              .toLowerCase()
+              .startsWith(String(filter.value || '').toLowerCase())
+
+          case 'gt':
+            return Number(value) > Number(filter.value)
+
+          case 'lt':
+            return Number(value) < Number(filter.value)
+
+          case 'between': {
+            if (!filter.value?.start || !filter.value?.end) {
+              return true
+            }
+
+            const rowDate = new Date(value)
+
+            const start = new Date(filter.value.start)
+
+            const end = new Date(filter.value.end)
+
+            // incluir fin del día
+
+            end.setHours(23, 59, 59, 999)
+
+            return rowDate >= start && rowDate <= end
+          }
+
+          default:
+            return defaultStringFilter(row, columnId, filter?.value)
+        }
+      }
+
+      /* ========================
+         FILTER FN
+      ========================= */
+
+      const filterFn = col.filterFn ?? advancedFilter
+
+      console.log('COLUMN FILTER FN', {
+        column: accessorKey,
+        filterFn
+      })
 
       return {
         id: col.id ?? accessorKey,
+
         accessorKey,
+
         accessorFn,
+
         header,
+
         cell,
+
         meta,
+
         filterFn,
+
         ...(col.column || {})
       } as TableColumn<T>
     })

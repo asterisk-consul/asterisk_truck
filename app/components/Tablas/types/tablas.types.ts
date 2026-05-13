@@ -1,7 +1,5 @@
 import type { TableColumn } from '@nuxt/ui'
 
-export type FilterType = 'text' | 'date-range'
-
 export type ExtendedColumn<T> = TableColumn<T> & {
   accessorKey?: string
   meta?: {
@@ -47,4 +45,34 @@ export interface TableApi<T> {
 }
 export interface UTableInstance<T> extends ComponentPublicInstance {
   tableApi: TableApi<T> | null
+}
+
+export type FilterOperator =
+  | 'contains'
+  | 'equals'
+  | 'startsWith'
+  | 'endsWith'
+  | 'between'
+  | 'gt'
+  | 'lt'
+  | 'in'
+
+export type FilterType = 'text' | 'number' | 'date-range' | 'select' | 'boolean'
+
+export interface TableFilter {
+  id: string
+  column: string
+  operator: FilterOperator
+  value: any
+}
+
+export interface FilterOption {
+  label: string
+  value: string | number | boolean
+}
+
+export interface ColumnFilterMeta {
+  type: FilterType
+  operators?: FilterOperator[]
+  options?: FilterOption[]
 }

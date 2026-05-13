@@ -1,21 +1,65 @@
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { nanoid } from 'nanoid'
 import type { Ref } from 'vue'
 
 import type {
   TableFilter,
   FilterOperator
-} from '~/components/Tablas/tablas.types'
+} from '~/components/Tablas/types/tablas.types'
 
-export function useTableFilters(table: Ref<any>) {
+export function useTableFilters(table: Ref<any>, columns?: Ref<any[]>) {
   const filters = ref<TableFilter[]>([])
 
+  function getColumnMeta(columnId: string) {
+    return columns?.value?.find(
+      (c) => c.accessorKey === columnId || c.id === columnId
+    )?.meta?.filter
+  }
+
+  function getDefaultOperator(type?: string): FilterOperator {
+    switch (type) {
+      case 'number':
+        return 'equals'
+
+      case 'date-range':
+        return 'between'
+
+      case 'select':
+        return 'equals'
+
+      default:
+        return 'contains'
+    }
+  }
+
+  function getDefaultValue(type?: string) {
+    switch (type) {
+      case 'date-range':
+        return {
+          start: undefined,
+          end: undefined
+        }
+
+      case 'boolean':
+        return false
+
+      default:
+        return ''
+    }
+  }
+
   function addFilter() {
+    const firstColumn = columns?.value?.find((c) => c.accessorKey || c.id)
+
+    const columnId = firstColumn?.accessorKey || firstColumn?.id || ''
+
+    const meta = getColumnMeta(columnId)
+
     filters.value.push({
       id: nanoid(),
-      column: '',
-      operator: 'contains',
-      value: ''
+      column: columnId,
+      operator: getDefaultOperator(meta?.type),
+      value: getDefaultValue(meta?.type)
     })
   }
 
@@ -31,20 +75,6 @@ export function useTableFilters(table: Ref<any>) {
     if (!api) return
 
     api.resetColumnFilters()
-    api.resetGlobalFilter()
-  }
-
-  function getDefaultOperator(type?: string): FilterOperator {
-    switch (type) {
-      case 'number':
-        return 'equals'
-
-      case 'date-range':
-        return 'between'
-
-      default:
-        return 'contains'
-    }
   }
 
   watch(
@@ -65,14 +95,15 @@ export function useTableFilters(table: Ref<any>) {
         })
       })
     },
-    { deep: true }
+    {
+      deep: true
+    }
   )
 
   return {
     filters,
     addFilter,
     removeFilter,
-    clearFilters,
-    getDefaultOperator
+    clearFilters
   }
 }

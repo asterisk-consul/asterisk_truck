@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import DateRangePicker from '@/components/compras/FiltroDateCompras.vue'
 
-import type { ColumnFilterMeta } from './tablas.types'
+import type { ColumnFilterMeta } from '../types/tablas.types'
 
 const props = defineProps<{
   modelValue: any

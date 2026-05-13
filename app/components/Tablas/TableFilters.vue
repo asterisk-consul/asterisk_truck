@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="T">
-import FilterValueInput from './FilterValueInput.vue'
+import FilterValueInput from './filters/FilterValueInput.vue'
 
-import type { TableFilter, ColumnFilterMeta } from './tablas.types'
+import type { TableFilter, ColumnFilterMeta } from './types/tablas.types'
 
 const props = defineProps<{
   filters: TableFilter[]

@@ -1,25 +1,22 @@
 <script setup lang="ts" generic="T extends Record<string, any>">
-import { sub } from 'date-fns'
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
+
 import { getPaginationRowModel } from '@tanstack/vue-table'
-import type { ComponentPublicInstance } from 'vue'
+
+import type { UTableInstance, ExtendedColumn } from './types/tablas.types'
 
 import { useColumnVisibility } from '@/composables/table/useColumnVisibility'
+import { useTableFilters } from '@/components/Tablas/composable/useTableFilters'
+
 import DeleteConfirmModal from './DeleteConfirmModal.vue'
 import TableSelectionBar from './TableSelectionBar.vue'
-import DateRangePicker, {
-  type DateRange
-} from '@/components/compras/FiltroDateCompras.vue'
 
-/* ========================
-   Tipos
-======================== */
-
-import type { UTableInstance, ExtendedColumn } from './tablas.types'
+import TableFiltersPopover from '@/components/Tablas/filters/TableFiltersPopover.vue'
 
 /* ========================
    Props / Emits
 ======================== */
+
 const props = defineProps<{
   data: T[]
   columns: ExtendedColumn<T>[]
@@ -33,156 +30,110 @@ const emit = defineEmits<{
 /* ========================
    Tabla
 ======================== */
+
 const table = useTemplateRef<UTableInstance<T>>('table')
-const rowSelection = ref<Record<string, boolean>>({})
-const showDeleteModal = ref(false)
-const { columnVisibility, columnVisibilityItems } = useColumnVisibility(table)
-/* ========================
-   Filtros dinámicos
-======================== */
 
 defineExpose({
   table
 })
-const selectedColumn = ref<string>('__global__')
 
-const searchText = ref<string>('')
+const rowSelection = ref<Record<string, boolean>>({})
 
-const searchRange = shallowRef<DateRange>({
-  start: sub(new Date(), { days: 14 }),
-  end: new Date()
-})
+const showDeleteModal = ref(false)
 
-const columnFilters = ref<any[]>([])
-const globalFilter = ref<string>('')
-const filterableColumns = computed(() =>
-  props.columns
-    .filter((c) => c.accessorKey)
-    .map((c: any) => ({
-      label:
-        c.meta?.label ??
-        (typeof c.header === 'string' ? c.header : c.accessorKey),
-      value: String(c.accessorKey)
-    }))
-)
+const { columnVisibility, columnVisibilityItems } = useColumnVisibility(table)
 
-const columnOptions = computed(() => [
-  { label: 'Todas', value: '__global__' },
-  ...filterableColumns.value
-])
+/* ========================
+   Filters
+======================== */
 
-const selectedColumnDef = computed(() =>
-  props.columns.find((c) => c.accessorKey === selectedColumn.value)
-)
-
-const isDateRangeFilter = computed(
-  () => selectedColumnDef.value?.meta?.filterType === 'date-range'
+const { filters, addFilter, removeFilter, clearFilters } = useTableFilters(
+  table,
+  computed(() => props.columns)
 )
 
 /* ========================
-   Aplicar filtros texto
+   FilterFns
 ======================== */
-function applyTextFilter(value: string, column: string) {
-  const api = table.value?.tableApi
-  if (!api) return
-  // console.log('SET FILTER', {
-  //   column,
-  //   value
-  // })
-  if (column === '__global__') {
-    filterableColumns.value.forEach((c) => {
-      api.getColumn(c.value)?.setFilterValue(undefined)
-    })
-    globalFilter.value = value
-    return
+
+const filterFns = {
+  advancedFilter: (row: any, columnId: string, filter: any) => {
+    const value = row.getValue(columnId)
+
+    if (!filter) {
+      return true
+    }
+
+    switch (filter.operator) {
+      case 'contains':
+        return String(value || '')
+          .toLowerCase()
+          .includes(String(filter.value || '').toLowerCase())
+
+      case 'equals':
+        return String(value) === String(filter.value)
+
+      case 'startsWith':
+        return String(value || '')
+          .toLowerCase()
+          .startsWith(String(filter.value || '').toLowerCase())
+
+      case 'gt':
+        return Number(value) > Number(filter.value)
+
+      case 'lt':
+        return Number(value) < Number(filter.value)
+
+      case 'between':
+        if (!filter.value?.start || !filter.value?.end) {
+          return true
+        }
+
+        const rowDate = new Date(value)
+
+        const start = new Date(filter.value.start)
+
+        const end = new Date(filter.value.end)
+
+        return rowDate >= start && rowDate <= end
+
+      default:
+        return true
+    }
   }
-
-  globalFilter.value = ''
-
-  filterableColumns.value.forEach((c) => {
-    if (c.value !== column) {
-      api.getColumn(c.value)?.setFilterValue(undefined)
-    }
-  })
-
-  api.getColumn(column)?.setFilterValue(value || undefined)
 }
 
-/* ========================
-   Aplicar filtros fecha rango
-======================== */
-function applyDateRangeFilter(column: string, range: DateRange) {
-  const api = table.value?.tableApi
-  if (!api) return
+// /* ========================
+//    Sync Filters
+// ======================== */
 
-  globalFilter.value = ''
+// watch(
+//   filters,
+//   () => {
+//     console.log('FILTERS =>', filters.value)
 
-  filterableColumns.value.forEach((c) => {
-    if (c.value !== column) {
-      api.getColumn(c.value)?.setFilterValue(undefined)
-    }
-  })
+//     const api = table.value?.tableApi
 
-  api.getColumn(column)?.setFilterValue({
-    start: range.start,
-    end: range.end
-  })
-}
+//     if (!api) return
 
-/* ========================
-   Debounce texto
-======================== */
-const DEBOUNCE_MS = 300
+//     filters.value.forEach((filter) => {
+//       console.log('APPLY FILTER =>', filter)
 
-const applyTextFilterDebounced = useDebounceFn(
-  (v: string, c: string) => applyTextFilter(v, c),
-  DEBOUNCE_MS
-)
-
-/* ========================
-   Watchers
-======================== */
-watch([searchText, selectedColumn], ([v, c]) => {
-  if (isDateRangeFilter.value) return
-  applyTextFilterDebounced(v, c)
-})
-
-watch(
-  [searchRange, selectedColumn],
-  ([range, col]) => {
-    if (!isDateRangeFilter.value) return
-    applyDateRangeFilter(col, range)
-  },
-  { deep: true }
-)
-
-watch(selectedColumn, () => {
-  searchText.value = ''
-  searchRange.value = { start: new Date(), end: new Date() }
-})
-
-onMounted(() => {
-  applyTextFilter('', selectedColumn.value)
-})
-
-watch(
-  () => table.value?.tableApi,
-  (api) => {
-    if (!api) return
-    applyTextFilter('', selectedColumn.value)
-  },
-  { immediate: true }
-)
-
-// ✅ Solo reacciona si cambia la referencia del array, no el contenido
-watch(
-  () => props.data,
-  () => applyTextFilter('', selectedColumn.value)
-)
+//       api.getColumn(filter.column)?.setFilterValue({
+//         operator: filter.operator,
+//         value: filter.value
+//       })
+//     })
+//   },
+//   {
+//     deep: true
+//   }
+// )
 
 /* ========================
    Selección
 ======================== */
+
 const selectedRows = computed<T[]>(
   () =>
     table.value?.tableApi
@@ -196,6 +147,10 @@ const totalCount = computed<number>(
   () => table.value?.tableApi?.getFilteredRowModel().rows.length ?? 0
 )
 
+/* ========================
+   Pagination
+======================== */
+
 const pagination = ref({
   pageIndex: 0,
   pageSize: 15
@@ -204,51 +159,72 @@ const pagination = ref({
 /* ========================
    Acciones
 ======================== */
+
 function confirmDelete(): void {
   emit('delete:rows', selectedRows.value)
+
   rowSelection.value = {}
+
   showDeleteModal.value = false
 }
 </script>
 
 <template>
   <div class="flex-1 w-full pb-20">
-    <!-- Buscador dinámico -->
-    <div class="flex items-center justify-between gap-2 py-3.5">
+    <!-- ========================
+         Topbar
+    ========================= -->
+
+    <div class="flex items-center justify-between gap-4 py-3.5">
+      <!-- Filters -->
+
+      <TableFiltersPopover
+        :filters="filters"
+        :columns="props.columns"
+        @add="addFilter"
+        @remove="removeFilter"
+      />
+
+      <!-- Right Actions -->
+
       <div class="flex items-center gap-2">
-        <USelect v-model="selectedColumn" :items="columnOptions" class="w-44" />
-
-        <!-- Texto -->
-        <UInput
-          v-if="!isDateRangeFilter"
-          v-model="searchText"
-          placeholder="Buscar..."
-          class="max-w-sm"
-          icon="i-lucide-search"
-        />
-
-        <!-- Rango fechas -->
-        <DateRangePicker v-else v-model="searchRange" />
-      </div>
-      <UDropdownMenu :items="columnVisibilityItems" :content="{ align: 'end' }">
         <UButton
-          label="Display"
           color="neutral"
           variant="outline"
-          trailing-icon="i-lucide-settings-2"
-        />
-      </UDropdownMenu>
+          icon="i-lucide-x"
+          @click="clearFilters"
+        >
+          Limpiar
+        </UButton>
+
+        <UDropdownMenu
+          :items="columnVisibilityItems"
+          :content="{
+            align: 'end'
+          }"
+        >
+          <UButton
+            label="Display"
+            color="neutral"
+            variant="outline"
+            trailing-icon="i-lucide-settings-2"
+          />
+        </UDropdownMenu>
+      </div>
     </div>
 
-    <!-- Tabla -->
+    <!-- ========================
+         Tabla
+    ========================= -->
 
     <UTable
       ref="table"
       v-model:pagination="pagination"
       v-model:row-selection="rowSelection"
       v-model:column-visibility="columnVisibility"
-      v-model:column-filters="columnFilters"
-      v-model:global-filter="globalFilter"
+      :table-options="{
+        filterFns
+      }"
       sticky
       :get-row-id="(row: T) => (row as any).id"
       :data="props.data"
@@ -260,25 +236,36 @@ function confirmDelete(): void {
       }"
       :ui="{
         base: 'table-fixed border-separate border-spacing-0',
+
         thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
+
         tbody: '[&>tr]:last:[&>td]:border-b-0',
+
         th: 'first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
+
         td: 'border-b border-default'
       }"
       :class="[
         'max-h-[75vh] overflow-y-auto',
+
         selectedCount > 0 ? 'rounded-b-lg rounded-t-none' : 'rounded-lg'
       ]"
     />
 
-    <!-- Footer -->
+    <!-- ========================
+         Footer
+    ========================= -->
 
     <div
       class="flex items-center justify-between border-t border-default bg-muted/30 px-4 py-2"
     >
       <div class="text-xs text-muted">
-        {{ selectedCount }} seleccionadas • {{ totalCount }} totales
+        {{ selectedCount }}
+        seleccionadas •
+        {{ totalCount }}
+        totales
       </div>
+
       <UPagination
         size="sm"
         :page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
@@ -287,13 +274,20 @@ function confirmDelete(): void {
         @update:page="(p) => table?.tableApi?.setPageIndex(p - 1)"
       />
     </div>
-    <!-- Barra selección -->
+
+    <!-- ========================
+         Selection Bar
+    ========================= -->
+
     <TableSelectionBar
       :count="selectedCount"
       @open-delete="showDeleteModal = true"
     />
 
-    <!-- Modal eliminar -->
+    <!-- ========================
+         Delete Modal
+    ========================= -->
+
     <DeleteConfirmModal
       :open="showDeleteModal"
       :count="selectedCount"
