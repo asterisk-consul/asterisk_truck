@@ -77,7 +77,8 @@ export const navigationLinks = [
         { label: 'Miembros', to: '/settings/members' },
         { label: 'Notificaciones', to: '/settings/notifications' },
         { label: 'Seguridad', to: '/settings/security' },
-        { label: 'Impuestos', to: '/settings/taxes' }
+        { label: 'Impuestos', to: '/settings/taxes' },
+        { label: 'Monedas', to: '/settings/monedas' }
       ]
     }
   ],

@@ -27,8 +27,19 @@ const links = [
       label: 'Security',
       icon: 'i-lucide-shield',
       to: '/settings/security'
+    },
+    {
+      label: 'Impuestos',
+      icon: 'i-lucide-percent',
+      to: '/settings/taxes'
+    },
+    {
+      label: 'Monedas',
+      icon: 'i-lucide-currency-dollar',
+      to: '/settings/monedas'
     }
   ],
+
   [
     {
       label: 'Documentation',
