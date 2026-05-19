@@ -63,6 +63,7 @@ async function fetchData() {
   error.value = null
   try {
     data.value = await SalesService.getSummary(filters.value)
+    console.log(data.value)
   } catch (e: any) {
     error.value = e?.message ?? 'Error al cargar datos'
   } finally {

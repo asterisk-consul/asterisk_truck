@@ -5,5 +5,5 @@ export default defineEventHandler(async (event) => {
 
   const documentTypeId = query.document_type_id
 
-  return apiProxy(event, `/documents?document_type_id=${documentTypeId}`)
+  return apiProxy(event, `/documents/sales?document_type_id=${documentTypeId}`)
 })
