@@ -35,7 +35,7 @@ const links = [
     },
     {
       label: 'Monedas',
-      icon: 'i-lucide-currency-dollar',
+      icon: 'i-lucide-banknote',
       to: '/settings/monedas'
     }
   ],

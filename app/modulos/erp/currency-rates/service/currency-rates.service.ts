@@ -4,7 +4,7 @@ import type {
   UpdateCurrencyRateInput
 } from '~/modulos/erp/currency-rates/types/currency-rates.types'
 
-const urlBase = '/api/logistica/master-data/currency-rates'
+const urlBase = '/api/erp/currencies-rate'
 
 export const useCurrencyRatesService = () => {
   const findAll = () => {

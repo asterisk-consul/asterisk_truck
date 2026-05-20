@@ -20,6 +20,7 @@ const getItems = (currency: Currency): DropdownMenuItem[] => [
   {
     label: currency.active ? 'Desactivar' : 'Activar',
     icon: currency.active ? 'i-lucide-circle-off' : 'i-lucide-circle-check',
+    color: currency.active ? ('error' as const) : ('success' as const),
     onSelect: () => emit('toggle', currency)
   }
 ]

@@ -124,91 +124,79 @@ const columns = [
 </script>
 
 <template>
-  <UDashboardPanel>
-    <template #header>
-      <UDashboardNavbar title="Impuestos">
-        <template #trailing>
-          <UButton
-            label="Nuevo impuesto"
-            icon="i-lucide-plus"
-            color="primary"
-            @click="openCreate"
-          />
-        </template>
-      </UDashboardNavbar>
-    </template>
+  <UPageCard
+    title="Impuestos"
+    description="Configuración de impuestos"
+    variant="naked"
+    orientation="horizontal"
+    class="mb-4"
+  >
+    <UButton
+      label="Nuevo impuesto"
+      icon="i-lucide-plus"
+      color="neutral"
+      class="w-fit lg:ms-auto"
+      @click="openCreate"
+    />
+  </UPageCard>
 
-    <template #body>
-      <div class="p-4 space-y-4">
-        <UAlert
-          v-if="error"
-          color="error"
+  <UPageCard variant="subtle">
+    <UTable :data="taxes ?? []" :columns="columns" :loading="pending">
+      <template #code-cell="{ row }">
+        {{ row.original.code }}
+      </template>
+
+      <template #name-cell="{ row }">
+        {{ row.original.name }}
+      </template>
+
+      <template #rate-cell="{ row }">
+        {{ row.original.rate }}{{ row.original.is_percentage ? '%' : ' $' }}
+      </template>
+
+      <template #tax_type-cell="{ row }">
+        <UBadge
+          :label="row.original.tax_type"
           variant="subtle"
-          icon="i-lucide-circle-alert"
-          title="Error al cargar impuestos"
+          color="primary"
         />
+      </template>
 
-        <UPageCard variant="subtle">
-          <UTable :data="taxes ?? []" :columns="columns" :loading="pending">
-            <template #code-cell="{ row }">
-              {{ row.original.code }}
-            </template>
+      <template #calculation_level-cell="{ row }">
+        <UBadge
+          :label="row.original.calculation_level"
+          variant="outline"
+          color="neutral"
+        />
+      </template>
 
-            <template #name-cell="{ row }">
-              {{ row.original.name }}
-            </template>
+      <template #active-cell="{ row }">
+        <USwitch
+          :model-value="row.original.active"
+          @update:model-value="toggleActive(row.original)"
+        />
+      </template>
 
-            <template #rate-cell="{ row }">
-              {{ row.original.rate
-              }}{{ row.original.is_percentage ? '%' : ' $' }}
-            </template>
-
-            <template #tax_type-cell="{ row }">
-              <UBadge
-                :label="row.original.tax_type"
-                variant="subtle"
-                color="primary"
-              />
-            </template>
-
-            <template #calculation_level-cell="{ row }">
-              <UBadge
-                :label="row.original.calculation_level"
-                variant="outline"
-                color="neutral"
-              />
-            </template>
-
-            <template #active-cell="{ row }">
-              <USwitch
-                :model-value="row.original.active"
-                @update:model-value="toggleActive(row.original)"
-              />
-            </template>
-
-            <template #actions-cell="{ row }">
-              <div class="flex gap-1">
-                <UButton
-                  icon="i-lucide-pencil"
-                  variant="ghost"
-                  color="neutral"
-                  size="sm"
-                  @click="openEdit(row.original)"
-                />
-                <UButton
-                  icon="i-lucide-trash-2"
-                  variant="ghost"
-                  color="error"
-                  size="sm"
-                  @click="deleteTax(row.original)"
-                />
-              </div>
-            </template>
-          </UTable>
-        </UPageCard>
-      </div>
-    </template>
-  </UDashboardPanel>
+      <template #actions-cell="{ row }">
+        <div class="flex gap-1">
+          <UButton
+            icon="i-lucide-pencil"
+            variant="ghost"
+            color="neutral"
+            size="sm"
+            @click="openEdit(row.original)"
+          />
+          <UButton
+            icon="i-lucide-trash-2"
+            variant="ghost"
+            color="error"
+            size="sm"
+            @click="deleteTax(row.original)"
+          />
+        </div>
+      </template>
+    </UTable>
+  </UPageCard>
 
   <!-- Modal -->
   <UModal
