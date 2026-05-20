@@ -43,7 +43,7 @@ onMounted(() => {
         description="Listado de Monedas."
         orientation="horizontal"
         variant="naked"
-        class="mb-2 mt-4"
+        class="mb-2 mt-4 w-full lg:max-w-2xl mx-auto"
       >
         <UButton
           icon="i-heroicons-plus"
@@ -52,13 +52,14 @@ onMounted(() => {
           class="w-fit lg:ms-auto"
         />
       </UPageCard>
-      <div class="grid gap-2" v-if="!loading">
+      <div class="grid gap-2 w-full lg:max-w-2xl mx-auto" v-if="!loading">
         <USkeleton class="h-4 w-55" />
         <USkeleton class="h-4 w-50" />
       </div>
       <UPageCard
         v-else
         variant="subtle"
+        class="w-full lg:max-w-2xl mx-auto"
         :ui="{
           container: 'p-0 sm:p-0 gap-y-0',
           wrapper: 'items-stretch',

@@ -129,7 +129,7 @@ const columns = [
     description="Configuración de impuestos"
     variant="naked"
     orientation="horizontal"
-    class="mb-4"
+    class="mb-4 lg:max-w-2xl mx-auto"
   >
     <UButton
       label="Nuevo impuesto"
@@ -140,7 +140,7 @@ const columns = [
     />
   </UPageCard>
 
-  <UPageCard variant="subtle">
+  <UPageCard variant="subtle" class="w-full lg:max-w-2xl mx-auto">
     <UTable :data="taxes ?? []" :columns="columns" :loading="pending">
       <template #code-cell="{ row }">
         {{ row.original.code }}

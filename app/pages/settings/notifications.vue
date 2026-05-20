@@ -60,7 +60,11 @@ async function onChange() {
 </script>
 
 <template>
-  <div v-for="(section, index) in sections" :key="index">
+  <div
+    v-for="(section, index) in sections"
+    :key="index"
+    class="w-full lg:max-w-2xl mx-auto"
+  >
     <UPageCard
       :title="section.title"
       :description="section.description"

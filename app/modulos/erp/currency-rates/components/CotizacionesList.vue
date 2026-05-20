@@ -3,12 +3,13 @@ import type { TableColumn } from '@nuxt/ui'
 import { UBadge } from '#components'
 import { h } from 'vue'
 
+import CurrencyRateStats from '~/modulos/erp/currency-rates/components/CurrencyRateStats.vue'
+
 import { useCurrencyRatesStore } from '~/modulos/erp/currency-rates/store/currency-rates.store'
 import type { CurrencyRate } from '~/modulos/erp/currency-rates/types/currency-rates.types'
 
 const store = useCurrencyRatesStore()
 const { items } = storeToRefs(store)
-console.log(items)
 onMounted(() => {
   store.fetchAll()
 })
@@ -130,10 +131,33 @@ const columns: TableColumn<CurrencyRate>[] = [
     }
   }
 ]
-console.log('CotizacionesList mounted')
 </script>
 <template>
-  <UPageCard title="Cotizaciones" description="Listado de Cotizaciones.">
-    <UTable :data="items" :columns="columns" />
+  <UPageCard
+    title="Cotizaciones"
+    description="Listado de Cotizaciones."
+    orientation="horizontal"
+    variant="naked"
+    class="mb-2 mt-4"
+  />
+
+  <CurrencyRateStats :rates="items" />
+
+  <UPageCard
+    title="Historial de Cotizaciones"
+    description="Listado"
+    orientation="horizontal"
+    variant="naked"
+    class="mb-2 mt-4"
+  />
+  <UPageCard
+    variant="subtle"
+    :ui="{
+      container: 'p-0 sm:p-0 gap-y-0 w-full',
+      wrapper: 'items-stretch',
+      header: 'p-4 mb-0 border-b border-default'
+    }"
+  >
+    <UTable :columns="columns" :data="items" />
   </UPageCard>
 </template>

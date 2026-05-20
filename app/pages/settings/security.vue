@@ -76,6 +76,7 @@ async function onSubmit(event: FormSubmitEvent<PasswordSchema>) {
     title="Password"
     description="Confirmá tu contraseña actual antes de cambiarla."
     variant="subtle"
+    class="w-full lg:max-w-2xl mx-auto"
   >
     <UForm
       :schema="passwordSchema"
@@ -118,7 +119,7 @@ async function onSubmit(event: FormSubmitEvent<PasswordSchema>) {
   <UPageCard
     title="Account"
     description="Si ya no querés usar el servicio, podés eliminar tu cuenta. Esta acción es irreversible."
-    class="bg-linear-to-tl from-error/10 from-5% to-default"
+    class="bg-linear-to-tl from-error/10 from-5% to-default w-full lg:max-w-2xl mx-auto"
   >
     <template #footer>
       <UButton label="Eliminar cuenta" color="error" />
